@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>绳网</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="popup-container hide" id="popup-container">
+        <div class="post-details-container">
+            <header>
+                <div class="author-info">
+                    <img class="avatar" src="/static/image/default-avatar.svg">
+                    <div class="right">
+                        <div class="author-name">绳网用户114514</div>
+                        <div>111</div>
+                    </div>
+                </div>
+                <img class="close-btn" src="/static/image/close-btn-right.svg">
+            </header>
+            <main>
+                <div class="media-container">
+                    <img id="post-cover" class="cover" src="/static/image/default-cover.png">
+                </div>
+                <div class="content">
+                    <div class="post-title" id="post-title"></div>
+                    <div class="post-body" id="post-body"></div>
+                    <div class="comments">
+                        <div class="comment-item">
+                            <img class="avatar" src="/static/image/default-avatar.svg">
+                            <div class="right">
+                                <div class="name">绳网用户114514</div>
+                                <div class="comment-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <div class="wrapper">
+        <header>
+            <div class="user-info-card">
+            <img class="avatar" src="/static/image/default-avatar.svg"></img>
+            <div class="text">
+                <div class="name">绳网用户114514</div>
+                <div class="experience">
+                    <div class="bar">
+                        <span class="cur-exp">7890</span>&nbsp;/&nbsp;
+                        <span class="total-exp">10000</span>
+                    </div>
+                </div>
+            </div>
+            <div class="level">50</div>
+        </div>
+            <script>
+                try{
+                  const percentage = (parseFloat(document.querySelector('.cur-exp').textContent) / parseFloat(document.querySelector('.total-exp').textContent)) * 100;
+                    document.querySelector('.experience .bar').style.width = `${percentage}%`;
+                }catch{};
+            </script>
+            <ul class="nav">
+            <li class="nav-item active">推送</li>
+            <li class="nav-item">日程</li>
+            <li class="nav-item">绳网等级</li>
+        </ul>
+        <script>
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function() {
+        document.querySelectorAll('.nav-item.active').forEach(activeItem => {
+            activeItem.classList.remove('active');
+        });
+        this.classList.add('active');
+    });
+});
+
+</script>
+        </header>
+        <main>
+            <div class="waterfall">
+                {% for i in range(50) %}
+                <div class="waterfall-item">
+                    <img class="cover" src="./static/image/01.png" alt="">
+                    <div class="footer">
+                        <div class="author-info">
+                            <img class="avatar" src="/static/image/default-avatar.svg">
+                            <span class="author-name">绳网用户114514</span>
+                        </div>
+                        <div class="title">绳网绳网绳网绳绳网绳绳网绳绳绳网网</div>
+                        <div class="summary">绳网绳网绳网绳网绳网绳绳网绳绳网绳网绳绳网绳网绳网绳网绳绳网绳绳网绳网绳绳网绳网绳网绳网绳网</div>
+                    </div>
+                </div>
+                <div class="waterfall-item">
+                    <img class="cover" src="./static/image/default-cover.png" alt="">
+                    <div class="footer">
+                        <div class="author-info">
+                            <img class="avatar" src="/static/image/default-avatar.svg">
+                            <span class="author-name">绳网用户114514</span>
+                        </div>
+                        <div class="title">绳网绳网绳绳网网</div>
+                        <div class="summary">绳网绳网绳网绳网绳网绳绳网绳绳网绳网绳绳网绳网绳网绳网绳绳网绳绳网绳网绳绳网绳网绳网绳网绳网</div>
+                    </div>
+                </div>
+
+                {% endfor %}
+
+            </div>
+    </main>
+    </div>
+</body>
+<script src="{{ url_for('static', filename='js/waterfall.js') }}"></script>
+<script>
+    const popupContainer = document.getElementById("popup-container");
+    const postTitle = document.getElementById('post-title');
+    const postContent = document.getElementById('post-body');
+    const postCover = document.getElementById('post-cover');
+
+    document.querySelectorAll('.waterfall-item').forEach(item => {
+        item.addEventListener('click', () => {
+            postTitle.textContent = item.querySelector('.footer .title').textContent;
+            postContent.textContent = item.querySelector('.footer .summary').textContent;
+            postCover.src = item.querySelector('.cover').src;;
+
+            popupContainer.classList.remove('hide');
+        });
+    });
+
+    document.querySelector('.post-details-container header .close-btn').addEventListener('click', () => {
+        popupContainer.classList.add('hide');
+    });
+</script>
+
+</html>
