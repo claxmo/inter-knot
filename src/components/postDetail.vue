@@ -443,10 +443,8 @@ const nextImage = () => {
             height: 100%;
             .author-name{
                 color: #5e5e5e;
-                font-size: 1.25em;
             }
             .comment-body {
-                font-size: 1.25em;
                 color: #9e9e9e;
                 word-wrap: break-word;
                 word-break: break-word;
