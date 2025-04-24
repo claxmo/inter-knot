@@ -18,9 +18,10 @@
                 <div class="media-container">
                     <span class="prev-btn" @click="prevImage" title="上一张" v-if="imgUrls.length > 1"></span>
                     <img 
-                    :src="imgUrls[currentIndex]" 
-                    :key="currentIndex"
-                    loading="lazy" />
+                    v-for="(url, index) in imgUrls"
+                    v-show="index === currentIndex"
+                    :src="url" 
+                    :key="index" />
                     <span class="next-btn" @click="nextImage" title="下一张" v-if="imgUrls.length > 1"></span>
                     <span class="cur-page" v-if="imgUrls.length > 1">{{ currentIndex + 1 }}&nbsp;-&nbsp;{{ imgUrls.length }}</span>
                 </div>
