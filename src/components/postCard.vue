@@ -55,11 +55,23 @@ const onLoad = () => {
     isLoading.value = false;
 };
 
+const retryCount = ref(0);
+const maxRetries = 3;
+
 const onError = () => {
-    isLoading.value = false;
-    isError.value = true;
-    
+    if (retryCount.value < maxRetries) {
+        retryCount.value++;
+        setTimeout(() => {
+            coverUrl.value += (coverUrl.value.includes('?') ? '&' : '?') + `retry=${retryCount.value}`;
+            isLoading.value = true;
+            isError.value = false;
+        }, 1000);
+    } else {
+        isError.value = true;
+        isLoading.value = false;
+    }
 };
+
 
 </script>
 
