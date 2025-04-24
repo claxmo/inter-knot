@@ -174,7 +174,8 @@ const onError = () => {
         overflow: hidden;
         overflow-wrap: break-word;
         font-size: 1.125em;
-        margin-bottom: 2px;
+        margin-bottom: 6px;
+        padding: 0 5px;
     }
     .post-body {
         color: #9e9e9e;
@@ -182,6 +183,7 @@ const onError = () => {
         overflow: hidden;             
         text-overflow: ellipsis;
         font-size: 1em;
+        padding: 0 5px;
     }
 }
 
