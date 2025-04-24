@@ -10,7 +10,7 @@
         />
         <div class="footer">
             <div class="author-info">
-                <img class="avatar" :src="post.author.avatarUrl" />
+                <span class="avatar"><img  :src="post.author.avatarUrl" /></span>
                 <span class="author-name">{{ post.author.login }}</span>
             </div>
             <span class="post-title" v-text="post.title"></span>
@@ -111,8 +111,6 @@ const onError = () => {
             border-radius: 50%;
             border: 5px solid #1f1f1f;
             margin-top: -32px;
-            object-fit: cover;
-            position: relative;
             z-index: 1;
             &::before {
                 position: absolute;
@@ -137,6 +135,14 @@ const onError = () => {
                 border-radius: 50%;
                 box-shadow: -15px 18px #1f1f1f;
                 z-index: 0;
+            }
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                position: relative;
+                z-index: 1;
+                border-radius: 50%;
             }
         }
         .author-name {
