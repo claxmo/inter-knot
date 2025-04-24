@@ -97,7 +97,7 @@ const onError = () => {
     display: flex;
     flex-direction: column;
     position: relative;
-    padding: 0 15px 3px;
+    padding: 0 15px 8px;
     .author-info {
         width: 100%;
         height: 30px;
@@ -174,7 +174,7 @@ const onError = () => {
         overflow: hidden;
         overflow-wrap: break-word;
         font-size: 1.125em;
-        margin-bottom: 6px;
+        margin-bottom: 2px;
         padding: 0 5px;
     }
     .post-body {
