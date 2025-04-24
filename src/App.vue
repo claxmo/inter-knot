@@ -13,8 +13,8 @@
     <navBar />
   </header>
   <main @scroll="scrollHandle">
-    <span style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;">
-      <a href="https://raw.githubusercontent.com/claxmo/inter-knot/main/绳网跨域助手-0.1.0.user.js" class="download-link" v-if="store.posts.length <= 0">点击下载绳网跨域助手</a>
+    <span style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;"  v-if="store.posts.length <= 0">
+      <a href="https://raw.githubusercontent.com/claxmo/inter-knot/main/绳网跨域助手-0.1.0.user.js" class="download-link">点击下载绳网跨域助手</a>
     </span>
     <postWaterfall v-if="store.posts.length" :items="store.posts" :itemWidth="300" :itemGap="25" />
   </main>
