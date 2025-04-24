@@ -13,7 +13,9 @@
     <navBar />
   </header>
   <main @scroll="scrollHandle">
-    <a href="https://raw.githubusercontent.com/claxmo/inter-knot/main/绳网跨域助手-0.1.0.user.js" class="download-link" v-if="store.posts.length <= 0">点击下载绳网跨域助手</a>
+    <span style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;">
+      <a href="https://raw.githubusercontent.com/claxmo/inter-knot/main/绳网跨域助手-0.1.0.user.js" class="download-link" v-if="store.posts.length <= 0">点击下载绳网跨域助手</a>
+    </span>
     <postWaterfall v-if="store.posts.length" :items="store.posts" :itemWidth="300" :itemGap="25" />
   </main>
   <p class="message" v-if="showMessage">{{ message }}</p>
@@ -175,11 +177,6 @@ main {
   font-style: italic;
   color: #00f2ff;
   text-decoration: underline;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 </style>
