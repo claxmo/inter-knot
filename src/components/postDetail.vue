@@ -3,7 +3,7 @@
         <div class="post-detail" @click.stop>
             <header>
                 <div class="author-info">
-                    <img class="avatar" :src="post.author?.avatarUrl || defaultCoverUrl" />
+                    <img class="avatar" :src="post.author?.avatarUrl || defaultAvatarUrl" />
                     <div class="text">
                         <span class="author-name">{{ post.author?.login || "匿名用户" }}</span>
                         <div class="meta">
@@ -53,6 +53,7 @@ import { marked } from 'marked';
 import { computed, ref, watch, nextTick } from 'vue';
 import { useConfigStore } from '../stores/config';
 import defaultCoverUrl from '../assets/svg/default-cover.svg';
+import defaultAvatarUrl from '../assets/svg/default-avatar.svg';
 import 'github-markdown-css/github-markdown-dark.css';
 
 
@@ -81,13 +82,7 @@ const extractImageUrls = (html) => {
 const message = ref('');
 
 const getNextComments = async () => {
-    if (comments.value.hasNextPage === false) {
-        message.value = "- 已无更多评论 -";
-        return;
-    }
-    if (isLoading.value){
-        return;
-    }
+    if (isLoading.value || comments.value.hasNextPage === false) return;
     isLoading.value = true;
     message.value = "正在努力加载中···";
     try{ 
@@ -101,6 +96,9 @@ const getNextComments = async () => {
         comments.value.nodes.push(...uniqueNewComments);
         comments.value.endCursor = commentData.pageInfo.endCursor;
         comments.value.hasNextPage = commentData.pageInfo.hasNextPage;
+        if (comments.value.hasNextPage === false) {
+            message.value = "- 已无更多评论 -";
+        }
     }catch{
         console.log("获取评论列表失败!");
     }finally{
@@ -441,6 +439,10 @@ const nextImage = () => {
         .text{
             flex: 1;
             height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
             .author-name{
                 color: #5e5e5e;
             }
