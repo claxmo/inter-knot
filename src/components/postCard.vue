@@ -19,11 +19,10 @@
     </div>
 </template>
 
-
 <script setup>
-import defaultCoverUrl from '../assets/svg/default-cover.svg'
 import { marked } from 'marked'
 import { defineProps, nextTick, ref, defineEmits } from 'vue'
+import defaultCoverUrl from '../assets/svg/default-cover.svg'
 
 const props = defineProps({
     data: {
@@ -33,8 +32,7 @@ const props = defineProps({
 });
 
 const post = ref(props.data);
-const isLoading = ref(true);
-const isError = ref(false);
+
 const postBody = ref("");
 const coverUrl = ref(null);
 
@@ -49,6 +47,8 @@ nextTick(() => {
 });
 
 const emit = defineEmits(["click","imageLoaded"]);
+const isLoading = ref(true);
+const isError = ref(false);
 
 const onLoad = () => {
     emit("imageLoaded");
@@ -77,7 +77,7 @@ const onError = () => {
 .post-card {
     background: #1f1f1f;
     border-radius: 30px 30px 0px 30px;
-    border: 5px solid #000;
+    border: 4px solid #000;
     cursor: pointer;
     transition: all 0.3s;
     overflow: hidden;
@@ -167,8 +167,8 @@ const onError = () => {
     .post-title {
         display: -webkit-box;
         -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
         text-overflow: ellipsis;
         white-space: normal;
         overflow: hidden;

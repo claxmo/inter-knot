@@ -3,12 +3,12 @@
         <div class="post-detail" @click.stop>
             <header>
                 <div class="author-info">
-                    <img class="avatar" :src="post.author?.avatarUrl || defaultAvatarUrl" />
+                    <img class="avatar" :src="post.author?.avatarUrl ?? defaultAvatarUrl" />
                     <div class="text">
-                        <span class="author-name">{{ post.author?.login || "匿名用户" }}</span>
+                        <span class="author-name">{{ post.author?.login ?? "匿名用户" }}</span>
                         <div class="meta">
-                            <span>{{ post.createdAt }}</span>
-                            <span><img src="../assets/svg/views.svg" />{{ post.comments?.totalCount || 0 }}</span>
+                            <span>{{ post?.createdAt }}</span>
+                            <span><img src="../assets/svg/views.svg" />{{ post.comments?.totalCount ?? 0 }}</span>
                         </div>
                     </div>
                 </div>
@@ -29,11 +29,11 @@
                     <span class="post-title" v-text="post.title"></span>
                     <div class="markdown-body" v-html="postBody"></div>
                     <a class="reply-btn"
-                       :href="`https://github.com/claxmo/inter-knot/discussions/${discussion.number}`" 
+                       :href="`https://github.com/claxmo/inter-knot/discussions/${post.number}`" 
                        target="_blank" 
                        title="写评论"><img src="../assets/svg/write.svg" width="20" height="20"/>&nbsp;写评论</a>   
-                    <ul class="comment-list" v-if="comments.nodes" @scroll="scrollHandle">
-                        <li class="comment-item" v-for="(comment, index) in comments.nodes" :key="index">
+                    <ul class="comment-list" @scroll="scrollHandle">
+                        <li class="comment-item" v-for="(comment, index) in comments" :key="index">
                             <img class="avatar" :src="comment.author.avatarUrl" />
                             <div class="text">
                                 <span class="author-name">{{ comment.author.login }}</span>
@@ -42,7 +42,11 @@
                             <span class="level">{{ index + 1 }}F</span>
                         </li>
                     </ul>      
-                    <p class="message">{{ message }}</p>            
+                    <span class="message">
+                        <p v-if="isLoading">正在努力加载中···</p>
+                        <p v-else-if="hasNextPage === false">- 已无更多评论 -</p>
+                        <p v-else @click="getNextComments" class="click">- 点击加载更多 -</p>            
+                    </span>
                 </div>
             </main>
         </div>
@@ -53,55 +57,36 @@
 import { marked } from 'marked';
 import { computed, ref, watch, nextTick } from 'vue';
 import { useConfigStore } from '../stores/config';
+import { useToast } from 'vue-toastification';
 import defaultCoverUrl from '../assets/svg/default-cover.svg';
 import defaultAvatarUrl from '../assets/svg/default-avatar.svg';
 import 'github-markdown-css/github-markdown-dark.css';
 
-
 const store = useConfigStore();
 const post = computed(() => store.posts[store.curPostIndex] ?? {});
-const imgUrls = ref([defaultCoverUrl]);
+const comments = ref([]);
+const endCursor = ref(null);
+const hasNextPage = ref(null);
+const isLoading = ref(false);
+
+const imgUrls = ref([]);
 const postBody = ref("");
 const currentIndex = ref(0);
-const discussion = ref({});
-
-const isLoading = ref(false);
-const comments = ref({
-    nodes:[],
-    endCursor: null,
-    hasNextPage: null,
-});
-
-const imgRegx = /<img[^>]*src="([^"]*)"[^>]*>/g;
-
-const cleanMarkdownImages = (html) => html.replace(imgRegx, '');
-
-const extractImageUrls = (html) => {
-  return [...html.matchAll(imgRegx)].map(match => match[1]);
-};
-
-const message = ref('');
 
 const getNextComments = async () => {
-    if (isLoading.value || comments.value.hasNextPage === false) return;
+    if (isLoading.value || hasNextPage.value === false) return;
     isLoading.value = true;
-    message.value = "正在努力加载中···";
     try{ 
-        const response = await window.getComments(post.value.id, comments.value.endCursor);
-        const commentData = response.data.node.comments;
-
-        const uniqueNewComments = commentData.nodes.filter(
-            comment => !comments.value.nodes.some(c => c.id === comment.id)
+        const response = await window.getComments(post.value.id, endCursor.value);
+        const commentNode = response.data.node;
+        const newComments = commentNode.comments.nodes.filter(
+            comment => !comments.value.some(c => c.id === comment.id)
         );
-
-        comments.value.nodes.push(...uniqueNewComments);
-        comments.value.endCursor = commentData.pageInfo.endCursor;
-        comments.value.hasNextPage = commentData.pageInfo.hasNextPage;
-        if (comments.value.hasNextPage === false) {
-            message.value = "- 已无更多评论 -";
-        }
+        comments.value = [...comments.value, ...newComments]
+        endCursor.value = commentNode.comments.pageInfo.endCursor;
+        hasNextPage.value = commentNode.comments.pageInfo.hasNextPage;
     }catch{
-        console.log("获取评论列表失败!");
+        useToast().warning("获取评论列表失败!");
     }finally{
         nextTick(() => {
             isLoading.value = false;
@@ -109,39 +94,21 @@ const getNextComments = async () => {
     }
 };
 
-let intervalId = null;
-
 watch(post, async () => {
-    if (!post.value) return;
-    message.value = "";
-    clearInterval(intervalId);
-    comments.value = {
-        nodes:[],
-        endCursor: null,
-        hasNextPage: null,
-    };
-    imgUrls.value = [defaultCoverUrl];
-    currentIndex.value = 0;
+    if(!post.value || !post.value.id) return;
+    comments.value = [];
+    endCursor.value = null;
+    hasNextPage.value = null;
+    isLoading.value = false;
 
-    postBody.value = marked(post.value.body)
-    imgUrls.value = extractImageUrls(postBody.value);
-    if (imgUrls.value.length === 0) {
-        imgUrls.value = [defaultCoverUrl];
-    }
-    postBody.value = cleanMarkdownImages(postBody.value);
+    currentIndex.value = 0;
+    postBody.value = marked(post.value.body || "");
+    const imgRegx = /<img[^>]*src="([^"]*)"[^>]*>/g;
+    const matches = [...postBody.value.matchAll(imgRegx)];
+    imgUrls.value = matches.length > 0 ? matches.map(match => match[1]) : [defaultCoverUrl];
+    postBody.value = postBody.value.replace(imgRegx, '');
 
     await getNextComments();
-    intervalId = setInterval(async () => { 
-        if (store.hasNextPage === false) {
-            clearInterval(intervalId);
-            return;
-        }
-        await getNextComments();
-
-    }, 3000);
-
-    discussion.value = (await window.getDiscussion(post.value.id)).data.node;
-
 });
 
 const prevImage = () => {
@@ -357,48 +324,6 @@ const nextImage = () => {
     .post-title {
         font-size: 1.125em;
     }
-        // .text {
-        //     width: 100%;
-        //    overflow: hidden;
-        //    text-overflow: ellipsis;
-        //    text-align: justify;
-        //    display: -webkit-box;
-        //    -webkit-line-clamp: 5;
-        //    line-clamp: 5;
-        //    -webkit-box-orient: vertical;
-        //    position: relative;
-        //    &::before {
-        //     content: "";
-        //     height: calc(100% - 1.5rem);
-        //     float: right;
-        //    }
-        //    .exp-btn {
-        //         cursor: pointer;
-        //         float: right;
-        //         clear: both;
-        //         color: #3e3e3e;
-        //         margin-left: 32px;
-        //         &::before {
-        //             content: "▼展开";
-        //         }
-        //         &:hover {
-        //             color: #9e9e9e;
-        //         }
-        //    }
-        // }
-        // .exp {
-        //     display: none;
-        // }
-        // .exp:checked+.text .exp-btn::before{
-        //     content: "▲收起";
-        // }
-        // .exp:checked+.text {
-        //     -webkit-line-clamp: 999;
-        //     line-clamp: 999;
-        //     &::after {
-        //         visibility: hidden;
-        //     }
-        // }
     .reply-btn {
         background-color: #000;
         border: 4px solid #333;
@@ -409,71 +334,76 @@ const nextImage = () => {
         min-height: 45px;
         width: 100%;
         cursor: pointer;
+        margin: 8px 0;
 
     }
-}
-
-.comment-list {
-    width: 100%;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin-bottom: 12px;
-    .comment-item {
-        min-height: 70px;
+    .comment-list {
         width: 100%;
-        border-bottom: 3px solid #333;
-        display: flex;
-        justify-content: space-between;
-        gap: 5px;
-        position: relative;
-        padding-bottom: 8px;
-        .avatar {
-            height: 65px;
-            aspect-ratio: 1/1;
-            border-radius: 50px;
-            object-fit: cover;
-            border: 4px solid #333;
-            font-size: 1.125em;
-        }
-        .text{
-            flex: 1;
-            height: 100%;
+        height: auto;
+        .comment-item {
+            min-height: 66px;
+            width: 100%;
+            border-bottom: 2px solid #333;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-
-            .author-name{
-                color: #5e5e5e;
+            padding: 4px 0;
+            position: relative;
+            .avatar {
+                height: 56px;
+                aspect-ratio: 1/1;
+                border-radius: 50px;
+                object-fit: cover;
+                border: 4px solid #333;
             }
-            .comment-body {
-                color: #9e9e9e;
-                word-wrap: break-word;
-                word-break: break-word;
-                white-space: normal;
+            .text{
+                margin-left: 5px;
+                flex: 1;
+                min-height: 100%;
+                display: flex;
+                justify-content: center;
+                gap: 2px;
+                flex-direction: column;
+                .author-name{
+                    color: #5e5e5e;
+                }
+                .comment-body {
+                    color: #9e9e9e;
+                    word-wrap: break-word;
+                    word-break: break-word;
+                    white-space: normal;
+                }
+            }
+            .level {
+                font-size: 0.75em;
+                background-color: rgba(255,255,255,0.3);
+                padding: 0 12px;
+                border-radius: 25px;
+                border-top-left-radius: 0;
+                position: absolute;
+                top: 8px;
+                right: 0;
+                color: #000;
+
             }
         }
-        .level {
-            font-size: 0.875em;
-            background-color: rgba(255,255,255,0.3);
-            padding: 0 12px;
-            border-radius: 25px;
-            border-top-left-radius: 0;
-            position: absolute;
-            top: 0;
-            right: 0;
-            color: #000;
-
+    }
+    .message {
+        width: 100%;
+        height: auto;
+        p {
+            text-align: center;
+            color: #5e5e5e;
+            font-size: 16px;
+        }
+        .click {
+            cursor: pointer;
+            &:hover {
+                color: #3e3e3e;
+            }
         }
     }
 }
 
-.message {
-  text-align: center;
-  color: #5e5e5e;
-  font-size: 16px;
-}
+
 
 @media (max-width: 1080px) {
 
@@ -501,5 +431,47 @@ const nextImage = () => {
     }
 }
 
-
+// .text {
+//     width: 100%;
+//    overflow: hidden;
+//    text-overflow: ellipsis;
+//    text-align: justify;
+//    display: -webkit-box;
+//    -webkit-line-clamp: 5;
+//    line-clamp: 5;
+//    -webkit-box-orient: vertical;
+//    position: relative;
+//    &::before {
+//     content: "";
+//     height: calc(100% - 1.5rem);
+//     float: right;
+//    }
+//    .exp-btn {
+//         cursor: pointer;
+//         float: right;
+//         clear: both;
+//         color: #3e3e3e;
+//         margin-left: 32px;
+//         &::before {
+//             content: "▼展开";
+//         }
+//         &:hover {
+//             color: #9e9e9e;
+//         }
+//    }
+// }
+// .exp {
+//     display: none;
+// }
+// .exp:checked+.text .exp-btn::before{
+//     content: "▲收起";
+// }
+// .exp:checked+.text {
+//     -webkit-line-clamp: 999;
+//     line-clamp: 999;
+//     &::after {
+//         visibility: hidden;
+//     }
+// }
 </style>
+

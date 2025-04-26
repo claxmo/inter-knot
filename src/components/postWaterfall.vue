@@ -8,7 +8,7 @@
 
 <script setup>
 import postCard from './postCard.vue';
-import { defineProps, ref, onMounted, onUnmounted, watch,nextTick } from 'vue';
+import { defineProps, ref, onMounted, watch,nextTick } from 'vue';
 import { useConfigStore } from '../stores/config';
 
 const store = useConfigStore();
@@ -74,10 +74,7 @@ onMounted(() => {
         if (resizeTimeout) clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => layout(), 200); // 防抖,延时200ms执行布局
     });
-});
-
-onUnmounted(() => {
-    window.removeEventListener('resize', layout);
+    layout();
 });
 
 watch(props.items,() => {

@@ -21,6 +21,7 @@
 import defaultAvatarUrl from '../assets/svg/default-avatar.svg';
 import { computed, onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useToast } from 'vue-toastification';
 import { useConfigStore } from '../stores/config';
 
 const store = useConfigStore();
@@ -45,7 +46,7 @@ onMounted(async () => {
       try{
         author.value = await window.getUserProfile();
       }catch{
-        console.log("获取用户信息失败!")
+        useToast().warning("获取用户信息失败!")
       }
     }
 });
