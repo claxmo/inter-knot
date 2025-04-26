@@ -21,6 +21,7 @@
     const USERNAME = "claxmo";
     const REPO = "inter-knot";
     let accessToken = localStorage.getItem("accessToken");
+
     const request = async (method, url, data = null) => {
         return new Promise((resolve, reject) => {
             GM_xmlhttpRequest({
@@ -80,6 +81,7 @@
                 hasNextPage
               }
               nodes {
+                number
                 id
                 title
                 body
@@ -89,42 +91,13 @@
                   avatarUrl
                 }
                 comments {
-                  totalCount
+                    totalCount
+                  }
                 }
               }
             }
           }
         }`,{cursor});
-
-    };
-
-    unsafeWindow.getDiscussion = async (discussion_id) => {
-        return await graphql(`
-          query($id: ID!) {
-              node(id: $id) {
-                  ... on Discussion {
-                      id
-                      number
-                      title
-                      body
-                      createdAt
-                      author {
-                          login
-                          avatarUrl
-                      }
-                      comments {
-                          totalCount
-                      }
-                      repository {
-                          name
-                        owner {
-                              login
-                          }
-                      }
-                  }
-              }
-         }
-      `, { id: discussion_id });
     };
 
     unsafeWindow.getComments = async (discussion_id, cursor = null) => {
@@ -132,7 +105,7 @@
           query($id: ID!, $cursor: String) {
               node(id: $id) {
                   ... on Discussion {
-                      comments(first: 10, after: $cursor) {
+                      comments(first: 20, after: $cursor) {
                           nodes {
                               id
                               body
