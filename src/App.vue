@@ -1,13 +1,14 @@
 <template>
   <postDetail />
   <header>
-    <div style="display: flex; height: 100%; gap: 12px; align-items: center;">
+    <div style="display: flex; height: 100%; gap: 8px; align-items: center;">
       <userInfo />
       <a class="btn" 
          title="写帖子" 
          href="https://github.com/claxmo/inter-knot/discussions/new/choose" 
          target="_blank"><img src="./assets/svg/write.svg">
       </a>
+      <!-- <span class="btn" title="刷新帖子" @click="refreshDiscussions"><img src="./assets/svg/refresh.svg"></span> -->
     </div>
     <navBar />
   </header>
@@ -17,10 +18,7 @@
     </span>
     <postWaterfall v-if="store.posts.length" :items="store.posts" :itemWidth="300" :itemGap="25" />
   </main>
-  <span class="message" v-if="distanceToBottom <= 1">
-    <p v-if="isLoading">正在努力加载···</p>
-    <p v-else-if="store.hasNextPage === false">已经到底了···\[ O_X ]/</p>
-  </span>
+  <span class="message" v-if="distanceToBottom <= 1">{{ message }}</span>
 </template>
 
 <script setup>
@@ -28,12 +26,22 @@ import userInfo from './components/userInfo.vue';
 import navBar from './components/navBar.vue';
 import postWaterfall from './components/postWaterfall.vue';
 import postDetail from './components/postDetail.vue';
-import { ref, onMounted,nextTick, onUnmounted } from 'vue';
+import { ref, onMounted,nextTick, onUnmounted, computed } from 'vue';
 import { useToast } from 'vue-toastification';
 import { useConfigStore } from './stores/config';
 
 const store = useConfigStore();
 const isLoading = ref(false);
+
+const message = computed(() => {
+  if (isLoading.value) {
+    return '正在努力加载···'
+  } else if (store.hasNextPage === false) {
+    return '已经到底了···\\[ O_X ]/'
+  } else {
+    return ''
+  }
+})
 
 const getNextDiscussions = async () => {
   if (isLoading.value || store.hasNextPage === false) return;
@@ -55,6 +63,38 @@ const getNextDiscussions = async () => {
     });   
   }
 };
+
+// const refreshDiscussions = async () => {
+//   if (isLoading.value) return;
+//   isLoading.value = true;
+//   let endCursor = null;
+//   let hasNextPage = true;
+//   let totalNewPosts = [];
+//   try{
+//     while (hasNextPage){
+//       const response = await window.getDiscussions(endCursor);
+//       const discussions = response.data.repository.discussions;
+//       const newPosts =  discussions.nodes.filter(post => 
+//           !store.posts.some(existingPost => existingPost.id === post.id)
+//       );
+//       totalNewPosts = [...totalNewPosts, ...newPosts];
+//       if (newPosts.length < 20 || discussions.pageInfo.hasNextPage === false){
+//         break;
+//       }else{
+//         endCursor = discussions.pageInfo.endCursor;
+//         hasNextPage = discussions.pageInfo.hasNextPage;
+//       }
+//     }
+//     store.posts = [...totalNewPosts, ...store.posts];
+//     useToast().info(`发现了 ${totalNewPosts.length} 篇新帖子`)
+//   }catch{
+//     useToast().warning("刷新讨论列表失败!");
+//   }finally{
+//     nextTick(() => {
+//       isLoading.value = false;
+//     });
+//   } 
+// };
 
 const distanceToBottom = ref(null);
 
@@ -157,10 +197,8 @@ main {
   align-items: center;
   bottom: 0;
   left: 0;
-  p{
-    color: #5e5e5e;
-    font-size: 24px;
-  }
+  color: #5e5e5e;
+  font-size: 24px;
 }
 
 .download-link {

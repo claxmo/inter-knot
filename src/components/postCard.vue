@@ -153,6 +153,9 @@ const onError = () => {
             white-space: nowrap;
             position: relative;
             margin-left: 5px;
+            padding-left: 4px;
+            overflow: hidden;             
+            text-overflow: ellipsis;
             &::before{
                 content: "";
                 position: absolute;
