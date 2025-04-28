@@ -8,7 +8,7 @@
 
 <script setup>
 import postCard from './postCard.vue';
-import { defineProps, ref, onMounted, watch,nextTick } from 'vue';
+import { defineProps, ref, onMounted, watch,nextTick , onUnmounted} from 'vue';
 import { useConfigStore } from '../stores/config';
 
 const store = useConfigStore();
@@ -57,7 +57,7 @@ const layout = () => {
             const item = waterfall.value.children[i];
             let minTop = getMinTop(nextTop);
             item.style.left = `${minTop.index * (props.itemWidth + props.itemGap)}px`;
-            item.style.top = `${minTop.min + props.itemGap / 2}px`;
+            item.style.top = `${minTop.min + props.itemGap}px`;
             item.style.width = props.itemWidth + "px"; 
             item.style.display = "block";
             nextTop[minTop.index] += item.offsetHeight + props.itemGap;
@@ -67,17 +67,22 @@ const layout = () => {
     }
 };
 
-let resizeTimeout = null;
+// let resizeTimeout = null;
 
 onMounted(() => {
-    window.addEventListener('resize', () => {
-        if (resizeTimeout) clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => layout(), 200); // 防抖,延时200ms执行布局
-    });
+    // window.addEventListener('resize', () => {
+    //     if (resizeTimeout) clearTimeout(resizeTimeout);
+    //     resizeTimeout = setTimeout(() => layout(), 200); // 防抖,延时200ms执行布局
+    // });
+    window.addEventListener('resize',layout);
     layout();
 });
 
-watch(props.items,() => {
+onUnmounted(() => {
+    window.removeEventListener('resize',layout);
+});
+
+watch(() => props.items,() => {
     nextTick(() => {
         layout();
     });    

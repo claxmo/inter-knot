@@ -62,7 +62,7 @@ onMounted(async () => {
   justify-content: space-between;
   gap: 10px;
   padding: 5px 15px 5px 5px;
-  border: 3px solid #000;
+  border: 3px solid @color-black;
   border-radius: 50px;
   background: linear-gradient(#212121, #141414);
   box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
@@ -71,7 +71,7 @@ onMounted(async () => {
   transition: all 0.3s;
   font-size: 16px;
   &:hover {
-    border-color: yellow;
+    border-color: @color-yellow;
   }
   .avatar {
     height: 100%;
@@ -97,13 +97,13 @@ onMounted(async () => {
       height: 14px;
       width: 100%;
       border-radius: 50px;
-      background: #222;
-      box-shadow: inset 0 2px 2px #131313, inset 0 -2px 2px #262626;
+      background: @color-gray-dark;
+      box-shadow: inset 0 2px 2px #131313, inset 0 -2px 2px @color-gray;
       .bar {
         height: 100%;
         max-width: 100%;
         border-radius: 50px;
-        background: linear-gradient(90deg, #4661fd, #10bff0);
+        background: linear-gradient(90deg, @color-blue, @color-blue-light);
         padding: 0 2px;
         display: flex;
         align-items: center;
@@ -125,7 +125,7 @@ onMounted(async () => {
     }
     .level-text {
       font-size: 0.625em;
-      color: #5e5e5e;
+      color: @font-color-secoundary;
     }
   }
 }

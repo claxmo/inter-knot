@@ -46,7 +46,7 @@
 .navbar {
   width: auto;
   height: 50px;
-  border: 4px solid #333;
+  border: 4px solid @color-gray;
   padding: 0 10px;
   border-radius: 50px;
   display: flex;
@@ -114,10 +114,10 @@
   
 @keyframes item-bg-color {
     0% {
-        background: #fbfe00;
+        background: @color-yellow;
     }
     100% {
-        background: #aefe00;
+        background: @color-green;
     }
 }
 

@@ -66,18 +66,18 @@ const onError = () => {
 <style scoped lang="less">
 @keyframes border-glow {
     0% {
-        border-color: #fbfe00;
+        border-color: @color-yellow;
     }
     100% {
         // scale: 1.05;
-        border-color:#aefe00;
+        border-color: @color-green;
     }
 }
 
 .post-card {
-    background: #1f1f1f;
+    background-color: @color-gray-dark;
+    border: 4px solid @color-black;
     border-radius: 30px 30px 0px 30px;
-    border: 4px solid #000;
     cursor: pointer;
     transition: all 0.3s;
     overflow: hidden;
@@ -109,7 +109,7 @@ const onError = () => {
             width: 65px;
             height: 65px;
             border-radius: 50%;
-            border: 5px solid #1f1f1f;
+            border: 4px solid @color-gray-dark;
             margin-top: -32px;
             z-index: 1;
             &::before {
@@ -121,7 +121,7 @@ const onError = () => {
                 height: 30px;
                 background: transparent;
                 border-radius: 50%;
-                box-shadow: 15px 18px #1f1f1f;
+                box-shadow: 15px 18px @color-gray-dark;
                 z-index: 0;
             }
             &::after {
@@ -133,7 +133,7 @@ const onError = () => {
                 height: 30px;
                 background: transparent;
                 border-radius: 50%;
-                box-shadow: -15px 18px #1f1f1f;
+                box-shadow: -15px 18px @color-gray-dark;
                 z-index: 0;
             }
             img {
@@ -148,7 +148,7 @@ const onError = () => {
         .author-name {
             font-size: 1.125em;
             flex: 1;
-            color: #5e5e5e;
+            color: @font-color-secoundary;
             text-overflow: ellipsis;
             white-space: nowrap;
             position: relative;
@@ -161,7 +161,7 @@ const onError = () => {
                 position: absolute;
                 height: 3px;
                 width: 100%;
-                background-color: #343434;
+                background-color: @color-gray;
                 bottom: 0px;
                 left: 0px;
             }
@@ -181,7 +181,7 @@ const onError = () => {
         padding: 0 5px;
     }
     .post-body {
-        color: #9e9e9e;
+        color: @font-color-muted;
         white-space: nowrap;          
         overflow: hidden;             
         text-overflow: ellipsis;

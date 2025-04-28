@@ -16,7 +16,7 @@
     <span style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;"  v-if="store.posts.length <= 0">
       <a href="https://raw.githubusercontent.com/claxmo/inter-knot/main/绳网跨域助手-0.1.0.user.js" class="download-link">点击下载绳网跨域助手</a>
     </span>
-    <postWaterfall v-if="store.posts.length" :items="store.posts" :itemWidth="300" :itemGap="25" />
+    <postWaterfall v-if="store.posts.length" :items="store.posts" :itemWidth="300" :itemGap="25" :refreshFlag="store.refreshPostFlag" />
   </main>
   <span class="message" v-if="distanceToBottom <= 1">{{ message }}</span>
 </template>
@@ -52,7 +52,7 @@ const getNextDiscussions = async () => {
     const newPosts =  discussions.nodes.filter(post => 
         !store.posts.some(existingPost => existingPost.id === post.id)
     );
-    store.posts = [...store.posts, ...newPosts];
+    store.posts.push(...newPosts);
     store.endCursor =  discussions.pageInfo.endCursor;
     store.hasNextPage =  discussions.pageInfo.hasNextPage;
   }catch{
@@ -85,7 +85,7 @@ const getNextDiscussions = async () => {
 //         hasNextPage = discussions.pageInfo.hasNextPage;
 //       }
 //     }
-//     store.posts = [...totalNewPosts, ...store.posts];
+//     store.posts.unshift(...totalNewPosts);
 //     useToast().info(`发现了 ${totalNewPosts.length} 篇新帖子`)
 //   }catch{
 //     useToast().warning("刷新讨论列表失败!");
@@ -127,12 +127,12 @@ onUnmounted(() => {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    border: 3px solid #000;
+    border: 3px solid @color-black;
     background: linear-gradient(#212121, #141414);
     box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
     transition: all 0.3s;
     &:hover {
-      border-color: yellow;
+      border-color: @color-yellow;
     }
     img {
       width: 28px;
@@ -197,14 +197,14 @@ main {
   align-items: center;
   bottom: 0;
   left: 0;
-  color: #5e5e5e;
-  font-size: 24px;
+  color: @font-color-secoundary;
+  font-size: 1.5rem;
 }
 
 .download-link {
   font-size: 2.5rem;
   font-style: italic;
-  color: #00f2ff;
+  color: @color-blue-light;
   text-decoration: underline;
 }
 </style>

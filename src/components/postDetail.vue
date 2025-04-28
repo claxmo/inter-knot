@@ -37,7 +37,7 @@
                             <img class="avatar" :src="comment.author.avatarUrl" />
                             <div class="text">
                                 <span class="author-name">{{ comment.author.login }}</span>
-                                <div class="markdown-body comment-body" v-html="comment.body"></div>
+                                <div class="markdown-body" v-html="marked(comment.body)"></div>
                             </div>
                             <span class="level">{{ index + 1 }}F</span>
                         </li>
@@ -172,7 +172,7 @@ const nextImage = () => {
     height: 70%;
     transition: all 0.3s;
     border-radius: 50px 0px 50px 50px;
-    border: 4px solid #333;
+    border: 4px solid @color-gray;
     overflow: hidden;
     background: url('../assets/img/background.png') no-repeat center center;
     background-size: cover;
@@ -188,7 +188,7 @@ const nextImage = () => {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.7);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
@@ -209,7 +209,7 @@ const nextImage = () => {
                 aspect-ratio: 1/1;
                 border-radius: 50%;
                 object-fit: cover;
-                border: 6px solid #333;
+                border: 6px solid @color-gray;
             }
             .text {
                 display: flex;
@@ -218,7 +218,7 @@ const nextImage = () => {
                 gap: 5px;
                 .author-name {
                     font-size: 1.375em;
-                    color: #7e7e7e;
+                    color: @font-color-muted;
                 }
                 .meta {
                     display: flex;
@@ -250,7 +250,7 @@ const nextImage = () => {
         height: 100%;
         display: flex;
         justify-content: space-around;
-        border: 4px solid #000;
+        border: 4px solid @color-black;
         border-radius: 50px 0px 50px 50px;
         background-color: rgba(0, 0, 0, 0.3);
         gap: 5px;       
@@ -261,9 +261,9 @@ const nextImage = () => {
 .media-container {
     width: 35%;
     height: 100%;
-    border: 4px solid #333;
+    border: 4px solid @color-gray;
     border-radius: 25px;
-    background-color: #000;
+    background-color: @color-black;
     overflow: hidden;
     position: relative;
     img {
@@ -300,7 +300,7 @@ const nextImage = () => {
     width: 100%;
     background-color: rgba(0,0,0,0);
     * {
-        color: #9e9e9e;
+        color: @font-color-muted;
         margin-bottom: 0.5em;
         margin-top: 0;
         word-wrap: break-word;
@@ -321,12 +321,13 @@ const nextImage = () => {
     overflow-x: hidden;
     overflow-wrap: break-word;
     gap: 8px;
+    
     .post-title {
         font-size: 1.125em;
     }
     .reply-btn {
-        background-color: #000;
-        border: 4px solid #333;
+        background-color: @color-black;
+        border: 4px solid @color-gray;
         border-radius: 50px;
         display: flex;
         align-items: center;
@@ -343,7 +344,7 @@ const nextImage = () => {
         .comment-item {
             min-height: 66px;
             width: 100%;
-            border-bottom: 2px solid #333;
+            border-bottom: 2px solid @color-gray;
             display: flex;
             padding: 4px 0;
             position: relative;
@@ -352,7 +353,7 @@ const nextImage = () => {
                 aspect-ratio: 1/1;
                 border-radius: 50px;
                 object-fit: cover;
-                border: 4px solid #333;
+                border: 4px solid @color-gray;
             }
             .text{
                 margin-left: 5px;
@@ -363,14 +364,8 @@ const nextImage = () => {
                 gap: 2px;
                 flex-direction: column;
                 .author-name{
-                    color: #5e5e5e;
-                }
-                .comment-body {
-                    color: #9e9e9e;
-                    word-wrap: break-word;
-                    word-break: break-word;
-                    white-space: normal;
-                }
+                    color: @font-color-secoundary;
+                }             
             }
             .level {
                 font-size: 0.75em;
@@ -381,7 +376,7 @@ const nextImage = () => {
                 position: absolute;
                 top: 8px;
                 right: 0;
-                color: #000;
+                color: @color-black;
 
             }
         }
@@ -391,13 +386,13 @@ const nextImage = () => {
         height: auto;
         p {
             text-align: center;
-            color: #5e5e5e;
+            color: @font-color-secoundary;
             font-size: 16px;
         }
         .click {
             cursor: pointer;
             &:hover {
-                color: #3e3e3e;
+                color: @font-color-muted;
             }
         }
     }
