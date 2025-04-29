@@ -65,7 +65,7 @@ const getNextDiscussions = async () => {
   isLoading.value = true;
   try{
     const {posts, endCursor, hasNextPage} = await fetchDiscussions(store.endCursor);
-    store.posts.push(... deduplicatePosts(posts, store.posts));
+    store.posts.push(...deduplicatePosts(posts, store.posts));
     store.endCursor =  endCursor;
     store.hasNextPage =  hasNextPage;
   }catch{
