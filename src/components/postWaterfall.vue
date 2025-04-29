@@ -1,6 +1,6 @@
 <template>
     <div class="waterfall-container" ref="waterfall" >
-        <div class="waterfall-item" v-for="(item, index) in props.items" :key="index" >
+        <div class="waterfall-item" v-for="(item, index) in props.items" :key="item.id" >
             <postCard :data="item" @click="store.openPostDetail(index)" @imageLoaded="layout"/>
         </div>
     </div>
@@ -67,14 +67,14 @@ const layout = () => {
     }
 };
 
-// let resizeTimeout = null;
+let resizeTimeout = null;
 
 onMounted(() => {
-    // window.addEventListener('resize', () => {
-    //     if (resizeTimeout) clearTimeout(resizeTimeout);
-    //     resizeTimeout = setTimeout(() => layout(), 200); // 防抖,延时200ms执行布局
-    // });
-    window.addEventListener('resize',layout);
+    window.addEventListener('resize', () => {
+        if (resizeTimeout) clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => layout(), 200); // 防抖,延时200ms执行布局
+    });
+    // window.addEventListener('resize',layout);
     layout();
 });
 
@@ -82,7 +82,7 @@ onUnmounted(() => {
     window.removeEventListener('resize',layout);
 });
 
-watch(() => props.items,() => {
+watch(() => props.items, () => {
     nextTick(() => {
         layout();
     });    

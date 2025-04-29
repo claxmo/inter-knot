@@ -33,7 +33,7 @@
                        target="_blank" 
                        title="写评论"><img src="../assets/svg/write.svg" width="20" height="20"/>&nbsp;写评论</a>   
                     <ul class="comment-list" @scroll="scrollHandle">
-                        <li class="comment-item" v-for="(comment, index) in comments" :key="index">
+                        <li class="comment-item" v-for="(comment, index) in comments" :key="comment.id">
                             <img class="avatar" :src="comment.author.avatarUrl" />
                             <div class="text">
                                 <span class="author-name">{{ comment.author.login }}</span>

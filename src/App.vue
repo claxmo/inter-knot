@@ -8,7 +8,7 @@
          href="https://github.com/claxmo/inter-knot/discussions/new/choose" 
          target="_blank"><img src="./assets/svg/write.svg">
       </a>
-      <!-- <span class="btn" title="刷新帖子" @click="refreshDiscussions"><img src="./assets/svg/refresh.svg"></span> -->
+      <span class="btn" title="刷新帖子" @click="refreshDiscussions"><img src="./assets/svg/refresh.svg"></span>
     </div>
     <navBar />
   </header>
@@ -43,18 +43,31 @@ const message = computed(() => {
   }
 })
 
+const fetchDiscussions = async (cursor = null) => {
+  const response = await window.getDiscussions(cursor);
+  const discussions = response.data.repository.discussions;
+  return {
+    posts: discussions.nodes,
+    endCursor: discussions.pageInfo.endCursor,
+    hasNextPage: discussions.pageInfo.hasNextPage
+  };
+};
+
+const deduplicatePosts = (newPosts, existingPosts) => {
+  return newPosts.filter(post => 
+    !existingPosts.some(existing => existing.id === post.id)
+  );
+};
+
+
 const getNextDiscussions = async () => {
   if (isLoading.value || store.hasNextPage === false) return;
   isLoading.value = true;
   try{
-    const response = await window.getDiscussions(store.endCursor);
-    const discussions = response.data.repository.discussions;
-    const newPosts =  discussions.nodes.filter(post => 
-        !store.posts.some(existingPost => existingPost.id === post.id)
-    );
-    store.posts.push(...newPosts);
-    store.endCursor =  discussions.pageInfo.endCursor;
-    store.hasNextPage =  discussions.pageInfo.hasNextPage;
+    const {posts, endCursor, hasNextPage} = await fetchDiscussions(store.endCursor);
+    store.posts.push(... deduplicatePosts(posts, store.posts));
+    store.endCursor =  endCursor;
+    store.hasNextPage =  hasNextPage;
   }catch{
     useToast().warning("获取讨论列表失败!");
   }finally{
@@ -64,37 +77,31 @@ const getNextDiscussions = async () => {
   }
 };
 
-// const refreshDiscussions = async () => {
-//   if (isLoading.value) return;
-//   isLoading.value = true;
-//   let endCursor = null;
-//   let hasNextPage = true;
-//   let totalNewPosts = [];
-//   try{
-//     while (hasNextPage){
-//       const response = await window.getDiscussions(endCursor);
-//       const discussions = response.data.repository.discussions;
-//       const newPosts =  discussions.nodes.filter(post => 
-//           !store.posts.some(existingPost => existingPost.id === post.id)
-//       );
-//       totalNewPosts = [...totalNewPosts, ...newPosts];
-//       if (newPosts.length < 20 || discussions.pageInfo.hasNextPage === false){
-//         break;
-//       }else{
-//         endCursor = discussions.pageInfo.endCursor;
-//         hasNextPage = discussions.pageInfo.hasNextPage;
-//       }
-//     }
-//     store.posts.unshift(...totalNewPosts);
-//     useToast().info(`发现了 ${totalNewPosts.length} 篇新帖子`)
-//   }catch{
-//     useToast().warning("刷新讨论列表失败!");
-//   }finally{
-//     nextTick(() => {
-//       isLoading.value = false;
-//     });
-//   } 
-// };
+const refreshDiscussions = async () => {
+  if (isLoading.value) return;
+  isLoading.value = true;
+  let endCursor = null;
+  let flag = true;
+  let totalNewPosts = [];
+  try{
+    while (flag){
+      const {posts, endCursor: nextCursor, hasNextPage} = await fetchDiscussions(endCursor);
+      const newPosts = deduplicatePosts(posts, [...totalNewPosts, ...store.posts]);
+      if (newPosts.length === 0) break;
+      totalNewPosts.push(...newPosts);
+      endCursor = nextCursor;
+      flag = hasNextPage;
+    }
+    useToast().info(`发现了 ${totalNewPosts.length} 篇新帖子`)
+    store.posts.unshift(...totalNewPosts);
+  }catch{
+    useToast().warning("刷新讨论列表失败!");
+  }finally{
+    nextTick(() => {
+      isLoading.value = false;
+    });
+  } 
+};
 
 const distanceToBottom = ref(null);
 

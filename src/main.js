@@ -14,7 +14,7 @@ app.use(Toast, {
     position: "top-right",
   
     // 通知显示时长（毫秒），0 表示永久不消失
-    timeout: 5000,
+    timeout: 3000,
   
     // 点击通知时是否关闭
     closeOnClick: true,
