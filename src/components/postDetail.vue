@@ -21,7 +21,7 @@
                     v-for="(url, index) in imgUrls"
                     v-show="index === currentIndex"
                     :src="url" 
-                    :key="index" />
+                    :key="url" />
                     <span class="next-btn" @click="nextImage" title="下一张" v-if="imgUrls.length > 1"></span>
                     <span class="cur-page" v-if="imgUrls.length > 1">{{ currentIndex + 1 }}&nbsp;-&nbsp;{{ imgUrls.length }}</span>
                 </div>
