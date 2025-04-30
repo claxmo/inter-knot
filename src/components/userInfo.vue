@@ -78,6 +78,7 @@ onMounted(async () => {
     aspect-ratio: 1;
     border-radius: 50%;
     flex-shrink: 0;
+    border: 2px solid @color-black;
   }
   .info-text {
     flex: 1;

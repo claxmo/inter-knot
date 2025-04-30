@@ -3,11 +3,11 @@
         <div class="post-detail" @click.stop>
             <header>
                 <div class="author-info">
-                    <img class="avatar" :src="post.author?.avatarUrl ?? defaultAvatarUrl" />
+                    <span class="avatar"><img :src="post.author?.avatarUrl ?? defaultAvatarUrl" /></span>
                     <div class="text">
                         <span class="author-name">{{ post.author?.login ?? "匿名用户" }}</span>
                         <div class="meta">
-                            <span>{{ post?.createdAt }}</span>
+                            <span><img src="../assets/svg/clock.svg" />{{ new Date(post?.createdAt).toLocaleDateString('en-CA') }}</span>
                             <span><img src="../assets/svg/views.svg" />{{ post.comments?.totalCount ?? 0 }}</span>
                         </div>
                     </div>
@@ -34,7 +34,7 @@
                        title="写评论"><img src="../assets/svg/write.svg" width="20" height="20"/>&nbsp;写评论</a>   
                     <ul class="comment-list" @scroll="scrollHandle">
                         <li class="comment-item" v-for="(comment, index) in comments" :key="comment.id">
-                            <img class="avatar" :src="comment.author.avatarUrl" />
+                            <span class="avatar"><img :src="comment.author.avatarUrl" /></span>
                             <div class="text">
                                 <span class="author-name">{{ comment.author.login }}</span>
                                 <div class="markdown-body" v-html="marked(comment.body)"></div>
@@ -208,8 +208,14 @@ const nextImage = () => {
                 height: 100%;
                 aspect-ratio: 1/1;
                 border-radius: 50%;
-                object-fit: cover;
-                border: 6px solid @color-gray;
+                border: 4px solid @color-gray;
+                img {
+                    height: 100%;
+                    aspect-ratio: 1/1;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid @color-black;
+                }
             }
             .text {
                 display: flex;
@@ -224,6 +230,10 @@ const nextImage = () => {
                     display: flex;
                     gap: 8px;
                     span {
+                        height: 20px;
+                        white-space: nowrap;          
+                        overflow: hidden;             
+                        text-overflow: ellipsis;
                         font-size: 14px;
                         background-color: rgba(255,255,255,0.3);
                         align-items: center;
@@ -352,8 +362,13 @@ const nextImage = () => {
                 height: 56px;
                 aspect-ratio: 1/1;
                 border-radius: 50px;
-                object-fit: cover;
-                border: 4px solid @color-gray;
+                border: 3px solid @color-gray;
+                img {
+                    height: 100%;
+                    border-radius: 50px;
+                    object-fit: cover;
+                    border: 2px solid @color-black;
+                }
             }
             .text{
                 margin-left: 5px;

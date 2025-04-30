@@ -1,24 +1,36 @@
 <template>
+  <audio ref="bgm" loop>
+    <source src="./assets/audio/三Z-STUDIO,HOYO-MiX - 夏日盛典.mp3" type="audio/mpeg">
+  </audio>
+  <div class="btn-container" ref="btnContainer">
+    <span class="btn" title="刷新帖子" @click="refreshDiscussions"><img src="./assets/svg/refresh.svg"></span>
+    <a
+      class="btn" 
+      title="写帖子" 
+      href="https://github.com/claxmo/inter-knot/discussions/new/choose" 
+      target="_blank"><img src="./assets/svg/write.svg">
+    </a>
+    <span class="btn" title="顶部" @click="scrollTop"><img src="./assets/svg/arrow-up.svg"></span>
+
+  </div>
   <postDetail />
   <header>
-    <div style="display: flex; height: 100%; gap: 8px; align-items: center;">
-      <userInfo />
-      <a class="btn" 
-         title="写帖子" 
-         href="https://github.com/claxmo/inter-knot/discussions/new/choose" 
-         target="_blank"><img src="./assets/svg/write.svg">
-      </a>
-      <span class="btn" title="刷新帖子" @click="refreshDiscussions"><img src="./assets/svg/refresh.svg"></span>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
+      <userInfo />  
+      <span class="btn" @click="toggleMusic">
+        <img src="./assets/svg/volume-2.svg" v-if="isPlaying">
+        <img src="./assets/svg/volume-x.svg" v-else>
+      </span>
     </div>
     <navBar />
   </header>
-  <main @scroll="scrollHandle">
+  <main @scroll="scrollHandle" ref="mainContainer">
     <span style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;"  v-if="store.posts.length <= 0">
       <a href="https://raw.githubusercontent.com/claxmo/inter-knot/main/绳网跨域助手-0.1.0.user.js" class="download-link">点击下载绳网跨域助手</a>
     </span>
     <postWaterfall v-if="store.posts.length" :items="store.posts" :itemWidth="300" :itemGap="25" :refreshFlag="store.refreshPostFlag" />
   </main>
-  <span class="message" v-if="distanceToBottom <= 1">{{ message }}</span>
+  <span class="message" v-show="distanceToBottom <= 1">{{ message }}</span>
 </template>
 
 <script setup>
@@ -32,6 +44,7 @@ import { useConfigStore } from './stores/config';
 
 const store = useConfigStore();
 const isLoading = ref(false);
+const mainContainer = ref(null);
 
 const message = computed(() => {
   if (isLoading.value) {
@@ -87,13 +100,15 @@ const refreshDiscussions = async () => {
     while (flag){
       const {posts, endCursor: nextCursor, hasNextPage} = await fetchDiscussions(endCursor);
       const newPosts = deduplicatePosts(posts, [...totalNewPosts, ...store.posts]);
-      if (newPosts.length === 0) break;
       totalNewPosts.push(...newPosts);
       endCursor = nextCursor;
       flag = hasNextPage;
-    }
-    useToast().info(`发现了 ${totalNewPosts.length} 篇新帖子`)
-    store.posts.unshift(...totalNewPosts);
+      useToast().info(`发现了 ${totalNewPosts.length} 篇新帖子`)      
+      if (newPosts.length === 0) break;
+        
+      store.posts.unshift(...totalNewPosts);
+      scrollTop();
+    }   
   }catch{
     useToast().warning("刷新讨论列表失败!");
   }finally{
@@ -103,7 +118,14 @@ const refreshDiscussions = async () => {
   } 
 };
 
+const scrollTop = () => {
+  mainContainer.value.scrollTo({top: 0, behavior: 'smooth'});
+
+};
+
+const btnContainer = ref(null);
 const distanceToBottom = ref(null);
+let scrollTimer = null;
 
 const scrollHandle = (e) => {
   const target = e.target;
@@ -112,6 +134,25 @@ const scrollHandle = (e) => {
   if (distanceToBottom.value <= viewportHeight) {
     getNextDiscussions();
   }
+  btnContainer.value.style.opacity = '0.3';
+  if (scrollTimer) clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(() => {
+    btnContainer.value.style.opacity = '1';
+  }, 300);
+};
+
+const bgm = ref(null);
+const isPlaying = ref(false);
+
+const toggleMusic = () => {
+  if (!bgm.value) return;
+
+  if (isPlaying.value) {
+    bgm.value.pause();
+  } else {
+    bgm.value.play();
+  }
+  isPlaying.value = !isPlaying.value;
 };
 
 onMounted(() => {
@@ -126,6 +167,19 @@ onUnmounted(() => {
 </script>
 
 <style lang="less" scoped>
+.btn-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  position: fixed;
+  bottom: 35px;
+  right: 25px;
+  z-index: 10;
+  transition: all 0.3s;
+  }
+
 .btn {
     height: 50px;
     aspect-ratio: 1;

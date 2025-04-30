@@ -206,4 +206,8 @@ const onError = () => {
         height: 24px;
     }
 }
+
+.post-card.viewed .post-title {
+    color: @font-color-muted;
+}
 </style>

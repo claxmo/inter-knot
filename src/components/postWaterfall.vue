@@ -1,14 +1,18 @@
 <template>
     <div class="waterfall-container" ref="waterfall" >
         <div class="waterfall-item" v-for="(item, index) in props.items" :key="item.id" >
-            <postCard :data="item" @click="store.openPostDetail(index)" @imageLoaded="layout"/>
+            <postCard 
+            :data="item" 
+            :class="{ viewed: viewedIds.has(item.id) }"
+            @click="clickHandle(item.id, index)" 
+            @imageLoaded="layout"/>
         </div>
     </div>
 </template>
 
 <script setup>
 import postCard from './postCard.vue';
-import { defineProps, ref, onMounted, watch,nextTick , onUnmounted} from 'vue';
+import { defineProps, ref, onMounted, watch,nextTick , onUnmounted, reactive} from 'vue';
 import { useConfigStore } from '../stores/config';
 
 const store = useConfigStore();
@@ -27,6 +31,12 @@ const props = defineProps({
     },
 
 });
+
+const viewedIds = reactive(new Set());
+const clickHandle = (_id, index) => {
+    viewedIds.add(_id);
+    store.openPostDetail(index);
+}; 
 
 const waterfall = ref(null);
 
