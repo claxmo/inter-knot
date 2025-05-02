@@ -18,8 +18,8 @@
     <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
       <userInfo />  
       <span class="btn" @click="toggleMusic">
-        <img src="./assets/svg/volume-2.svg" v-if="isPlaying">
-        <img src="./assets/svg/volume-x.svg" v-else>
+        <img src="./assets/svg/volume-2.svg" v-show="isPlaying">
+        <img src="./assets/svg/volume-x.svg" v-show="!isPlaying">
       </span>
     </div>
     <navBar />
@@ -171,7 +171,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   flex-direction: column;
-  gap: 5px;
+  gap: 8px;
   align-items: center;
   position: fixed;
   bottom: 35px;

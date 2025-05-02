@@ -9,6 +9,7 @@
                         <div class="meta">
                             <span><img src="../assets/svg/clock.svg" />{{ new Date(post?.createdAt).toLocaleDateString('en-CA') }}</span>
                             <span><img src="../assets/svg/views.svg" />{{ post.comments?.totalCount ?? 0 }}</span>
+                            <span><img src="../assets/svg/tag.svg" />{{ post.category?.name }}</span>
                         </div>
                     </div>
                 </div>
@@ -26,20 +27,25 @@
                     <span class="cur-page" v-if="imgUrls.length > 1">{{ currentIndex + 1 }}&nbsp;-&nbsp;{{ imgUrls.length }}</span>
                 </div>
                 <div class="interaction-container">
-                    <span class="post-title" v-text="post.title"></span>
+                    <span class="post-title" v-text="postTitle"></span>
                     <div class="markdown-body" v-html="postBody"></div>
                     <a class="reply-btn"
                        :href="`https://github.com/claxmo/inter-knot/discussions/${post.number}`" 
                        target="_blank" 
                        title="写评论"><img src="../assets/svg/write.svg" width="20" height="20"/>&nbsp;写评论</a>   
                     <ul class="comment-list" @scroll="scrollHandle">
-                        <li class="comment-item" v-for="(comment, index) in comments" :key="comment.id">
+                        <li class="comment-item" 
+                            v-for="(comment, index) in comments"
+                            :key="comment.id"
+                            :class="{ owner: comment.author.login === store.author.login }" >
                             <span class="avatar"><img :src="comment.author.avatarUrl" /></span>
                             <div class="text">
-                                <span class="author-name">{{ comment.author.login }}</span>
+                                <span class="author-name">
+                                    {{ comment.author.login === post.author.login ? `[楼主]${comment.author.login}` : comment.author.login }}
+                                </span>
                                 <div class="markdown-body" v-html="marked(comment.body)"></div>
                             </div>
-                            <span class="level">{{ index + 1 }}F</span>
+                            <span class="floor">{{ index + 1 }}F</span>
                         </li>
                     </ul>      
                     <span class="message">
@@ -70,6 +76,13 @@ const hasNextPage = ref(null);
 const isLoading = ref(false);
 
 const imgUrls = ref([]);
+const postTitle = computed(() => {
+  if (post.value.category?.name !== '常规' ) {
+    return `[ ${post.value.category?.name} ]` + post.value.title;
+  } else {
+    return post.value.title;
+  }
+});
 const postBody = ref("");
 const currentIndex = ref(0);
 
@@ -224,13 +237,13 @@ const nextImage = () => {
                 gap: 5px;
                 .author-name {
                     font-size: 1.375em;
-                    color: @font-color-muted;
+                    color: @font-color-secoundary;
                 }
                 .meta {
                     display: flex;
                     gap: 8px;
                     span {
-                        height: 20px;
+                        height: 18px;
                         white-space: nowrap;          
                         overflow: hidden;             
                         text-overflow: ellipsis;
@@ -310,7 +323,7 @@ const nextImage = () => {
     width: 100%;
     background-color: rgba(0,0,0,0);
     * {
-        color: @font-color-muted;
+        color: @font-color-secoundary;
         margin-bottom: 0.5em;
         margin-top: 0;
         word-wrap: break-word;
@@ -358,6 +371,14 @@ const nextImage = () => {
             display: flex;
             padding: 4px 0;
             position: relative;
+            &.owner {
+                .text .author-name {
+                    color: @color-orange;
+                }
+                .floor {
+                    background-color: @color-orange;
+                }
+            }
             .avatar {
                 height: 56px;
                 aspect-ratio: 1/1;
@@ -382,7 +403,7 @@ const nextImage = () => {
                     color: @font-color-secoundary;
                 }             
             }
-            .level {
+            .floor {
                 font-size: 0.75em;
                 background-color: rgba(255,255,255,0.3);
                 padding: 0 12px;
@@ -406,9 +427,6 @@ const nextImage = () => {
         }
         .click {
             cursor: pointer;
-            &:hover {
-                color: @font-color-muted;
-            }
         }
     }
 }
@@ -440,6 +458,9 @@ const nextImage = () => {
         }
     }
 }
+
+
+
 
 // .text {
 //     width: 100%;

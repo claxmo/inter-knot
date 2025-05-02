@@ -1,5 +1,5 @@
 <template>
-    <div class="post-card" @click="$emit('click')">
+    <div class="post-card" @click="$emit('click')" :class="{delegate: post.category?.name === '委托', owner: post.author.login === store.author.login}">
         <span class="views"><img src="../assets/svg/views.svg" />{{ post.comments.totalCount }}</span>
         <img 
             class="cover" 
@@ -13,7 +13,7 @@
                 <span class="avatar"><img  :src="post.author.avatarUrl" /></span>
                 <span class="author-name">{{ post.author.login }}</span>
             </div>
-            <span class="post-title" v-text="post.title"></span>
+            <span class="post-title" v-text="postTitle"></span>
             <span class="post-body" v-text="postBody"></span>
         </div>
     </div>
@@ -21,7 +21,8 @@
 
 <script setup>
 import { marked } from 'marked'
-import { defineProps, nextTick, ref, defineEmits } from 'vue'
+import { defineProps, nextTick, ref, defineEmits, computed } from 'vue'
+import { useConfigStore } from '../stores/config';
 import defaultCoverUrl from '../assets/svg/default-cover.svg'
 
 const props = defineProps({
@@ -31,8 +32,16 @@ const props = defineProps({
     }
 });
 
+const store = useConfigStore();
 const post = ref(props.data);
 
+const postTitle = computed(() => {
+    if (post.value.category.name !== "常规"){
+        return `[ ${post.value.category.name} ]` + post.value.title;
+    }else{
+        return post.value.title;
+    }
+});
 const postBody = ref("");
 const coverUrl = ref(null);
 
@@ -106,8 +115,8 @@ const onError = () => {
         margin-bottom: 5px;
         .avatar {
             position: relative;
-            width: 65px;
             height: 65px;
+            aspect-ratio: 1/1;
             border-radius: 50%;
             border: 4px solid @color-gray-dark;
             margin-top: -32px;
@@ -146,7 +155,7 @@ const onError = () => {
             }
         }
         .author-name {
-            font-size: 1.125em;
+            font-size: 1em;
             flex: 1;
             color: @font-color-secoundary;
             text-overflow: ellipsis;
@@ -162,7 +171,7 @@ const onError = () => {
                 height: 3px;
                 width: 100%;
                 background-color: @color-gray;
-                bottom: 0px;
+                bottom: 2px;
                 left: 0px;
             }
         }
@@ -176,16 +185,16 @@ const onError = () => {
         white-space: normal;
         overflow: hidden;
         overflow-wrap: break-word;
-        font-size: 1.125em;
+        font-size: 1em;
         margin-bottom: 2px;
         padding: 0 5px;
     }
     .post-body {
-        color: @font-color-muted;
+        color: @font-color-secoundary;
         white-space: nowrap;          
         overflow: hidden;             
         text-overflow: ellipsis;
-        font-size: 1em;
+        font-size: 0.875em;
         padding: 0 5px;
     }
 }
@@ -208,6 +217,19 @@ const onError = () => {
 }
 
 .post-card.viewed .post-title {
-    color: @font-color-muted;
+    color: @font-color-secoundary;
 }
+
+.post-card.delegate:not(.viewed) .post-title{
+    background: linear-gradient(0deg, @color-blue, @color-blue-light); /* 渐变色定义 */
+    -webkit-background-clip: text; /* 裁剪背景到文字 */
+    -webkit-text-fill-color: transparent; /* 文字颜色透明 */
+    background-clip: text;
+
+}
+
+// .post-card.owner .author-name{
+//     color: @color-orange;
+// }
+
 </style>

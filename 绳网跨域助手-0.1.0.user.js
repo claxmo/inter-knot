@@ -93,6 +93,11 @@
                 comments {
                     totalCount
                   }
+                category{
+                    id
+                    name
+                    emoji
+                  }
                 }
               }
             }
