@@ -18,6 +18,9 @@ export const useConfigStore = defineStore('config', () => {
         isOpenPostDetail.value = false;
     };
 
+    const name = "claxmo";
+    const repo = "inter-knot";
+
     return {
         author,
         posts,
@@ -27,6 +30,8 @@ export const useConfigStore = defineStore('config', () => {
         isOpenPostDetail,
         openPostDetail,
         closePostDetail,
+        name,
+        repo
 
     };
 });

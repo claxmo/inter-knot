@@ -6,11 +6,12 @@
                     <span class="avatar"><img :src="post.author?.avatarUrl ?? defaultAvatarUrl" /></span>
                     <div class="text">
                         <span class="author-name">{{ post.author?.login ?? "匿名用户" }}</span>
-                        <div class="meta">
-                            <span><img src="../assets/svg/clock.svg" />{{ new Date(post?.createdAt).toLocaleDateString('en-CA') }}</span>
-                            <span><img src="../assets/svg/views.svg" />{{ post.comments?.totalCount ?? 0 }}</span>
-                            <span><img src="../assets/svg/tag.svg" />{{ post.category?.name }}</span>
-                        </div>
+                        <ul class="meta">
+                            <li><img src="../assets/svg/clock.svg" />{{ new Date(post?.createdAt).toLocaleDateString("en-CA") }}</li>
+                            <li><img src="../assets/svg/views.svg" />{{ post.comments?.totalCount ?? 0 }}</li>
+                            <li>#{{ post.number }}</li>
+                            <!-- <span><img src="../assets/svg/tag.svg" />{{ post.category?.name }}</span> -->
+                        </ul>
                     </div>
                 </div>
                 <img class="close-btn" src="../assets/svg/close-btn-right.svg" alt="关闭" @click="store.closePostDetail" />
@@ -30,7 +31,7 @@
                     <span class="post-title" v-text="postTitle"></span>
                     <div class="markdown-body" v-html="postBody"></div>
                     <a class="reply-btn"
-                       :href="`https://github.com/claxmo/inter-knot/discussions/${post.number}`" 
+                       :href="`https://github.com/${store.name}/${store.repo}/discussions/${post.number}`" 
                        target="_blank" 
                        title="写评论"><img src="../assets/svg/write.svg" width="20" height="20"/>&nbsp;写评论</a>   
                     <ul class="comment-list" @scroll="scrollHandle">
@@ -43,6 +44,7 @@
                                 <span class="author-name">
                                     {{ comment.author.login === post.author.login ? `[楼主]${comment.author.login}` : comment.author.login }}
                                 </span>
+                                <span class="createAt">{{ new Date(comment.createdAt).toLocaleDateString("en-CA") }}</span>
                                 <div class="markdown-body" v-html="marked(comment.body)"></div>
                             </div>
                             <span class="floor">{{ index + 1 }}F</span>
@@ -66,7 +68,6 @@ import { useConfigStore } from '../stores/config';
 import { useToast } from 'vue-toastification';
 import defaultCoverUrl from '../assets/svg/default-cover.svg';
 import defaultAvatarUrl from '../assets/svg/default-avatar.svg';
-import 'github-markdown-css/github-markdown-dark.css';
 
 const store = useConfigStore();
 const post = computed(() => store.posts[store.curPostIndex] ?? {});
@@ -242,8 +243,8 @@ const nextImage = () => {
                 .meta {
                     display: flex;
                     gap: 8px;
-                    span {
-                        height: 18px;
+                    li {
+                        height: 20px;
                         white-space: nowrap;          
                         overflow: hidden;             
                         text-overflow: ellipsis;
@@ -253,8 +254,8 @@ const nextImage = () => {
                         display: flex;
                         justify-content: center;
                         border-radius: 50px;
-                        padding: 0 6px;
-                        gap: 5px;
+                        padding: 0 8px;
+                        gap: 3px;
                         img {
                             width: 18px;
                             height: 18px;
@@ -316,19 +317,6 @@ const nextImage = () => {
         bottom: 4px;
         text-align: center;
         color: rgba(255,255,255,0.3);
-    }
-}
-
-.markdown-body {
-    width: 100%;
-    background-color: rgba(0,0,0,0);
-    * {
-        color: @font-color-secoundary;
-        margin-bottom: 0.5em;
-        margin-top: 0;
-        word-wrap: break-word;
-        word-break: break-word;
-        white-space: normal;
     }
 }
 
@@ -399,9 +387,13 @@ const nextImage = () => {
                 justify-content: center;
                 gap: 2px;
                 flex-direction: column;
-                .author-name{
+                .author-name {
                     color: @font-color-secoundary;
-                }             
+                } 
+                .createAt {
+                    color: @font-color-secoundary;
+                    font-size: 12px;
+                }            
             }
             .floor {
                 font-size: 0.75em;
@@ -410,7 +402,7 @@ const nextImage = () => {
                 border-radius: 25px;
                 border-top-left-radius: 0;
                 position: absolute;
-                top: 8px;
+                top: 7px;
                 right: 0;
                 color: @color-black;
 

@@ -7,11 +7,10 @@
     <a
       class="btn" 
       title="写帖子" 
-      href="https://github.com/claxmo/inter-knot/discussions/new/choose" 
+      :href="`https://github.com/${store.name}/${store.repo}/discussions/new/choose`" 
       target="_blank"><img src="./assets/svg/write.svg">
     </a>
     <span class="btn" title="顶部" @click="scrollTop"><img src="./assets/svg/arrow-up.svg"></span>
-
   </div>
   <postDetail />
   <header>
@@ -26,7 +25,7 @@
   </header>
   <main @scroll="scrollHandle" ref="mainContainer">
     <span style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;"  v-if="store.posts.length <= 0">
-      <a href="https://raw.githubusercontent.com/claxmo/inter-knot/main/绳网跨域助手-0.1.0.user.js" class="download-link">点击下载绳网跨域助手</a>
+      <a :href="`https://raw.githubusercontent.com/${store.name}/${store.repo}/main/绳网跨域助手-0.1.0.user.js`" class="download-link">点击下载绳网跨域助手</a>
     </span>
     <postWaterfall v-if="store.posts.length" :items="store.posts" :itemWidth="300" :itemGap="25" :refreshFlag="store.refreshPostFlag" />
   </main>
@@ -44,7 +43,6 @@ import { useConfigStore } from './stores/config';
 
 const store = useConfigStore();
 const isLoading = ref(false);
-const mainContainer = ref(null);
 
 const message = computed(() => {
   if (isLoading.value) {
@@ -71,7 +69,6 @@ const deduplicatePosts = (newPosts, existingPosts) => {
     !existingPosts.some(existing => existing.id === post.id)
   );
 };
-
 
 const getNextDiscussions = async () => {
   if (isLoading.value || store.hasNextPage === false) return;
@@ -118,14 +115,15 @@ const refreshDiscussions = async () => {
   } 
 };
 
+const mainContainer = ref(null);
+const btnContainer = ref(null);
+const distanceToBottom = ref(null);
+let scrollTimer = null;
+
 const scrollTop = () => {
   mainContainer.value.scrollTo({top: 0, behavior: 'smooth'});
 
 };
-
-const btnContainer = ref(null);
-const distanceToBottom = ref(null);
-let scrollTimer = null;
 
 const scrollHandle = (e) => {
   const target = e.target;
@@ -145,8 +143,6 @@ const bgm = ref(null);
 const isPlaying = ref(false);
 
 const toggleMusic = () => {
-  if (!bgm.value) return;
-
   if (isPlaying.value) {
     bgm.value.pause();
   } else {
@@ -182,8 +178,8 @@ onUnmounted(() => {
 
 .btn {
     height: 50px;
-    aspect-ratio: 1;
-    border-radius: 50%;
+    min-width: 50px;
+    border-radius: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
