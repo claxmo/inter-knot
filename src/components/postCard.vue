@@ -21,9 +21,9 @@
 
 <script setup>
 import { marked } from 'marked'
-import { defineProps, nextTick, ref, defineEmits, computed } from 'vue'
+import { defineProps, nextTick, ref, defineEmits, computed } from 'vue';
 import { useConfigStore } from '../stores/config';
-import defaultCoverUrl from '../assets/svg/default-cover.svg'
+import defaultCoverUrl from '../assets/svg/default-cover.svg';
 
 const props = defineProps({
     data: {
@@ -97,7 +97,7 @@ const onError = () => {
     .cover {
         width: 100%;
         object-fit: cover;
-        max-height: 400px;
+        max-height: 350px;
     }
 }
 
@@ -125,7 +125,7 @@ const onError = () => {
                 position: absolute;
                 content: "";
                 top: -6px;
-                left: -30px;
+                left: -29px;
                 width: 30px;
                 height: 30px;
                 background: transparent;
@@ -137,7 +137,7 @@ const onError = () => {
                 position: absolute;
                 content: "";
                 top: -6px;
-                right: -30px;
+                right: -29px;
                 width: 30px;
                 height: 30px;
                 background: transparent;
@@ -231,5 +231,7 @@ const onError = () => {
 // .post-card.owner .author-name{
 //     color: @color-orange;
 // }
+
+
 
 </style>

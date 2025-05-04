@@ -16,6 +16,7 @@
   <header>
     <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
       <userInfo />  
+      <!-- <span class="btn" title="登出" v-if="store.author?.login"><img src="./assets/svg/logout.svg"></span> -->
       <span class="btn" @click="toggleMusic">
         <img src="./assets/svg/volume-2.svg" v-show="isPlaying">
         <img src="./assets/svg/volume-x.svg" v-show="!isPlaying">
