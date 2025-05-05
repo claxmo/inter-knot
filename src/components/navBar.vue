@@ -32,13 +32,13 @@
 </template>
   
 <script setup>
-    import { ref } from 'vue'
+  import { ref } from 'vue'
 
-    const activeIndex = ref(0)
+  const activeIndex = ref(0)
 
-    const setActive = (index) => {
-        activeIndex.value = index
-    }
+  const setActive = (index) => {
+      activeIndex.value = index
+  }
 </script>
   
   
@@ -53,7 +53,7 @@
   justify-content: space-around;
   align-items: center;
   overflow: visible;
-  background: url('../assets/svg/point.svg') center repeat;
+  background: url('@/assets/svg/point.svg') center repeat;
   background-size: 8px;
   background-color: rgba(0, 0, 0, 0.7);
   .item {

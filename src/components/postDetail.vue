@@ -7,14 +7,14 @@
                     <div class="text">
                         <span class="author-name">{{ post.author?.login ?? "匿名用户" }}</span>
                         <ul class="meta">
-                            <li><img src="../assets/svg/clock.svg" />{{ new Date(post?.createdAt).toLocaleDateString("en-CA") }}</li>
-                            <li><img src="../assets/svg/views.svg" />{{ post.comments?.totalCount ?? 0 }}</li>
+                            <li><img src="@/assets/svg/clock.svg" />{{ new Date(post?.createdAt).toLocaleDateString("en-CA") }}</li>
+                            <li><img src="@/assets/svg/views.svg" />{{ post.comments?.totalCount ?? 0 }}</li>
                             <li>#{{ post.number }}</li>
                             <!-- <span><img src="../assets/svg/tag.svg" />{{ post.category?.name }}</span> -->
                         </ul>
                     </div>
                 </div>
-                <img class="close-btn" src="../assets/svg/close-btn-right.svg" alt="关闭" @click="store.closePostDetail" />
+                <img class="close-btn" src="@/assets/svg/close-btn-right.svg" alt="关闭" @click="store.closePostDetail" />
             </header>
             <main>
                 <div class="media-container">
@@ -34,9 +34,9 @@
                        :href="`https://github.com/${store.name}/${store.repo}/discussions/${post.number}`" 
                        target="_blank" 
                        title="写评论"><img src="../assets/svg/write.svg" width="20" height="20"/>&nbsp;写评论</a>   
-                    <ul class="comment-list" @scroll="scrollHandle">
+                    <ul class="comment-list">
                         <li class="comment-item" 
-                            v-for="(comment, index) in comments"
+                            v-for="(comment, index) in comments.nodes"
                             :key="comment.id"
                             :class="{ owner: comment.author.login === store.author.login }" >
                             <span class="avatar"><img :src="comment.author.avatarUrl" /></span>
@@ -52,8 +52,8 @@
                     </ul>      
                     <span class="message">
                         <p v-if="isLoading">正在努力加载中···</p>
-                        <p v-else-if="hasNextPage === false">- 已无更多评论 -</p>
-                        <p v-else @click="getNextComments" class="click">- 点击加载更多 -</p>            
+                        <p v-else-if="comments.pageInfo?.hasNextPage === false">- 已无更多评论 -</p>
+                        <p v-else @click="getNextComments" style="cursor: pointer;">- 点击加载更多 -</p>            
                     </span>
                 </div>
             </main>
@@ -62,18 +62,23 @@
 </template>
 
 <script setup>
+import defaultCoverUrl from '@/assets/svg/default-cover.svg';
+import defaultAvatarUrl from '@/assets/svg/default-avatar.svg';
 import { marked } from 'marked';
 import { computed, ref, watch, nextTick } from 'vue';
-import { useConfigStore } from '../stores/config';
 import { useToast } from 'vue-toastification';
-import defaultCoverUrl from '../assets/svg/default-cover.svg';
-import defaultAvatarUrl from '../assets/svg/default-avatar.svg';
+import { useConfigStore } from '@/stores/config';
+
 
 const store = useConfigStore();
 const post = computed(() => store.posts[store.curPostIndex] ?? {});
-const comments = ref([]);
-const endCursor = ref(null);
-const hasNextPage = ref(null);
+const comments = ref({
+        nodes: [],
+        pageInfo: {
+            hasNextPage: true,
+            endCursor: null,
+        }
+    });
 const isLoading = ref(false);
 
 const imgUrls = ref([]);
@@ -88,17 +93,14 @@ const postBody = ref("");
 const currentIndex = ref(0);
 
 const getNextComments = async () => {
-    if (isLoading.value || hasNextPage.value === false) return;
+    if (isLoading.value || comments.value.pageInfo?.hasNextPage === false) return;
     isLoading.value = true;
-    try{ 
-        const response = await window.getComments(post.value.id, endCursor.value);
-        const commentNode = response.data.node;
-        const newComments = commentNode.comments.nodes.filter(
-            comment => !comments.value.some(c => c.id === comment.id)
-        );
-        comments.value = [...comments.value, ...newComments]
-        endCursor.value = commentNode.comments.pageInfo.endCursor;
-        hasNextPage.value = commentNode.comments.pageInfo.hasNextPage;
+    try{
+        const commentNode = await window.getComments(post.value.id, comments.value.pageInfo?.endCursor);
+        comments.value.nodes.push(...commentNode.comments.nodes.filter(
+            comment => !comments.value.nodes.some(c => c.id === comment.id)
+        ));
+        comments.value.pageInfo = commentNode.comments.pageInfo;
     }catch{
         useToast().warning("获取评论列表失败!");
     }finally{
@@ -106,13 +108,19 @@ const getNextComments = async () => {
             isLoading.value = false;
         });
     }
+        
+       
 };
 
 watch(post, async () => {
     if(!post.value || !post.value.id) return;
-    comments.value = [];
-    endCursor.value = null;
-    hasNextPage.value = null;
+    comments.value = {
+        nodes: [],
+        pageInfo: {
+            hasNextPage: true,
+            endCursor: null,
+        }
+    };
     isLoading.value = false;
 
     currentIndex.value = 0;
@@ -141,7 +149,7 @@ const nextImage = () => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('../assets/svg/mask.svg') repeat center center;
+    background: url('@/assets/svg/mask.svg') repeat center center;
     background-size: 12px;
     display: flex;
     justify-content: center;
@@ -188,7 +196,7 @@ const nextImage = () => {
     border-radius: 50px 0px 50px 50px;
     border: 4px solid @color-gray;
     overflow: hidden;
-    background: url('../assets/img/background.png') no-repeat center center;
+    background: url('@/assets/img/background.png') no-repeat center center;
     background-size: cover;
     animation: scroll 30s linear infinite;
     font-size: 16px;
@@ -416,9 +424,6 @@ const nextImage = () => {
             text-align: center;
             color: @font-color-secoundary;
             font-size: 16px;
-        }
-        .click {
-            cursor: pointer;
         }
     }
 }

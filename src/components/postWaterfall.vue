@@ -1,7 +1,7 @@
 <template>
     <div class="waterfall-container" ref="waterfall" >
         <div class="waterfall-item" v-for="(item, index) in props.items" :key="item.id" >
-            <postCard 
+            <Card 
             :data="item" 
             :class="{ viewed: viewedIds.has(item.id) }"
             @click="clickHandle(item.id, index)" 
@@ -11,9 +11,9 @@
 </template>
 
 <script setup>
-import postCard from './postCard.vue';
+import Card from '@/components/postCard.vue';
 import { defineProps, ref, onMounted, watch,nextTick , onUnmounted, reactive} from 'vue';
-import { useConfigStore } from '../stores/config';
+import { useConfigStore } from '@/stores/config';
 
 const store = useConfigStore();
 const props = defineProps({

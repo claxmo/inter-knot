@@ -1,6 +1,6 @@
 <template>
     <div class="post-card" @click="$emit('click')" :class="{delegate: post.category?.name === '委托', owner: post.author.login === store.author.login}">
-        <span class="views"><img src="../assets/svg/views.svg" />{{ post.comments.totalCount }}</span>
+        <span class="views"><img src="@/assets/svg/views.svg" />{{ post.comments.totalCount }}</span>
         <img 
             class="cover" 
             :src="isLoading || isError ? defaultCoverUrl : coverUrl" 
@@ -22,8 +22,8 @@
 <script setup>
 import { marked } from 'marked'
 import { defineProps, nextTick, ref, defineEmits, computed } from 'vue';
-import { useConfigStore } from '../stores/config';
-import defaultCoverUrl from '../assets/svg/default-cover.svg';
+import { useConfigStore } from '@/stores/config';
+import defaultCoverUrl from '@/assets/svg/default-cover.svg';
 
 const props = defineProps({
     data: {

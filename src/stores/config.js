@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 export const useConfigStore = defineStore('config', () => {
     const author = ref({});
@@ -8,6 +8,17 @@ export const useConfigStore = defineStore('config', () => {
     const endCursor = ref(null);
     const hasNextPage = ref(null);
     const isOpenPostDetail = ref(false);
+    const isLoading = ref(false);
+    const message = computed(() => {
+        if (isLoading.value) {
+            return '正在努力加载···'
+        } else if (hasNextPage.value === false) {
+            return '已经到底了···\\[ O_X ]/'
+        } else {
+            return ''
+        }
+    });
+      
 
     const openPostDetail = (index) => {
         curPostIndex.value = index;
@@ -28,6 +39,8 @@ export const useConfigStore = defineStore('config', () => {
         endCursor,
         hasNextPage,
         isOpenPostDetail,
+        isLoading,
+        message,
         openPostDetail,
         closePostDetail,
         name,

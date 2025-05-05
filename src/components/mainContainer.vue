@@ -1,0 +1,104 @@
+<template>
+    <main @scroll="scrollHandle" ref="mainRef">
+        <Waterfall v-if="store.posts.length" :items="store.posts" :itemWidth="300" :itemGap="25" />
+    </main>
+    <span class="message" v-show="distanceToBottom <= 1">{{ store.message }}</span>
+</template>
+
+<script setup>
+import Waterfall from "@/components/postWaterfall.vue";
+import { ref, onMounted, onUnmounted, nextTick, defineExpose } from "vue";
+import { useToast } from 'vue-toastification';
+import { useConfigStore } from '@/stores/config';
+
+const store = useConfigStore();
+const mainRef = ref(null);
+const distanceToBottom = ref(0);
+
+const scrollTop = () => {
+    mainRef.value.scrollTo({top: 0, behavior: 'smooth'});
+};
+
+defineExpose({
+    scrollTop,
+});
+
+const getNextDiscussions = async () => {
+    if (store.isLoading || store.hasNextPage === false) return;
+        store.isLoading = true;
+    try{
+        const discussions = await window.getDiscussions(store.endCursor);
+        store.posts.push(...discussions.nodes.filter(post => 
+            !store.posts.some(existing => existing.id === post.id)
+        ));
+        store.endCursor =  discussions.pageInfo.endCursor;
+        store.hasNextPage =  discussions.pageInfo.hasNextPage;
+    }catch{
+        useToast().warning("获取讨论列表失败!");
+    }finally{
+        nextTick(() => {
+            store.isLoading = false;
+        });   
+    }
+};
+
+const scrollHandle = (e) => {
+    const target = e.target;
+    const viewportHeight = target.clientHeight;
+    distanceToBottom.value = target.scrollHeight - (target.scrollTop + viewportHeight);
+    if (distanceToBottom.value <= viewportHeight) {
+        getNextDiscussions();
+    }
+};
+
+onMounted(() => {
+    window.addEventListener('resize',scrollHandle);
+    getNextDiscussions();
+});
+
+onUnmounted(() => {
+    window.removeEventListener('resize',scrollHandle);
+});
+
+</script>
+
+<style scoped lang="less">
+main {
+width: 100vw;
+height: 100vh;
+padding: 100px 0;
+display: flex;
+flex-direction: column;
+align-items: center;
+background: url('@/assets/img/background.png') no-repeat center center;
+background-size: cover;
+background-position: left bottom;
+animation: bg-scroll 30s linear infinite;
+overflow-y: scroll;
+overflow-x: hidden;
+}
+
+@keyframes bg-scroll {
+    0% {
+        background-position: left bottom;
+    }
+    100% {
+        background-position: right top;
+    }
+}
+
+
+.message{
+  width: 100%;
+  height: 75px;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  bottom: 0;
+  left: 0;
+  color: @font-color-secoundary;
+  font-size: 1.5rem;
+}
+
+</style>

@@ -4,6 +4,7 @@
 // @version      0.1.0
 // @description  none
 // @author       claxmo
+// @license      MIT
 // @run-at       document-start
 // @match        http://localhost:8080/inter-knot/*
 // @match        https://claxmo.github.io/inter-knot/*
@@ -11,6 +12,8 @@
 // @connect      api.github.com
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
+// @downloadURL https://update.greasyfork.org/scripts/534939/%E7%BB%B3%E7%BD%91%E8%B7%A8%E5%9F%9F%E5%8A%A9%E6%89%8B.user.js
+// @updateURL https://update.greasyfork.org/scripts/534939/%E7%BB%B3%E7%BD%91%E8%B7%A8%E5%9F%9F%E5%8A%A9%E6%89%8B.meta.js
 // ==/UserScript==
 
 (function () {
@@ -73,7 +76,7 @@
     };
 
     unsafeWindow.getDiscussions = async (cursor) => {
-        return await graphql(`query($cursor: String) {
+        return (await graphql(`query($cursor: String) {
           repository(owner: "${USERNAME}", name: "${REPO}") {
             discussions(first: 20, after: $cursor) {
               pageInfo {
@@ -102,11 +105,11 @@
               }
             }
           }
-        }`,{cursor});
+        }`,{cursor})).data.repository.discussions;
     };
 
     unsafeWindow.getComments = async (discussion_id, cursor = null) => {
-        return await graphql(`
+        return (await graphql(`
           query($id: ID!, $cursor: String) {
               node(id: $id) {
                   ... on Discussion {
@@ -128,7 +131,7 @@
                       }
                   }
               }
-          }`, { id: discussion_id, cursor });
+          }`, { id: discussion_id, cursor })).data.node;
     };
 
     const urlParams = new URLSearchParams(window.location.search);
