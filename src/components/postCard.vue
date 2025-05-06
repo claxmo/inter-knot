@@ -194,7 +194,7 @@ const onError = () => {
         white-space: nowrap;          
         overflow: hidden;             
         text-overflow: ellipsis;
-        font-size: 0.875em;
+        font-size: 0.925em;
         padding: 0 5px;
     }
 }

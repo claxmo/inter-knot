@@ -9,7 +9,7 @@
                         <ul class="meta">
                             <li><img src="@/assets/svg/clock.svg" />{{ new Date(post?.createdAt).toLocaleDateString("en-CA") }}</li>
                             <li><img src="@/assets/svg/views.svg" />{{ post.comments?.totalCount ?? 0 }}</li>
-                            <li>#{{ post.number }}</li>
+                            <!-- <li>#{{ post.number }}</li> -->
                             <!-- <span><img src="../assets/svg/tag.svg" />{{ post.category?.name }}</span> -->
                         </ul>
                     </div>
@@ -44,7 +44,7 @@
                                 <span class="author-name">
                                     {{ comment.author.login === post.author.login ? `[楼主]${comment.author.login}` : comment.author.login }}
                                 </span>
-                                <span class="createAt">{{ new Date(comment.createdAt).toLocaleDateString("en-CA") }}</span>
+                                <!-- <span class="createAt">{{ new Date(comment.createdAt).toLocaleDateString("en-CA") }}</span> -->
                                 <div class="markdown-body" v-html="marked(comment.body)"></div>
                             </div>
                             <span class="floor">{{ index + 1 }}F</span>
@@ -410,7 +410,7 @@ const nextImage = () => {
                 border-radius: 25px;
                 border-top-left-radius: 0;
                 position: absolute;
-                top: 7px;
+                top: 12px;
                 right: 0;
                 color: @color-black;
 

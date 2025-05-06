@@ -64,18 +64,18 @@ onUnmounted(() => {
 
 <style scoped lang="less">
 main {
-width: 100vw;
-height: 100vh;
-padding: 100px 0;
-display: flex;
-flex-direction: column;
-align-items: center;
-background: url('@/assets/img/background.png') no-repeat center center;
-background-size: cover;
-background-position: left bottom;
-animation: bg-scroll 30s linear infinite;
-overflow-y: scroll;
-overflow-x: hidden;
+    width: 100vw;
+    height: 100vh;
+    padding: 100px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: url('@/assets/img/background.png') no-repeat center center;
+    background-size: cover;
+    background-position: left bottom;
+    animation: bg-scroll 30s linear infinite;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 @keyframes bg-scroll {
