@@ -2,18 +2,16 @@
     <main @scroll="scrollHandle" ref="mainRef">
         <Waterfall v-if="store.posts.length" :items="store.posts" :itemWidth="300" :itemGap="25" />
     </main>
-    <span class="message" v-show="distanceToBottom <= 1">{{ store.message }}</span>
 </template>
 
 <script setup>
 import Waterfall from "@/components/postWaterfall.vue";
-import { ref, onMounted, onUnmounted, nextTick, defineExpose } from "vue";
+import { ref, onMounted, onUnmounted, nextTick, defineExpose, defineEmits } from "vue";
 import { useToast } from 'vue-toastification';
 import { useConfigStore } from '@/stores/config';
 
 const store = useConfigStore();
 const mainRef = ref(null);
-const distanceToBottom = ref(0);
 
 const scrollTop = () => {
     mainRef.value.scrollTo({top: 0, behavior: 'smooth'});
@@ -22,6 +20,9 @@ const scrollTop = () => {
 defineExpose({
     scrollTop,
 });
+
+const emit = defineEmits(["scroll"]);
+
 
 const getNextDiscussions = async () => {
     if (store.isLoading || store.hasNextPage === false) return;
@@ -42,13 +43,16 @@ const getNextDiscussions = async () => {
     }
 };
 
+let distanceToBottom = 0;
+
 const scrollHandle = (e) => {
     const target = e.target;
     const viewportHeight = target.clientHeight;
-    distanceToBottom.value = target.scrollHeight - (target.scrollTop + viewportHeight);
-    if (distanceToBottom.value <= viewportHeight) {
+    distanceToBottom = target.scrollHeight - (target.scrollTop + viewportHeight);
+    if (distanceToBottom <= viewportHeight) {
         getNextDiscussions();
     }
+    emit("scroll",{distanceToBottom});
 };
 
 onMounted(() => {
@@ -85,20 +89,6 @@ main {
     100% {
         background-position: right top;
     }
-}
-
-
-.message{
-  width: 100%;
-  height: 75px;
-  position: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  bottom: 0;
-  left: 0;
-  color: @font-color-secoundary;
-  font-size: 1.5rem;
 }
 
 </style>

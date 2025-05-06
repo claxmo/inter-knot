@@ -2,16 +2,18 @@
   <span style="position:fixed; display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh;"  v-if="store.posts.length <= 0">
     <a style="font-size: 2.5rem; font-style: italic; text-decoration: underline; color: #10bff0" href="https://greasyfork.org/zh-CN/scripts/534939-%E7%BB%B3%E7%BD%91%E8%B7%A8%E5%9F%9F%E5%8A%A9%E6%89%8B">点击下载绳网跨域助手</a>
   </span>
-  <div class="btn-container">
+  <div class="btn-container" ref="btnContainer">
     <button class="btn" title="刷新帖子" @click="refreshDiscussions"><img src="@/assets/svg/refresh.svg"></button>
     <button class="btn" title="写帖子">
         <a :href="`https://github.com/${store.name}/${store.repo}/discussions/new/choose`" target="_blank"><img src="@/assets/svg/write.svg"></a>
     </button>
     <button class="btn" title="顶部" @click="mainContainerRef.scrollTop"><img src="@/assets/svg/arrow-up.svg"></button>
-    </div>
+  </div>
   <postDetail />
   <headerContainer />
-  <mainContainer ref="mainContainerRef"/>
+  <mainContainer ref="mainContainerRef" @scroll="scrollHandle"/>
+  <span class="message" v-show="showMessage">{{ store.message }}</span>
+
 </template>
 
 <script setup>
@@ -54,6 +56,20 @@ const refreshDiscussions = async () => {
     } 
 };
 
+const showMessage = ref(false);
+let scrollTimer = null;
+const btnContainer = ref(null);
+
+const scrollHandle = ({distanceToBottom}) => {
+  console.log(distanceToBottom);
+  showMessage.value = distanceToBottom <= 1;
+  btnContainer.value.style.opacity = "0.3";
+  if (scrollTimer) clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(() => {
+    btnContainer.value.style.opacity = "1";
+  }, 300);
+};
+
 </script>
 
 <style scoped lang="less">
@@ -68,7 +84,20 @@ const refreshDiscussions = async () => {
   right: 25px;
   z-index: 10;
   transition: all 0.3s;
+  
 }
 
+.message{
+  width: 100%;
+  height: 75px;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  bottom: 0;
+  left: 0;
+  color: @font-color-secoundary;
+  font-size: 1.5rem;
+}
 </style>
 
