@@ -61,7 +61,6 @@ let scrollTimer = null;
 const btnContainer = ref(null);
 
 const scrollHandle = ({distanceToBottom}) => {
-  console.log(distanceToBottom);
   showMessage.value = distanceToBottom <= 1;
   btnContainer.value.style.opacity = "0.3";
   if (scrollTimer) clearTimeout(scrollTimer);

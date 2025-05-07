@@ -9,6 +9,7 @@
                         <ul class="meta">
                             <li><img src="@/assets/svg/clock.svg" />{{ new Date(post?.createdAt).toLocaleDateString("en-CA") }}</li>
                             <li><img src="@/assets/svg/views.svg" />{{ post.comments?.totalCount ?? 0 }}</li>
+                            <li><img src="@/assets/svg/pictures.svg" />{{ imgUrls.length }}</li>
                             <!-- <li>#{{ post.number }}</li> -->
                             <!-- <span><img src="../assets/svg/tag.svg" />{{ post.category?.name }}</span> -->
                         </ul>
@@ -18,14 +19,14 @@
             </header>
             <main>
                 <div class="media-container">
-                    <span class="prev-btn" @click="prevImage" title="上一张" v-if="imgUrls.length > 1"></span>
+                    <span class="prev-btn" @click="prevImage" title="上一张" v-show="imgUrls.length > 1"></span>
                     <img 
                     v-for="(url, index) in imgUrls"
                     v-show="index === currentIndex"
                     :src="url" 
                     :key="url" />
-                    <span class="next-btn" @click="nextImage" title="下一张" v-if="imgUrls.length > 1"></span>
-                    <span class="cur-page" v-if="imgUrls.length > 1">{{ currentIndex + 1 }}&nbsp;-&nbsp;{{ imgUrls.length }}</span>
+                    <span class="next-btn" @click="nextImage" title="下一张" v-show="imgUrls.length > 1"></span>
+                    <span class="cur-page" v-show="imgUrls.length > 1">{{ currentIndex + 1 }}&nbsp;-&nbsp;{{ imgUrls.length }}</span>
                 </div>
                 <div class="interaction-container">
                     <span class="post-title" v-text="postTitle"></span>

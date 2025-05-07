@@ -1,12 +1,18 @@
 <template>
-    <div class="post-card" @click="$emit('click')" :class="{delegate: post.category?.name === '委托', owner: post.author.login === store.author.login}">
+    <div class="post-card" 
+    @click="$emit('click')" 
+    :class="{
+        delegate: post.category?.name === '委托', 
+        owner: post.author.login === store.author.login,
+        R18: post.category?.name === 'R18' && coverUrl !== defaultCoverUrl
+    }">
         <span class="views"><img src="@/assets/svg/views.svg" />{{ post.comments.totalCount }}</span>
         <img 
-            class="cover" 
-            :src="isLoading || isError ? defaultCoverUrl : coverUrl" 
-            loading="lazy" 
-            @load="onLoad" 
-            @error="onError"
+        class="cover"
+        :src="isLoading || isError ? defaultCoverUrl : coverUrl" 
+        loading="lazy" 
+        @load="onLoad" 
+        @error="onError"
         />
         <div class="footer">
             <div class="author-info">
@@ -21,7 +27,7 @@
 
 <script setup>
 import { marked } from 'marked'
-import { defineProps, nextTick, ref, defineEmits, computed } from 'vue';
+import { defineProps, nextTick, ref, defineEmits, computed, toRef } from 'vue';
 import { useConfigStore } from '@/stores/config';
 import defaultCoverUrl from '@/assets/svg/default-cover.svg';
 
@@ -33,7 +39,7 @@ const props = defineProps({
 });
 
 const store = useConfigStore();
-const post = ref(props.data);
+const post = toRef(props, "data");
 
 const postTitle = computed(() => {
     if (post.value.category.name !== "常规"){
@@ -91,17 +97,20 @@ const onError = () => {
     transition: all 0.3s;
     overflow: hidden;
     font-size: 16px;
+    position: relative;
     &:hover {
         animation: border-glow 0.5s linear infinite alternate;
     }
     .cover {
         width: 100%;
         object-fit: cover;
-        max-height: 350px;
+        max-height: 400px;
+        display: block;
     }
 }
 
 .footer {
+    background-color: @color-gray-dark;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -119,13 +128,13 @@ const onError = () => {
             aspect-ratio: 1/1;
             border-radius: 50%;
             border: 4px solid @color-gray-dark;
-            margin-top: -32px;
+            margin-top: -28px;
             z-index: 1;
             &::before {
                 position: absolute;
                 content: "";
                 top: -6px;
-                left: -29px;
+                left: -29.5px;
                 width: 30px;
                 height: 30px;
                 background: transparent;
@@ -137,7 +146,7 @@ const onError = () => {
                 position: absolute;
                 content: "";
                 top: -6px;
-                right: -29px;
+                right: -29.5px;
                 width: 30px;
                 height: 30px;
                 background: transparent;
@@ -163,6 +172,7 @@ const onError = () => {
             position: relative;
             margin-left: 5px;
             padding-left: 4px;
+            padding-top: 2px;
             overflow: hidden;             
             text-overflow: ellipsis;
             &::before{
@@ -232,6 +242,10 @@ const onError = () => {
 //     color: @color-orange;
 // }
 
+.post-card.R18 .cover{
+    filter: blur(25px);
+
+}
 
 
 </style>
