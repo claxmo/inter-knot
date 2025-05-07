@@ -4,12 +4,12 @@
     :class="{
         delegate: post.category?.name === '委托', 
         owner: post.author.login === store.author.login,
-        R18: post.category?.name === 'R18' && coverUrl !== defaultCoverUrl && !isLoading && !isError
+        R18: post.category?.name === 'R18'
     }">
         <span class="views"><img src="@/assets/svg/views.svg" />{{ post.comments.totalCount }}</span>
         <img 
         class="cover"
-        :src="coverUrl" 
+        :src="isLoading || isError ? defaultCoverUrl : coverUrl" 
         loading="lazy" 
         @load="onLoad" 
         @error="onError"
@@ -68,13 +68,11 @@ const isError = ref(false);
 const onLoad = () => {
     emit("imageLoaded");
     isLoading.value = false;
-    coverUrl.value = defaultCoverUrl;
 };
 
 const onError = () => {
     isLoading.value = false;
     isError.value = true;
-    coverUrl.value = defaultCoverUrl;
     
 };
 
