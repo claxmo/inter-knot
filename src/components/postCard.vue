@@ -9,7 +9,7 @@
         <span class="views"><img src="@/assets/svg/views.svg" />{{ post.comments.totalCount }}</span>
         <img 
         class="cover"
-        :src="isLoading || isError ? defaultCoverUrl : coverUrl" 
+        :src="coverUrl" 
         loading="lazy" 
         @load="onLoad" 
         @error="onError"
@@ -68,11 +68,13 @@ const isError = ref(false);
 const onLoad = () => {
     emit("imageLoaded");
     isLoading.value = false;
+    coverUrl.value = defaultCoverUrl;
 };
 
 const onError = () => {
     isLoading.value = false;
     isError.value = true;
+    coverUrl.value = defaultCoverUrl;
     
 };
 
