@@ -1,5 +1,5 @@
 <template>
-    <div class="user-info" @click="clickHandle">
+    <div class="user-info" @click="clickHandle" :title="author?.login ? '已登录' : '点击登录'">
         <img class="avatar" :src="author?.avatar_url ?? defaultAvatarUrl">
         <div class="info-text">
             <span class="username">{{ author?.login ?? "传奇绳匠" }}</span>
@@ -45,9 +45,12 @@ onMounted(async () => {
     if (isLogin.value) {
       try{
         author.value = await window.getUserProfile();
-      }catch{
-        useToast().warning("获取用户信息失败!")
+      }catch(e){
+        useToast().error("获取用户信息失败!");
+        console.error(e);
       }
+    }else{
+      window.authLogin();
     }
 });
 

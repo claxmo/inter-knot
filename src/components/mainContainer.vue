@@ -23,10 +23,10 @@ defineExpose({
 
 const emit = defineEmits(["scroll"]);
 
-
 const getNextDiscussions = async () => {
     if (store.isLoading || store.hasNextPage === false) return;
-        store.isLoading = true;
+
+    store.isLoading = true;
     try{
         const discussions = await window.getDiscussions(store.endCursor);
         store.posts.push(...discussions.nodes.filter(post => 
@@ -34,8 +34,9 @@ const getNextDiscussions = async () => {
         ));
         store.endCursor =  discussions.pageInfo.endCursor;
         store.hasNextPage =  discussions.pageInfo.hasNextPage;
-    }catch{
-        useToast().warning("获取讨论列表失败!");
+    }catch(e){
+        useToast().error("获取讨论列表失败!");
+        console.error(e);
     }finally{
         nextTick(() => {
             store.isLoading = false;
@@ -57,7 +58,7 @@ const scrollHandle = (e) => {
 
 onMounted(() => {
     window.addEventListener('resize',scrollHandle);
-    getNextDiscussions();
+    getNextDiscussions(); 
 });
 
 onUnmounted(() => {

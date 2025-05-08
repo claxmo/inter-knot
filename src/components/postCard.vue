@@ -3,7 +3,7 @@
     @click="$emit('click')" 
     :class="{
         delegate: post.category?.name === '委托', 
-        owner: post.author.login === store.author.login,
+        // owner: post.author.login === store.author.login,
         R18: post.category?.name === 'R18'
     }">
         <span class="views"><img src="@/assets/svg/views.svg" />{{ post.comments.totalCount }}</span>
@@ -27,8 +27,7 @@
 
 <script setup>
 import { marked } from 'marked'
-import { defineProps, nextTick, ref, defineEmits, computed, toRef } from 'vue';
-import { useConfigStore } from '@/stores/config';
+import { defineProps, onMounted, ref, defineEmits, computed, toRef } from 'vue';
 import defaultCoverUrl from '@/assets/svg/default-cover.svg';
 
 const props = defineProps({
@@ -38,7 +37,6 @@ const props = defineProps({
     }
 });
 
-const store = useConfigStore();
 const post = toRef(props, "data");
 
 const postTitle = computed(() => {
@@ -50,20 +48,10 @@ const postTitle = computed(() => {
 });
 const postBody = ref("");
 const coverUrl = ref(null);
-
-nextTick(() => {
-    const matches = post.value.body.match(/!\[.*?\]\((.*?)\)/);
-    coverUrl.value = matches ? matches[1] : defaultCoverUrl;
-    postBody.value = marked(post.value.body).replace(/<[^>]*>/g, '');
-    if (postBody.value.trim() === ""){
-        postBody.value = "null";
-    }
-
-});
-
-const emit = defineEmits(["click","imageLoaded"]);
 const isLoading = ref(true);
 const isError = ref(false);
+
+const emit = defineEmits(["click","imageLoaded"]);
 
 const onLoad = () => {
     emit("imageLoaded");
@@ -75,6 +63,15 @@ const onError = () => {
     isError.value = true;
     
 };
+
+onMounted(() => {
+    const matches = post.value.body.match(/!\[.*?\]\((.*?)\)/);
+    coverUrl.value = matches ? matches[1] : defaultCoverUrl;
+    postBody.value = marked(post.value.body).replace(/<[^>]*>/g, '');
+    if (postBody.value.trim() === ""){
+        postBody.value = "null";
+    }
+});
 
 </script>
 
@@ -247,5 +244,8 @@ const onError = () => {
 
 }
 
+.post-card.R18:not(.viewed) .post-title{
+    color: @color-pink-light;
+}
 
 </style>

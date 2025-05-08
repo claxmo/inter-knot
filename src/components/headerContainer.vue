@@ -43,8 +43,6 @@ display: flex;
 justify-content: space-between;
 align-items: center;
 z-index: 10;
-
-/* 半透明背景 + 磨砂效果 */
 background-color: rgba(0, 0, 0, 0.7);
 backdrop-filter: blur(10px);
 -webkit-backdrop-filter: blur(10px);

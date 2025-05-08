@@ -70,7 +70,6 @@ import { computed, ref, watch, nextTick } from 'vue';
 import { useToast } from 'vue-toastification';
 import { useConfigStore } from '@/stores/config';
 
-
 const store = useConfigStore();
 const post = computed(() => store.posts[store.curPostIndex] ?? {});
 const comments = ref({
@@ -102,15 +101,22 @@ const getNextComments = async () => {
             comment => !comments.value.nodes.some(c => c.id === comment.id)
         ));
         comments.value.pageInfo = commentNode.comments.pageInfo;
-    }catch{
-        useToast().warning("获取评论列表失败!");
+    }catch(e){
+        useToast().error("获取评论列表失败!");
+        console.error(e);
     }finally{
         nextTick(() => {
             isLoading.value = false;
         });
-    }
-        
-       
+    }       
+};
+
+const prevImage = () => {
+  currentIndex.value = (currentIndex.value - 1 + imgUrls.value.length) % imgUrls.value.length;
+};
+
+const nextImage = () => {
+  currentIndex.value = (currentIndex.value + 1) % imgUrls.value.length;
 };
 
 watch(post, async () => {
@@ -123,7 +129,6 @@ watch(post, async () => {
         }
     };
     isLoading.value = false;
-
     currentIndex.value = 0;
     postBody.value = marked(post.value.body || "");
     const imgRegx = /<img[^>]*src="([^"]*)"[^>]*>/g;
@@ -134,13 +139,6 @@ watch(post, async () => {
     await getNextComments();
 });
 
-const prevImage = () => {
-  currentIndex.value = (currentIndex.value - 1 + imgUrls.value.length) % imgUrls.value.length;
-};
-
-const nextImage = () => {
-  currentIndex.value = (currentIndex.value + 1) % imgUrls.value.length;
-};
 </script>
 
 <style scoped lang="less">
@@ -429,8 +427,6 @@ const nextImage = () => {
     }
 }
 
-
-
 @media (max-width: 1080px) {
 
     .post-detail {
@@ -456,9 +452,6 @@ const nextImage = () => {
         }
     }
 }
-
-
-
 
 // .text {
 //     width: 100%;
