@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useConfigStore } from '@/stores/config';
 import { useToast } from 'vue-toastification';
 
@@ -24,7 +24,9 @@ const store = useConfigStore();
 const isOpen = ref(false);
 const activeIndex = ref(0);
 const curQuery = ref('全部');
-const queryOptions = [
+
+const queryOptions = computed(() => {
+ return [
     { label: '全部', query: '' },
     { label: '我的', query: store.author?.login ? `author:${store.author.login}` : '' },
     { label: '公告', query: 'category:公告' },
@@ -33,11 +35,13 @@ const queryOptions = [
     { label: 'R18', query: 'category:R18' },
     { label: '常规', query: 'category:常规' },
   ];
+});
+
 
 const setQuery = (index, query) => {
     if (store.isLoading) return useToast().info("等待加载完成后再试!");
     activeIndex.value = index;
-    curQuery.value = queryOptions[index].label;
+    curQuery.value = queryOptions.value[index].label;
     store.searchQuery = query;
     isOpen.value = !isOpen.value;
 };

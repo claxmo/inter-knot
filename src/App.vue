@@ -33,7 +33,7 @@ const showMessage = ref(false);
 let scrollTimer = null;
 
 const scrollHandle = ({distanceToBottom}) => {
-  showMessage.value = distanceToBottom <= 1;
+  showMessage.value = distanceToBottom <= 10;
   controlContainerRef.value.style.opacity = "0.3";
   if (scrollTimer) clearTimeout(scrollTimer);
   scrollTimer = setTimeout(() => {
