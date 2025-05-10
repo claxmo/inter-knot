@@ -9,6 +9,7 @@
 @color-pink-light: #FF386B;
 @font-color-primary: #f4f4f4;
 @font-color-secoundary: #9e9e9e;
+@font-color-active: #232323;
 
 @import '~github-markdown-css/github-markdown-dark.css';
 
@@ -31,11 +32,39 @@
     background: linear-gradient(#212121, #141414);
     box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
     transition: all 0.3s;
+    font-size: 16px;
     &:hover {
-      border-color: @color-yellow;
+      animation: border-glow 0.5s linear infinite alternate;
     }
     img {
       width: 28px;
       height: 28px;
     }
   }
+
+@keyframes border-glow {
+  0% {
+      border-color: @color-yellow;
+  }
+  100% {
+      border-color: @color-green;
+  }
+}
+
+@keyframes scale-grow {
+  0% {
+    scale: 1.1;
+  }
+  100% {
+    scale: 1.3;
+  }
+}
+
+@keyframes background-glow {
+  0% {
+      background-color: @color-yellow;
+  }
+  100% {
+      background-color: @color-green;
+  }
+}

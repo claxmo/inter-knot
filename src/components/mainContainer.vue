@@ -6,7 +6,7 @@
 
 <script setup>
 import Waterfall from "@/components/postWaterfall.vue";
-import { ref, onMounted, onUnmounted, nextTick, defineExpose, defineEmits } from "vue";
+import { ref, onMounted, onUnmounted, nextTick, defineExpose, defineEmits, watch } from "vue";
 import { useToast } from 'vue-toastification';
 import { useConfigStore } from '@/stores/config';
 
@@ -28,7 +28,8 @@ const getNextDiscussions = async () => {
 
     store.isLoading = true;
     try{
-        const discussions = await window.getDiscussions(store.endCursor);
+        if (typeof window.getDiscussions === "undefined") throw new Error("window.getDiscussions is undefined");
+        const discussions = await window.getDiscussions(store.endCursor, store.searchQuery);
         store.posts.push(...discussions.nodes.filter(post => 
             !store.posts.some(existing => existing.id === post.id)
         ));
@@ -63,6 +64,13 @@ onMounted(() => {
 
 onUnmounted(() => {
     window.removeEventListener('resize',scrollHandle);
+});
+
+watch(() => store.searchQuery, async () => {
+    store.posts = [];
+    store.endCursor = null;
+    store.hasNextPage = null;
+    await getNextDiscussions();
 });
 
 </script>

@@ -29,7 +29,10 @@
                     <span class="cur-page" v-show="imgUrls.length > 1">{{ currentIndex + 1 }}&nbsp;-&nbsp;{{ imgUrls.length }}</span>
                 </div>
                 <div class="interaction-container">
-                    <span class="post-title" v-text="postTitle"></span>
+                    <span class="post-title">
+                        <span class="label" v-show="post.category?.name !== '常规'">{{ `[${post.category?.name}]` }}</span>
+                        <span v-text="post.title"></span>
+                    </span>
                     <div class="markdown-body" v-html="postBody"></div>
                     <a class="reply-btn"
                        :href="`https://github.com/${store.name}/${store.repo}/discussions/${post.number}`" 
@@ -43,7 +46,8 @@
                             <span class="avatar"><img :src="comment.author.avatarUrl" /></span>
                             <div class="text">
                                 <span class="author-name">
-                                    {{ comment.author.login === post.author.login ? `[楼主]${comment.author.login}` : comment.author.login }}
+                                    <span class="label" v-if="comment.author.login === post.author.login">[楼主]</span>
+                                    <span>{{ comment .author.login }}</span>
                                 </span>
                                 <!-- <span class="createAt">{{ new Date(comment.createdAt).toLocaleDateString("en-CA") }}</span> -->
                                 <div class="markdown-body" v-html="marked(comment.body)"></div>
@@ -82,13 +86,6 @@ const comments = ref({
 const isLoading = ref(false);
 
 const imgUrls = ref([]);
-const postTitle = computed(() => {
-  if (post.value.category?.name !== '常规' ) {
-    return `[ ${post.value.category?.name} ]` + post.value.title;
-  } else {
-    return post.value.title;
-  }
-});
 const postBody = ref("");
 const currentIndex = ref(0);
 
@@ -96,6 +93,7 @@ const getNextComments = async () => {
     if (isLoading.value || comments.value.pageInfo?.hasNextPage === false) return;
     isLoading.value = true;
     try{
+        if (typeof window.getComments === "undefined") throw new Error("window.getComments is undefined");
         const commentNode = await window.getComments(post.value.id, comments.value.pageInfo?.endCursor);
         comments.value.nodes.push(...commentNode.comments.nodes.filter(
             comment => !comments.value.nodes.some(c => c.id === comment.id)
@@ -119,7 +117,10 @@ const nextImage = () => {
   currentIndex.value = (currentIndex.value + 1) % imgUrls.value.length;
 };
 
-watch(post, async () => {
+const imgRegx = /<img[^>]*src=['"]([^'"]+)['"][^>]*>/g;
+
+watch(() => store.isOpenPostDetail, async (newValue) => {
+    if (!newValue) return;
     if(!post.value || !post.value.id) return;
     comments.value = {
         nodes: [],
@@ -130,12 +131,17 @@ watch(post, async () => {
     };
     isLoading.value = false;
     currentIndex.value = 0;
-    postBody.value = marked(post.value.body || "");
-    const imgRegx = /<img[^>]*src="([^"]*)"[^>]*>/g;
-    const matches = [...postBody.value.matchAll(imgRegx)];
-    imgUrls.value = matches.length > 0 ? matches.map(match => match[1]) : [defaultCoverUrl];
-    postBody.value = postBody.value.replace(imgRegx, '');
+    imgUrls.value = [defaultCoverUrl];
+    postBody.value = "";
 
+    if (post.value.body){
+        postBody.value = marked(post.value.body);
+        const matches = [...postBody.value.matchAll(imgRegx)];
+        if (matches.length){
+            imgUrls.value = matches.map(match => match[1]);
+            postBody.value = postBody.value.replace(imgRegx, '');
+        }
+    }
     await getNextComments();
 });
 
@@ -339,9 +345,10 @@ watch(post, async () => {
     overflow-x: hidden;
     overflow-wrap: break-word;
     gap: 8px;
-    
     .post-title {
         font-size: 1.125em;
+        letter-spacing: 0.05em;
+
     }
     .reply-btn {
         background-color: @color-black;
@@ -366,14 +373,6 @@ watch(post, async () => {
             display: flex;
             padding: 4px 0;
             position: relative;
-            &.owner {
-                .text .author-name {
-                    color: @color-orange;
-                }
-                .floor {
-                    background-color: @color-orange;
-                }
-            }
             .avatar {
                 height: 56px;
                 aspect-ratio: 1/1;
@@ -396,11 +395,7 @@ watch(post, async () => {
                 flex-direction: column;
                 .author-name {
                     color: @font-color-secoundary;
-                } 
-                .createAt {
-                    color: @font-color-secoundary;
-                    font-size: 12px;
-                }            
+                }           
             }
             .floor {
                 font-size: 0.75em;
@@ -413,6 +408,14 @@ watch(post, async () => {
                 right: 0;
                 color: @color-black;
 
+            }
+            &.owner {
+                .text .author-name *{
+                    color: @color-orange;
+                }
+                .floor {
+                    background-color: @color-orange;
+                }
             }
         }
     }
@@ -452,48 +455,5 @@ watch(post, async () => {
         }
     }
 }
-
-// .text {
-//     width: 100%;
-//    overflow: hidden;
-//    text-overflow: ellipsis;
-//    text-align: justify;
-//    display: -webkit-box;
-//    -webkit-line-clamp: 5;
-//    line-clamp: 5;
-//    -webkit-box-orient: vertical;
-//    position: relative;
-//    &::before {
-//     content: "";
-//     height: calc(100% - 1.5rem);
-//     float: right;
-//    }
-//    .exp-btn {
-//         cursor: pointer;
-//         float: right;
-//         clear: both;
-//         color: #3e3e3e;
-//         margin-left: 32px;
-//         &::before {
-//             content: "▼展开";
-//         }
-//         &:hover {
-//             color: #9e9e9e;
-//         }
-//    }
-// }
-// .exp {
-//     display: none;
-// }
-// .exp:checked+.text .exp-btn::before{
-//     content: "▲收起";
-// }
-// .exp:checked+.text {
-//     -webkit-line-clamp: 999;
-//     line-clamp: 999;
-//     &::after {
-//         visibility: hidden;
-//     }
-// }
 </style>
 

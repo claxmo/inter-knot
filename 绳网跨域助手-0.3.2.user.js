@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         绳网跨域助手
 // @namespace    http://tampermonkey.net/
-// @version      0.1.0
+// @version      0.3.2
 // @description  none
 // @author       claxmo
 // @license      MIT
@@ -25,7 +25,7 @@
     const REPO = "inter-knot";
     let accessToken = localStorage.getItem("accessToken");
 
-    const request = async (method, url, data = null) => {
+         const request = async (method, url, data = null) => {
         return new Promise((resolve, reject) => {
             GM_xmlhttpRequest({
                 method,
@@ -75,28 +75,29 @@
         return await request("GET","https://api.github.com/user")
     };
 
-    unsafeWindow.getDiscussions = async (cursor) => {
-        return (await graphql(`query($cursor: String) {
-          repository(owner: "${USERNAME}", name: "${REPO}") {
-            discussions(first: 20, after: $cursor) {
+    unsafeWindow.getDiscussions = async (cursor, searchQuery = "") => {
+        return (await graphql(`
+          query($queryString: String!, $cursor: String) {
+            search(type: DISCUSSION, query: $queryString, first: 20, after: $cursor) {
               pageInfo {
                 endCursor
                 hasNextPage
               }
               nodes {
-                number
-                id
-                title
-                body
-                createdAt
-                author {
-                  login
-                  avatarUrl
-                }
-                comments {
+                ... on Discussion {
+                  number
+                  id
+                  title
+                  body
+                  createdAt
+                  author {
+                    login
+                    avatarUrl
+                  }
+                  comments {
                     totalCount
                   }
-                category{
+                 category {
                     id
                     name
                     emoji
@@ -105,8 +106,12 @@
               }
             }
           }
-        }`,{cursor})).data.repository.discussions;
+  `      , {
+            queryString: `repo:${USERNAME}/${REPO} ${searchQuery}`.trim(),
+            cursor
+        })).data.search;
     };
+
 
     unsafeWindow.getComments = async (discussion_id, cursor = null) => {
         return (await graphql(`

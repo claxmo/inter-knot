@@ -19,7 +19,10 @@
                 <span class="avatar"><img  :src="post.author.avatarUrl" /></span>
                 <span class="author-name">{{ post.author.login }}</span>
             </div>
-            <span class="post-title" v-text="postTitle"></span>
+            <span class="post-title">
+                <span class="label" v-show="post.category.name !== '常规'">{{ `[${post.category.name}]` }}</span>
+                <span v-text="post.title"></span>
+            </span>
             <span class="post-body" v-text="postBody"></span>
         </div>
     </div>
@@ -27,7 +30,7 @@
 
 <script setup>
 import { marked } from 'marked'
-import { defineProps, onMounted, ref, defineEmits, computed, toRef } from 'vue';
+import { defineProps, onMounted, ref, defineEmits, toRef } from 'vue';
 import defaultCoverUrl from '@/assets/svg/default-cover.svg';
 
 const props = defineProps({
@@ -39,13 +42,6 @@ const props = defineProps({
 
 const post = toRef(props, "data");
 
-const postTitle = computed(() => {
-    if (post.value.category.name !== "常规"){
-        return `[ ${post.value.category.name} ]` + post.value.title;
-    }else{
-        return post.value.title;
-    }
-});
 const postBody = ref("");
 const coverUrl = ref(null);
 const isLoading = ref(true);
@@ -76,16 +72,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
-@keyframes border-glow {
-    0% {
-        border-color: @color-yellow;
-    }
-    100% {
-        // scale: 1.05;
-        border-color: @color-green;
-    }
-}
-
 .post-card {
     background-color: @color-gray-dark;
     border: 4px solid @color-black;
@@ -102,6 +88,7 @@ onMounted(() => {
         width: 100%;
         object-fit: cover;
         max-height: 400px;
+        min-height: 185px;
         display: block;
     }
 }
@@ -127,6 +114,7 @@ onMounted(() => {
             border: 4px solid @color-gray-dark;
             margin-top: -28px;
             z-index: 1;
+            background-color: @color-gray-dark;
             &::before {
                 position: absolute;
                 content: "";
@@ -195,6 +183,7 @@ onMounted(() => {
         font-size: 1em;
         margin-bottom: 2px;
         padding: 0 5px;
+        letter-spacing: 0.05em;
     }
     .post-body {
         color: @font-color-secoundary;
@@ -223,11 +212,11 @@ onMounted(() => {
     }
 }
 
-.post-card.viewed .post-title {
+.post-card.viewed .post-title *{
     color: @font-color-secoundary;
 }
 
-.post-card.delegate:not(.viewed) .post-title{
+.post-card.delegate:not(.viewed) .post-title *{
     background: linear-gradient(0deg, @color-blue, @color-blue-light); /* 渐变色定义 */
     -webkit-background-clip: text; /* 裁剪背景到文字 */
     -webkit-text-fill-color: transparent; /* 文字颜色透明 */
@@ -244,7 +233,7 @@ onMounted(() => {
 
 }
 
-.post-card.R18:not(.viewed) .post-title{
+.post-card.R18:not(.viewed) .post-title *{
     color: @color-pink-light;
 }
 

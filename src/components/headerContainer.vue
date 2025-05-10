@@ -35,18 +35,18 @@ const togglePlay = () => {
 
 <style scoped lang="less">
 header{
-position: fixed;
-width: 100%;
-height: 90px;
-padding: 5px 50px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-z-index: 10;
-background-color: rgba(0, 0, 0, 0.7);
-backdrop-filter: blur(10px);
--webkit-backdrop-filter: blur(10px);
-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
+    position: fixed;
+    width: 100%;
+    height: 90px;
+    padding: 5px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
 }
 
 @media (max-width: 1440px) {

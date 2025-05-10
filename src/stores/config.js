@@ -9,6 +9,7 @@ export const useConfigStore = defineStore('config', () => {
     const hasNextPage = ref(null);
     const isOpenPostDetail = ref(false);
     const isLoading = ref(false);
+    const searchQuery = ref("");
     const message = computed(() => {
         if (isLoading.value) {
             return '正在努力加载···'
@@ -19,7 +20,6 @@ export const useConfigStore = defineStore('config', () => {
         }
     });
       
-
     const openPostDetail = (index) => {
         curPostIndex.value = index;
         isOpenPostDetail.value = true;
@@ -41,6 +41,7 @@ export const useConfigStore = defineStore('config', () => {
         isOpenPostDetail,
         isLoading,
         message,
+        searchQuery,
         openPostDetail,
         closePostDetail,
         name,

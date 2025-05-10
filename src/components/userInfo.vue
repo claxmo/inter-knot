@@ -44,6 +44,7 @@ const clickHandle = () => {
 onMounted(async () => {
     if (isLogin.value) {
       try{
+        if (typeof window.getUserProfile === "undefined") throw new Error("window.getUserProfile is undefined");
         author.value = await window.getUserProfile();
       }catch(e){
         useToast().error("获取用户信息失败!");
@@ -74,7 +75,7 @@ onMounted(async () => {
   transition: all 0.3s;
   font-size: 16px;
   &:hover {
-    border-color: @color-yellow;
+    animation: border-glow 0.5s linear infinite alternate;
   }
   .avatar {
     height: 100%;
