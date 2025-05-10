@@ -56,11 +56,11 @@ const refreshDiscussions = async () => {
           totalNewPosts.push(...newPosts);
           endCursor = discussions.pageInfo.nextCursor;
           flag = discussions.pageInfo.hasNextPage;
-          useToast().info(`发现了 ${totalNewPosts.length} 篇新帖子`)      
           if (newPosts.length === 0) break;
-          store.posts.unshift(...totalNewPosts);
-          mainContainerRef.value.scrollTop();
         }   
+        useToast().info(`发现了 ${totalNewPosts.length} 篇新帖子`)      
+        store.posts.unshift(...totalNewPosts);
+        mainContainerRef.value.scrollTop();
     }catch{
         useToast().warning("刷新讨论列表失败!");
     }finally{
