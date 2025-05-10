@@ -54,7 +54,7 @@ const refreshDiscussions = async () => {
               !store.posts.some(existing => existing.id === post.id)
           );
           totalNewPosts.push(...newPosts);
-          endCursor = discussions.pageInfo.nextCursor;
+          endCursor = discussions.pageInfo.endCursor;
           flag = discussions.pageInfo.hasNextPage;
           if (newPosts.length === 0) break;
         }   
