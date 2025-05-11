@@ -195,8 +195,8 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
 }
 
 .post-detail {
-    width:80%;
-    height: 80%;
+    width:70%;
+    height: 70%;
     transition: all 0.3s;
     border-radius: 50px 0px 50px 50px;
     border: 4px solid @color-gray;

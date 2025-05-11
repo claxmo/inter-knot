@@ -204,7 +204,7 @@ onMounted(() => {
     position: absolute;
     top: 5px;
     left: 15px;
-    z-index: 10;
+    z-index: 9;
     display: flex;
     gap: 4px;
     justify-content: center;
