@@ -10,7 +10,7 @@
             <button class="btn" title="顶部" @click="scrollTop"><img src="@/assets/svg/arrow-up.svg"></button>
         </div>
     </div> 
-    <span class="message" v-show="showMessage">{{ store.message }}</span>
+    <span class="message" v-show="distanceToBottom <= 10">{{ store.message }}</span>
 
 </template>
 
@@ -83,19 +83,17 @@ const refreshDiscussions = async () => {
     } 
 };
 
-const showMessage = ref(false);
 const controlContainerRef = ref(null);
 let scrollTimer = null;
-let distanceToBottom = 0;
+const distanceToBottom = ref(0);
 
 const scrollHandle = (e) => {
     const target = e.target;
     const viewportHeight = target.clientHeight;
-    distanceToBottom = target.scrollHeight - (target.scrollTop + viewportHeight);
-    if (distanceToBottom <= viewportHeight) {
+    distanceToBottom.value = target.scrollHeight - (target.scrollTop + viewportHeight);
+    if (distanceToBottom.value <= viewportHeight) {
         getNextDiscussions();
     }
-    showMessage.value = distanceToBottom <= 10;
     controlContainerRef.value.style.opacity = "0.3";
     if (scrollTimer) clearTimeout(scrollTimer);
     scrollTimer = setTimeout(() => {
