@@ -125,11 +125,11 @@ onMounted(async () => {
     height: 100%;
     text-align: center;
     .level-num {
-      font-size: 1.625em;
+      font-size: 1.5em;
       margin-bottom: -5px;
     }
     .level-text {
-      font-size: 0.625em;
+      font-size: 0.5em;
       color: @font-color-secoundary;
     }
   }

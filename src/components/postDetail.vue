@@ -26,7 +26,7 @@
                     :src="url" 
                     :key="url" />
                     <span class="next-btn" @click="nextImage" title="下一张" v-show="imgUrls.length > 1"></span>
-                    <span class="cur-page" v-show="imgUrls.length > 1">{{ currentIndex + 1 }}&nbsp;-&nbsp;{{ imgUrls.length }}</span>
+                    <span class="cur-page" v-show="imgUrls.length > 1">{{ currentIndex + 1 }}/{{ imgUrls.length }}</span>
                 </div>
                 <div class="interaction-container">
                     <span class="post-title">
@@ -195,8 +195,8 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
 }
 
 .post-detail {
-    width: 70%;
-    height: 70%;
+    width:80%;
+    height: 80%;
     transition: all 0.3s;
     border-radius: 50px 0px 50px 50px;
     border: 4px solid @color-gray;
@@ -347,8 +347,9 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
     gap: 8px;
     .post-title {
         font-size: 1.125em;
-        letter-spacing: 0.05em;
-
+         .label {
+            margin-right: 2px;
+        }
     }
     .reply-btn {
         background-color: @color-black;

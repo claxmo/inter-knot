@@ -6,7 +6,10 @@
         // owner: post.author.login === store.author.login,
         R18: post.category?.name === 'R18'
     }">
-        <span class="views"><img src="@/assets/svg/views.svg" />{{ post.comments.totalCount }}</span>
+        <span class="views">
+            <img src="@/assets/svg/views.svg" />
+            <span class="view-num">{{ post.comments.totalCount }}</span>
+        </span>
         <img 
         class="cover"
         :src="isLoading || isError ? defaultCoverUrl : coverUrl" 
@@ -20,7 +23,7 @@
                 <span class="author-name">{{ post.author.login }}</span>
             </div>
             <span class="post-title">
-                <span class="label" v-show="post.category.name !== '常规'">{{ `[${post.category.name}]` }}</span>
+                <span class="label" v-if="post.category.name !== '常规'">{{ `[${post.category.name}]` }}</span>
                 <span v-text="post.title"></span>
             </span>
             <span class="post-body" v-text="postBody"></span>
@@ -166,7 +169,7 @@ onMounted(() => {
                 height: 3px;
                 width: 100%;
                 background-color: @color-gray;
-                bottom: 2px;
+                bottom: 0px;
                 left: 0px;
             }
         }
@@ -181,9 +184,11 @@ onMounted(() => {
         overflow: hidden;
         overflow-wrap: break-word;
         font-size: 1em;
-        margin-bottom: 2px;
         padding: 0 5px;
-        letter-spacing: 0.05em;
+        .label {
+            margin-right: 2px;
+        }
+
     }
     .post-body {
         color: @font-color-secoundary;
@@ -197,15 +202,17 @@ onMounted(() => {
 
 .views{
     position: absolute;
-    top: 10px;
-    left: 24px;
+    top: 5px;
+    left: 15px;
     z-index: 10;
     display: flex;
-    gap: 6px;
+    gap: 4px;
     justify-content: center;
     align-items: center;
-    z-index: 9;
-    font-size: 1.125em;
+    .view-num{
+        font-size: 1.125em;
+        padding-bottom: 4px;
+    }
     img {
         width: 24px;
         height: 24px;
@@ -214,6 +221,7 @@ onMounted(() => {
 
 .post-card.viewed .post-title *{
     color: @font-color-secoundary;
+
 }
 
 .post-card.delegate:not(.viewed) .post-title *{

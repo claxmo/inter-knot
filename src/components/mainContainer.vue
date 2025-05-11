@@ -2,11 +2,22 @@
     <main @scroll="scrollHandle" ref="mainRef">
         <Waterfall v-if="store.posts.length" :items="store.posts" :itemWidth="300" :itemGap="25" />
     </main>
+    <div class="control-container" ref="controlContainerRef">
+        <queryControl />
+        <div class='btn-container'>
+            <button class="btn" title="刷新帖子" @click="refreshDiscussions"><img src="@/assets/svg/refresh.svg"></button>
+            <button class="btn" title="写帖子"><a :href="`https://github.com/${store.name}/${store.repo}/discussions/new/choose`" target="_blank"><img src="@/assets/svg/write.svg"></a></button>
+            <button class="btn" title="顶部" @click="scrollTop"><img src="@/assets/svg/arrow-up.svg"></button>
+        </div>
+    </div> 
+    <span class="message" v-show="showMessage">{{ store.message }}</span>
+
 </template>
 
 <script setup>
 import Waterfall from "@/components/postWaterfall.vue";
-import { ref, onMounted, onUnmounted, nextTick, defineExpose, defineEmits, watch } from "vue";
+import queryControl from "@/components/queryControl.vue";
+import { ref, onMounted, onUnmounted, nextTick, watch } from "vue";
 import { useToast } from 'vue-toastification';
 import { useConfigStore } from '@/stores/config';
 
@@ -16,12 +27,6 @@ const mainRef = ref(null);
 const scrollTop = () => {
     mainRef.value.scrollTo({top: 0, behavior: 'smooth'});
 };
-
-defineExpose({
-    scrollTop,
-});
-
-const emit = defineEmits(["scroll"]);
 
 const getNextDiscussions = async () => {
     if (store.isLoading || store.hasNextPage === false) return;
@@ -45,16 +50,56 @@ const getNextDiscussions = async () => {
     }
 };
 
-let distanceToBottom = 0;
+const refreshDiscussions = async () => {
+    if (store.isLoading) return;
+    store.isLoading = true;
+    let endCursor = null;
+    let flag = true;
+    let totalNewPosts = [];
+    try{
+        while (flag){
+            if (typeof window.getDiscussions === "undefined") throw new Error("window.getDiscussions is undefined");
+            const discussions = await window.getDiscussions(endCursor,store.searchQuery);
+            const newPosts = discussions.nodes.filter(post => 
+                !store.posts.some(existing => existing.id === post.id)
+            );
+            totalNewPosts.push(...newPosts);
+            endCursor = discussions.pageInfo.endCursor;
+            flag = discussions.pageInfo.hasNextPage;
+            if (newPosts.length === 0 || newPosts.length < discussions.nodes.length ) break;
+        }   
+        useToast().info(`发现 ${totalNewPosts.length} 篇新帖子`)       
+        if (totalNewPosts.length > 0){
+            store.posts.unshift(...totalNewPosts);
+            scrollTop();
+        }
+    }catch(e){
+        useToast().error("刷新讨论列表失败!");
+        console.error(e);
+    }finally{
+        nextTick(() => {
+            store.isLoading = false;
+        });
+    } 
+};
+
+const showMessage = ref(false);
+const controlContainerRef = ref(null);
+let scrollTimer = null;
 
 const scrollHandle = (e) => {
     const target = e.target;
     const viewportHeight = target.clientHeight;
-    distanceToBottom = target.scrollHeight - (target.scrollTop + viewportHeight);
+    const distanceToBottom = target.scrollHeight - (target.scrollTop + viewportHeight);
     if (distanceToBottom <= viewportHeight) {
         getNextDiscussions();
     }
-    emit("scroll",{distanceToBottom});
+    showMessage.value = distanceToBottom <= 10;
+    controlContainerRef.value.style.opacity = "0.3";
+    if (scrollTimer) clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+        controlContainerRef.value.style.opacity = "1";
+    }, 300);
 };
 
 onMounted(() => {
@@ -98,6 +143,39 @@ main {
     100% {
         background-position: right top;
     }
+}
+
+.control-container {
+  position: fixed;
+  bottom: 25px;
+  right: 80px;
+  display: flex;
+  justify-content: end;
+  align-items: end;
+  z-index: 10;
+  transition: all 0.3s;
+  .btn-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    position: absolute;
+    gap: 8px;
+    align-items: center;
+    right: -65px;
+  }
+}
+
+.message{
+  width: 100%;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  bottom: 34px;
+  left: 0;
+  color: @font-color-secoundary;
+  font-size: 1.5rem;
+  z-index: 1;
 }
 
 </style>

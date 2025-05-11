@@ -37,7 +37,6 @@ const queryOptions = computed(() => {
   ];
 });
 
-
 const setQuery = (index, query) => {
     if (store.isLoading) return useToast().info("等待加载完成后再试!");
     activeIndex.value = index;
@@ -46,7 +45,6 @@ const setQuery = (index, query) => {
     isOpen.value = !isOpen.value;
 };
 </script>
-
 
 <style scoped lang="less">
 .query-contorl {
