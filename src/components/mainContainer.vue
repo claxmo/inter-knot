@@ -86,11 +86,12 @@ const refreshDiscussions = async () => {
 const showMessage = ref(false);
 const controlContainerRef = ref(null);
 let scrollTimer = null;
+let distanceToBottom = 0;
 
 const scrollHandle = (e) => {
     const target = e.target;
     const viewportHeight = target.clientHeight;
-    const distanceToBottom = target.scrollHeight - (target.scrollTop + viewportHeight);
+    distanceToBottom = target.scrollHeight - (target.scrollTop + viewportHeight);
     if (distanceToBottom <= viewportHeight) {
         getNextDiscussions();
     }
