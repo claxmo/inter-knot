@@ -193,7 +193,7 @@ main {
   bottom: 34px;
   left: 0;
   color: @font-color-secoundary;
-  font-size: 1.125rem;
+  font-size: 20px;
   z-index: 1;
 }
 

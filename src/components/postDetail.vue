@@ -191,8 +191,8 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
 }
 
 .post-detail {
-    width:70%;
-    height: 70%;
+    width:75%;
+    height: 75%;
     transition: all 0.3s;
     border-radius: 50px 0px 50px 50px;
     border: 4px solid @color-gray;
@@ -341,7 +341,9 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
     overflow-wrap: break-word;
     gap: 8px;
     .post-title {
-        font-size: 1.125rem;
+        * {
+            font-size: 1.25rem;
+        }
          .label {
             margin-right: 2px;
         }
