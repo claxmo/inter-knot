@@ -341,7 +341,7 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
     overflow-wrap: break-word;
     gap: 8px;
     .post-title {
-        * {
+        span {
             font-size: 1.25rem;
         }
          .label {
@@ -393,11 +393,11 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
                 flex-direction: column;
                 .author-name {
                     color: @font-color-secoundary;
-                    font-size: 1.125rem;
+                    span {
+                        font-size: 1.125rem;
+                    }
                 }           
-
                 .label {
-                    font-size: 1.125rem;
                     margin-right: 2px;
                 }
             }
