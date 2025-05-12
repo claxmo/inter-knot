@@ -177,14 +177,16 @@ onMounted(() => {
     .post-title {
         display: -webkit-box;
         -webkit-box-orient: vertical;
-        -webkit-line-clamp: 3;
-        line-clamp: 3;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
         text-overflow: ellipsis;
         white-space: normal;
         overflow: hidden;
         overflow-wrap: break-word;
-        font-size: 1rem;
         padding: 0 5px;
+        span {
+            font-size: 1.125rem;
+        }
         .label {
             margin-right: 2px;
         }
@@ -195,7 +197,7 @@ onMounted(() => {
         white-space: nowrap;          
         overflow: hidden;             
         text-overflow: ellipsis;
-        font-size: 0.925rem;
+        font-size: 1rem;
         padding: 0 5px;
     }
 }

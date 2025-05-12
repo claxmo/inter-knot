@@ -365,14 +365,14 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
         width: 100%;
         height: auto;
         .comment-item {
-            min-height: 66px;
+            min-height: 70px;
             width: 100%;
             border-bottom: 2px solid @color-gray;
             display: flex;
             padding: 4px 0;
             position: relative;
             .avatar {
-                height: 56px;
+                height: 58px;
                 aspect-ratio: 1/1;
                 border-radius: 50px;
                 border: 3px solid @color-gray;
@@ -408,7 +408,7 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
                 border-radius: 25px;
                 border-top-left-radius: 0;
                 position: absolute;
-                top: 12px;
+                top: 10px;
                 right: 0;
                 color: @color-black;
 
