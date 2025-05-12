@@ -82,8 +82,8 @@ onMounted(() => {
     cursor: pointer;
     transition: all 0.3s;
     overflow: hidden;
-    font-size: 16px;
     position: relative;
+    z-index: 9;
     &:hover {
         animation: border-glow 0.5s linear infinite alternate;
     }
@@ -152,7 +152,7 @@ onMounted(() => {
             }
         }
         .author-name {
-            font-size: 1em;
+            font-size: 16px;
             flex: 1;
             color: @font-color-secoundary;
             text-overflow: ellipsis;
@@ -183,7 +183,7 @@ onMounted(() => {
         white-space: normal;
         overflow: hidden;
         overflow-wrap: break-word;
-        font-size: 1em;
+        font-size: 1rem;
         padding: 0 5px;
         .label {
             margin-right: 2px;
@@ -195,7 +195,7 @@ onMounted(() => {
         white-space: nowrap;          
         overflow: hidden;             
         text-overflow: ellipsis;
-        font-size: 0.925em;
+        font-size: 0.925rem;
         padding: 0 5px;
     }
 }
@@ -210,7 +210,7 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
     .view-num{
-        font-size: 1.125em;
+        font-size: 18px;
         padding-bottom: 4px;
     }
     img {

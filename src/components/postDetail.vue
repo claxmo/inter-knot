@@ -132,15 +132,11 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
     isLoading.value = false;
     currentIndex.value = 0;
     imgUrls.value = [defaultCoverUrl];
-    postBody.value = "";
-
-    if (post.value.body){
-        postBody.value = marked(post.value.body);
-        const matches = [...postBody.value.matchAll(imgRegx)];
-        if (matches.length){
-            imgUrls.value = matches.map(match => match[1]);
-            postBody.value = postBody.value.replace(imgRegx, '');
-        }
+    postBody.value = marked(post.value.body);
+    const matches = [...postBody.value.matchAll(imgRegx)];
+    if (matches.length){
+        imgUrls.value = matches.map(match => match[1]);
+        postBody.value = postBody.value.replace(imgRegx, '');
     }
     await getNextComments();
 });
@@ -204,7 +200,6 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
     background: url('@/assets/img/background.png') no-repeat center center;
     background-size: cover;
     animation: scroll 30s linear infinite;
-    font-size: 16px;
     header {
         position: fixed;
         top: 0;
@@ -250,7 +245,7 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
                 justify-content: center;
                 gap: 5px;
                 .author-name {
-                    font-size: 1.375em;
+                    font-size: 22px;
                     color: @font-color-secoundary;
                 }
                 .meta {
@@ -335,7 +330,7 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
 
 .interaction-container {
     width: 60%;
-    padding: 16px;
+    padding: 16px 24px;
     padding-bottom: 75px;
     display: flex;
     flex-direction: column;
@@ -346,7 +341,7 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
     overflow-wrap: break-word;
     gap: 8px;
     .post-title {
-        font-size: 1.125em;
+        font-size: 1.125rem;
          .label {
             margin-right: 2px;
         }
@@ -399,7 +394,7 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
                 }           
             }
             .floor {
-                font-size: 0.75em;
+                font-size: 12px;
                 background-color: rgba(255,255,255,0.3);
                 padding: 0 12px;
                 border-radius: 25px;
@@ -426,7 +421,7 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
         p {
             text-align: center;
             color: @font-color-secoundary;
-            font-size: 16px;
+            font-size: 1rem;
         }
     }
 }

@@ -11,7 +11,7 @@
         {{ item.label }}
       </li>
     </ul>
-    <div class="btn" @click="isOpen = !isOpen">{{ curQuery }}</div>
+    <span class="label" @click="isOpen = !isOpen">{{ label }}</span>
   </div>
 </template>
 
@@ -23,7 +23,7 @@ import { useToast } from 'vue-toastification';
 const store = useConfigStore();
 const isOpen = ref(false);
 const activeIndex = ref(0);
-const curQuery = ref('全部');
+const label = ref('全部');
 
 const queryOptions = computed(() => {
  return [
@@ -40,7 +40,7 @@ const queryOptions = computed(() => {
 const setQuery = (index, query) => {
     if (store.isLoading) return useToast().info("等待加载完成后再试!");
     activeIndex.value = index;
-    curQuery.value = queryOptions.value[index].label;
+    label.value = queryOptions.value[index].label;
     store.searchQuery = query;
     isOpen.value = !isOpen.value;
 };
@@ -49,14 +49,28 @@ const setQuery = (index, query) => {
 <style scoped lang="less">
 .query-contorl {
     width: 250px;
-    font-size: 16px;
+    font-size: 18px;
     &.open {
         .query-list {
             display: block;
         }
     }
-    .btn{
-        width: 100%;
+    .label{
+      width: 100%;
+      height: 50px;
+      border-radius: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: 3px solid @color-black;
+      background: linear-gradient(#212121, #141414);
+      box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
+      transition: all 0.3s;
+      font-size: 1em;
+      &:hover {
+        animation: border-glow 0.5s linear infinite alternate;
+      }
     }
     .query-list {
         list-style: none;
@@ -66,6 +80,8 @@ const setQuery = (index, query) => {
         padding: 4px;
         border-radius: 25px;
         background-color: @color-gray;
+        transition: all 0.5s;
+        font-size: 1em;
         .query-item {
             cursor: pointer;
             width: 100%;
@@ -75,6 +91,7 @@ const setQuery = (index, query) => {
             display: flex;
             justify-content: center;
             align-items: center;
+            font-size: 1em;
             &.active{
                 animation: background-glow 1s linear infinite alternate;
                 color: @font-color-active;

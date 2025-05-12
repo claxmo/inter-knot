@@ -58,6 +58,7 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="less">
+
 .user-info {
   width: 300px;
   height: 60px;
@@ -73,7 +74,6 @@ onMounted(async () => {
   color: inherit;
   cursor: pointer;
   transition: all 0.3s;
-  font-size: 16px;
   &:hover {
     animation: border-glow 0.5s linear infinite alternate;
   }
@@ -82,14 +82,14 @@ onMounted(async () => {
     aspect-ratio: 1;
     border-radius: 50%;
     flex-shrink: 0;
-    border: 2px solid @color-black;
+    // border: 2px solid @color-black;
   }
   .info-text {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 5px;
+    gap: 3px;
 
     .username {
       display: flex;
@@ -97,6 +97,7 @@ onMounted(async () => {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      font-size: 16px;
     }
     .experience {
       height: 14px;
@@ -112,10 +113,9 @@ onMounted(async () => {
         padding: 0 2px;
         display: flex;
         align-items: center;
-        font-size: 0.875em;
         .cur-exp,
         .total-exp {
-          font-size: 0.875em;
+          font-size: 12px;
           text-align: center;
         }
       }
@@ -125,11 +125,11 @@ onMounted(async () => {
     height: 100%;
     text-align: center;
     .level-num {
-      font-size: 1.5em;
-      margin-bottom: -5px;
+      font-size: 24px;
+      margin-bottom: -6px;
     }
     .level-text {
-      font-size: 0.5em;
+      font-size: 8px;
       color: @font-color-secoundary;
     }
   }

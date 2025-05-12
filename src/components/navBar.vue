@@ -80,7 +80,7 @@
         border-radius: 16px;
         transform: skewX(-27deg);
         animation: background-glow 1s linear infinite alternate,
-                   scale-grow 0.3s cubic-bezier(0.35, 0.7, 0, 0.8) infinite alternate;
+                   scale-grow 0.3s cubic-bezier(0.35, 0.7, 0, 0.7) infinite alternate;
       }
       &:first-child::before,
       &:last-child::before {

@@ -161,6 +161,26 @@ main {
     gap: 8px;
     align-items: center;
     right: -65px;
+    .btn {
+        height: 50px;
+        min-width: 50px;
+        border-radius: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border: 3px solid @color-black;
+        background: linear-gradient(#212121, #141414);
+        box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
+        transition: all 0.3s;
+        &:hover {
+        animation: border-glow 0.5s linear infinite alternate;
+        }
+        img {
+        width: 28px;
+        height: 28px;
+        }
+    }
   }
 }
 
@@ -173,7 +193,7 @@ main {
   bottom: 34px;
   left: 0;
   color: @font-color-secoundary;
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   z-index: 1;
 }
 
