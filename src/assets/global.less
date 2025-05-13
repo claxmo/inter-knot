@@ -17,7 +17,6 @@
     background-color: rgba(0,0,0,0);
     * {
         color: @font-color-secoundary;
-        font-size: 1.125rem;
     }
 }
 
@@ -48,3 +47,7 @@
   }
 }
 
+.backdrop-blur(@blur) {
+  backdrop-filter: blur(@blur);
+  -webkit-backdrop-filter: blur(@blur);
+}

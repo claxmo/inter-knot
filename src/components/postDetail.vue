@@ -10,8 +10,6 @@
                             <li><img src="@/assets/svg/clock.svg" />{{ new Date(post?.createdAt).toLocaleDateString("en-CA") }}</li>
                             <li><img src="@/assets/svg/views.svg" />{{ post.comments?.totalCount ?? 0 }}</li>
                             <li><img src="@/assets/svg/pictures.svg" />{{ imgUrls.length }}</li>
-                            <!-- <li>#{{ post.number }}</li> -->
-                            <!-- <span><img src="../assets/svg/tag.svg" />{{ post.category?.name }}</span> -->
                         </ul>
                     </div>
                 </div>
@@ -145,6 +143,9 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
 
 <style scoped lang="less">
 .mask {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: fixed;
     top: 0;
     left: 0;
@@ -152,9 +153,6 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
     height: 100%;
     background: url('@/assets/svg/mask.svg') repeat center center;
     background-size: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 11;
     transition: all 0.3s;
@@ -204,17 +202,15 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
         position: fixed;
         top: 0;
         left: 0;
+        display: flex;
+        justify-content: space-between;
+        justify-content: center;
         width: 100%;
         height: 85px;
         padding: 5px 36px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
         background-color: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
-        z-index: 1;
+        .backdrop-blur(10px);
         .close-btn {
             cursor: pointer;
             height: 100%;
@@ -252,18 +248,18 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
                     display: flex;
                     gap: 8px;
                     li {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        gap: 3px;
                         height: 20px;
                         white-space: nowrap;          
                         overflow: hidden;             
                         text-overflow: ellipsis;
                         font-size: 14px;
                         background-color: rgba(255,255,255,0.3);
-                        align-items: center;
-                        display: flex;
-                        justify-content: center;
                         border-radius: 50px;
                         padding: 0 8px;
-                        gap: 3px;
                         img {
                             width: 18px;
                             height: 18px;
@@ -275,17 +271,16 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
     }
 
     main {
+        display: flex;
+        justify-content: space-around;
         background: url("../assets/svg/point.svg");
         background-size: 8px;
         padding: 125px 25px 35px 25px;
         width: 100%;
         height: 100%;
-        display: flex;
-        justify-content: space-around;
         border: 4px solid @color-black;
         border-radius: 50px 0px 50px 50px;
         background-color: rgba(0, 0, 0, 0.3);
-        gap: 5px;       
         z-index: 0;
     }
 }
@@ -329,32 +324,32 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
 }
 
 .interaction-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     width: 60%;
     padding: 16px 24px;
     padding-bottom: 75px;
-    display: flex;
-    flex-direction: column;
     background-color: rgba(0, 0, 0, 0.7);
     border-radius: 25px;
     overflow-y: scroll;
     overflow-x: hidden;
     overflow-wrap: break-word;
-    gap: 8px;
     .post-title {
         span {
-            font-size: 1.25rem;
+            font-size: 1.125rem;
         }
          .label {
             margin-right: 2px;
         }
     }
     .reply-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         background-color: @color-black;
         border: 4px solid @color-gray;
         border-radius: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         min-height: 45px;
         width: 100%;
         cursor: pointer;
@@ -384,32 +379,30 @@ watch(() => store.isOpenPostDetail, async (newValue) => {
                 }
             }
             .text{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: 2px;
                 margin-left: 5px;
                 flex: 1;
                 min-height: 100%;
-                display: flex;
-                justify-content: center;
-                gap: 2px;
-                flex-direction: column;
                 .author-name {
                     color: @font-color-secoundary;
-                    span {
-                        font-size: 1.125rem;
-                    }
                 }           
                 .label {
                     margin-right: 2px;
                 }
             }
             .floor {
+                position: absolute;
+                top: 12px;
+                right: 0;
+                z-index: 1;
                 font-size: 12px;
                 background-color: rgba(255,255,255,0.3);
                 padding: 0 12px;
                 border-radius: 25px;
                 border-top-left-radius: 0;
-                position: absolute;
-                top: 10px;
-                right: 0;
                 color: @color-black;
 
             }

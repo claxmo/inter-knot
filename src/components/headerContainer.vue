@@ -14,17 +14,18 @@ import navBar from "@/components/navBar.vue";
 <style scoped lang="less">
 header{
     position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 90px;
     padding: 5px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 10;
     background-color: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
+    z-index: 10;
+    .backdrop-blur(10px);
 }
 
 @media (max-width: 1440px) {

@@ -1,11 +1,5 @@
 <template>
-    <div class="post-card" 
-    @click="$emit('click')" 
-    :class="{
-        delegate: post.category?.name === '委托', 
-        // owner: post.author.login === store.author.login,
-        R18: post.category?.name === 'R18'
-    }">
+    <div class="post-card" @click="$emit('click')" :class="{delegate: post.category?.name === '委托', R18: post.category?.name === 'R18'}">
         <span class="views">
             <img src="@/assets/svg/views.svg" />
             <span class="view-num">{{ post.comments.totalCount }}</span>
@@ -22,10 +16,10 @@
                 <span class="avatar"><img  :src="post.author.avatarUrl" /></span>
                 <span class="author-name">{{ post.author.login }}</span>
             </div>
-            <span class="post-title">
+            <div class="post-title">
                 <span class="label" v-if="post.category.name !== '常规'">{{ `[${post.category.name}]` }}</span>
                 <span v-text="post.title"></span>
-            </span>
+            </div>
             <span class="post-body" v-text="postBody"></span>
         </div>
     </div>
@@ -94,130 +88,128 @@ onMounted(() => {
         min-height: 185px;
         display: block;
     }
-}
-
-.footer {
-    background-color: @color-gray-dark;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    padding: 0 15px 8px;
-    .author-info {
-        width: 100%;
-        height: 30px;
-        overflow: visible;
+    .footer {
         display: flex;
-        margin-bottom: 5px;
-        .avatar {
-            position: relative;
-            height: 65px;
-            aspect-ratio: 1/1;
-            border-radius: 50%;
-            border: 4px solid @color-gray-dark;
-            margin-top: -28px;
-            z-index: 1;
-            background-color: @color-gray-dark;
-            &::before {
-                position: absolute;
-                content: "";
-                top: -6px;
-                left: -29.5px;
-                width: 30px;
-                height: 30px;
-                background: transparent;
-                border-radius: 50%;
-                box-shadow: 15px 18px @color-gray-dark;
-                z-index: 0;
-            }
-            &::after {
-                position: absolute;
-                content: "";
-                top: -6px;
-                right: -29.5px;
-                width: 30px;
-                height: 30px;
-                background: transparent;
-                border-radius: 50%;
-                box-shadow: -15px 18px @color-gray-dark;
-                z-index: 0;
-            }
-            img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
+        flex-direction: column;
+        background-color: @color-gray-dark;
+        width: 100%;
+        position: relative;
+        padding: 0 15px 8px;
+        .author-info {
+            width: 100%;
+            height: 30px;
+            overflow: visible;
+            display: flex;
+            margin-bottom: 5px;
+            .avatar {
                 position: relative;
-                z-index: 1;
+                height: 65px;
+                aspect-ratio: 1/1;
                 border-radius: 50%;
+                border: 4px solid @color-gray-dark;
+                margin-top: -28px;
+                z-index: 1;
+                background-color: @color-gray-dark;
+                &::before {
+                    position: absolute;
+                    content: "";
+                    top: -6px;
+                    left: -29.5px;
+                    width: 30px;
+                    height: 30px;
+                    background: transparent;
+                    border-radius: 50%;
+                    box-shadow: 15px 18px @color-gray-dark;
+                    z-index: 0;
+                }
+                &::after {
+                    position: absolute;
+                    content: "";
+                    top: -6px;
+                    right: -29.5px;
+                    width: 30px;
+                    height: 30px;
+                    background: transparent;
+                    border-radius: 50%;
+                    box-shadow: -15px 18px @color-gray-dark;
+                    z-index: 0;
+                }
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    position: relative;
+                    z-index: 1;
+                    border-radius: 50%;
+                }
+            }
+            .author-name {
+                font-size: 16px;
+                flex: 1;
+                color: @font-color-secoundary;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                position: relative;
+                margin-left: 5px;
+                padding-left: 4px;
+                padding-top: 2px;
+                overflow: hidden;             
+                text-overflow: ellipsis;
+                &::before{
+                    content: "";
+                    position: absolute;
+                    height: 3px;
+                    width: 100%;
+                    background-color: @color-gray;
+                    bottom: 0px;
+                    left: 0px;
+                }
             }
         }
-        .author-name {
-            font-size: 16px;
-            flex: 1;
-            color: @font-color-secoundary;
+        .post-title {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
             text-overflow: ellipsis;
-            white-space: nowrap;
-            position: relative;
-            margin-left: 5px;
-            padding-left: 4px;
-            padding-top: 2px;
+            white-space: normal;
+            overflow: hidden;
+            overflow-wrap: break-word;
+            padding: 0 5px;
+            span {
+                font-size: 1.125rem;
+            }
+            .label {
+                margin-right: 2px;
+            }
+
+        }
+        .post-body {
+            color: @font-color-secoundary;
+            white-space: nowrap;          
             overflow: hidden;             
             text-overflow: ellipsis;
-            &::before{
-                content: "";
-                position: absolute;
-                height: 3px;
-                width: 100%;
-                background-color: @color-gray;
-                bottom: 0px;
-                left: 0px;
-            }
+            font-size: 1rem;
+            padding: 0 5px;
         }
     }
-    .post-title {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
-        text-overflow: ellipsis;
-        white-space: normal;
-        overflow: hidden;
-        overflow-wrap: break-word;
-        padding: 0 5px;
-        span {
-            font-size: 1.125rem;
+    .views{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        position: absolute;
+        top: 5px;
+        left: 15px;
+        z-index: 9;
+        .view-num{
+            font-size: 18px;
+            padding-bottom: 4px;
         }
-        .label {
-            margin-right: 2px;
+        img {
+            width: 24px;
+            height: 24px;
         }
-
-    }
-    .post-body {
-        color: @font-color-secoundary;
-        white-space: nowrap;          
-        overflow: hidden;             
-        text-overflow: ellipsis;
-        font-size: 1rem;
-        padding: 0 5px;
-    }
-}
-
-.views{
-    position: absolute;
-    top: 5px;
-    left: 15px;
-    z-index: 9;
-    display: flex;
-    gap: 4px;
-    justify-content: center;
-    align-items: center;
-    .view-num{
-        font-size: 18px;
-        padding-bottom: 4px;
-    }
-    img {
-        width: 24px;
-        height: 24px;
     }
 }
 
@@ -227,20 +219,14 @@ onMounted(() => {
 }
 
 .post-card.delegate:not(.viewed) .post-title *{
-    background: linear-gradient(0deg, @color-blue, @color-blue-light); /* 渐变色定义 */
-    -webkit-background-clip: text; /* 裁剪背景到文字 */
-    -webkit-text-fill-color: transparent; /* 文字颜色透明 */
+    background: linear-gradient(0deg, @color-blue, @color-blue-light);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     background-clip: text;
-
 }
-
-// .post-card.owner .author-name{
-//     color: @color-orange;
-// }
 
 .post-card.R18 .cover{
     filter: blur(25px);
-
 }
 
 .post-card.R18:not(.viewed) .post-title *{

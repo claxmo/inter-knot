@@ -60,18 +60,16 @@ onMounted(async () => {
 <style scoped lang="less">
 
 .user-info {
-  width: 300px;
-  height: 60px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
   gap: 10px;
+  width: 300px;
+  height: 60px;
   padding: 5px 15px 5px 5px;
   border: 3px solid @color-black;
   border-radius: 50px;
   background: linear-gradient(#212121, #141414);
   box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
-  color: inherit;
   cursor: pointer;
   transition: all 0.3s;
   &:hover {
@@ -85,14 +83,12 @@ onMounted(async () => {
     // border: 2px solid @color-black;
   }
   .info-text {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: 3px;
+    flex: 1;
 
     .username {
-      display: flex;
       align-items: center;
       white-space: nowrap;
       overflow: hidden;

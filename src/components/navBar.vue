@@ -44,25 +44,25 @@
   
 <style scoped lang="less">
 .navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: auto;
   height: 50px;
   border: 4px solid @color-gray;
   padding: 0 10px;
   border-radius: 50px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
   overflow: visible;
   background: url('@/assets/svg/point.svg') center repeat;
   background-size: 8px;
   background-color: rgba(0, 0, 0, 0.7);
   .nav-item {
-    width: 220px;
-    height: 100%;
-    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 220px;
+    height: 100%;
+    position: relative;
     font-size: 24px;
     font-style: italic;
     cursor: pointer;

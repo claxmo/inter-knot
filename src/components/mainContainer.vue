@@ -1,6 +1,6 @@
 <template>
     <main @scroll="scrollHandle" ref="mainRef">
-        <Waterfall v-if="store.posts.length" :items="store.posts" :itemWidth="300" :itemGap="25" />
+        <Waterfall v-if="store.posts.length" :items="store.posts" :itemWidth=300 :itemGap=25 />
     </main>
     <div class="control-container" ref="controlContainerRef">
         <queryControl />
@@ -145,56 +145,53 @@ main {
 }
 
 .control-container {
-  position: fixed;
-  bottom: 25px;
-  right: 80px;
-  display: flex;
-  justify-content: end;
-  align-items: end;
-  z-index: 10;
-  transition: all 0.3s;
-  .btn-container {
+    position: fixed;
+    right: 80px;
+    bottom: 25px;
+    z-index: 10;
     display: flex;
-    justify-content: center;
-    flex-direction: column;
-    position: absolute;
-    gap: 8px;
-    align-items: center;
-    right: -65px;
-    .btn {
-        height: 50px;
-        min-width: 50px;
-        border-radius: 50px;
+    justify-content: end;
+    align-items: end;
+    transition: all 0.3s;
+    .btn-container {
+        position: absolute;
+        right: -65px;
         display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        border: 3px solid @color-black;
-        background: linear-gradient(#212121, #141414);
-        box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
-        transition: all 0.3s;
-        &:hover {
-        animation: border-glow 0.5s linear infinite alternate;
-        }
-        img {
-        width: 28px;
-        height: 28px;
+        gap: 8px;
+        flex-direction: column;
+        .btn {
+            height: 50px;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 3px solid @color-black;
+            background: linear-gradient(#212121, #141414);
+            box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
+            transition: all 0.3s;
+            &:hover {
+                animation: border-glow 0.5s linear infinite alternate;
+            }
+            img {
+                width: 28px;
+                height: 28px;
+            }
         }
     }
-  }
 }
 
 .message{
-  width: 100%;
-  position: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  bottom: 34px;
-  left: 0;
-  color: @font-color-secoundary;
-  font-size: 20px;
-  z-index: 1;
+    position: fixed;
+    bottom: 34px;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: @font-color-secoundary;
+    font-size: 1.25rem;
 }
 
 </style>
