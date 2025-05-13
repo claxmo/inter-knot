@@ -204,7 +204,7 @@ onMounted(() => {
         z-index: 9;
         .view-num{
             font-size: 18px;
-            padding-bottom: 4px;
+            padding-bottom: 3px;
         }
         img {
             width: 24px;
