@@ -1,39 +1,61 @@
 <template>
-    <main @scroll="scrollHandle" ref="mainRef">
-        <Waterfall v-if="store.posts.length" :items="store.posts" :itemWidth=300 :itemGap=25 />
+    <main>
+        <div class="main-background"></div>
+        <span v-if="needInstall" class="center">
+            <a href="https://greasyfork.org/zh-CN/scripts/534939-%E7%BB%B3%E7%BD%91%E8%B7%A8%E5%9F%9F%E5%8A%A9%E6%89%8B" class="link">点击下载绳网跨域助手</a>
+        </span>
+        <Waterfall v-else ref="waterfallRef" :items="store.posts" :width=300 :gap=25 >
+            <template #default="{ item }">
+                <Card :post="item" @click="showPopup(item)" @imageLoaded="waterfallRef.layout()"/>
+            </template>
+        </Waterfall>
+        <span class="message" ref="messageRef" :class="{center: !store.posts.length}">{{ message }}</span>
     </main>
-    <div class="control-container" ref="controlContainerRef">
-        <queryControl />
-        <div class='btn-container'>
-            <button class="btn" title="刷新帖子" @click="refreshDiscussions"><img src="@/assets/svg/refresh.svg"></button>
-            <button class="btn" title="写帖子"><a :href="`https://github.com/${store.name}/${store.repo}/discussions/new/choose`" target="_blank"><img src="@/assets/svg/write.svg"></a></button>
-            <button class="btn" title="顶部" @click="scrollTop"><img src="@/assets/svg/arrow-up.svg"></button>
-        </div>
-    </div> 
-    <span class="message" v-show="distanceToBottom <= 10">{{ store.message }}</span>
-
+    <PopupDetail :post="store.curPost" :show="store.showPopup" @hide="store.showPopup = false"/>
+    <QuerySelector :items="[
+        { label: '全部', query: '' },
+        { label: '我的', query: store.author?.login ? `author:${store.author.login}` : '' },
+        { label: '公告', query: 'category:公告' },
+        { label: '委托', query: 'category:委托' },
+        { label: '灌水', query: 'category:灌水' },
+        { label: 'R18', query: 'category:R18' },
+        { label: '常规', query: 'category:常规' },
+    ]"/>
 </template>
 
 <script setup>
-import Waterfall from "@/components/postWaterfall.vue";
-import queryControl from "@/components/queryControl.vue";
-import { ref, onMounted, onUnmounted, nextTick, watch } from "vue";
+import Waterfall from "@/components/waterfallLayout.vue";
+import Card from "@/components/postCard.vue";
+import PopupDetail from "@/components/popupDetail.vue";
+import QuerySelector from "@/components/querySelector.vue";
+import { ref, computed, onMounted, watch, nextTick } from "vue";
 import { useToast } from 'vue-toastification';
 import { useConfigStore } from '@/stores/config';
 
 const store = useConfigStore();
-const mainRef = ref(null);
+const waterfallRef = ref(null);
+const messageRef = ref(null);
 
-const scrollTop = () => {
-    mainRef.value.scrollTo({top: 0, behavior: 'smooth'});
+const message = computed(() => {
+    if (store.isLoading) {
+        return '正在努力加载···'
+    } else if (store.hasNextPage === false) {
+        return '已经到底了···\\[ O_X ]/'
+    } else {
+        return ''
+    }
+});
+const needInstall = ref(true);
+
+const showPopup = (post) => {
+    store.curPost = post;
+    store.showPopup = true;
 };
 
 const getNextDiscussions = async () => {
     if (store.isLoading || store.hasNextPage === false) return;
-
     store.isLoading = true;
     try{
-        if (typeof window.getDiscussions === "undefined") throw new Error("window.getDiscussions is undefined");
         const discussions = await window.getDiscussions(store.endCursor, store.searchQuery);
         store.posts.push(...discussions.nodes.filter(post => 
             !store.posts.some(existing => existing.id === post.id)
@@ -50,66 +72,6 @@ const getNextDiscussions = async () => {
     }
 };
 
-const refreshDiscussions = async () => {
-    if (store.isLoading) return;
-    store.isLoading = true;
-    let endCursor = null;
-    let flag = true;
-    let totalNewPosts = [];
-    try{
-        while (flag){
-            if (typeof window.getDiscussions === "undefined") throw new Error("window.getDiscussions is undefined");
-            const discussions = await window.getDiscussions(endCursor,store.searchQuery);
-            const newPosts = discussions.nodes.filter(post => 
-                !store.posts.some(existing => existing.id === post.id)
-            );
-            totalNewPosts.push(...newPosts);
-            endCursor = discussions.pageInfo.endCursor;
-            flag = discussions.pageInfo.hasNextPage;
-            if (newPosts.length === 0 || newPosts.length < discussions.nodes.length ) break;
-        }   
-        useToast().info(`发现 ${totalNewPosts.length} 篇新帖子`)       
-        if (totalNewPosts.length > 0){
-            store.posts.unshift(...totalNewPosts);
-            scrollTop();
-        }
-    }catch(e){
-        useToast().error("刷新讨论列表失败!");
-        console.error(e);
-    }finally{
-        nextTick(() => {
-            store.isLoading = false;
-        });
-    } 
-};
-
-const controlContainerRef = ref(null);
-let scrollTimer = null;
-const distanceToBottom = ref(0);
-
-const scrollHandle = (e) => {
-    const target = e.target;
-    const viewportHeight = target.clientHeight;
-    distanceToBottom.value = target.scrollHeight - (target.scrollTop + viewportHeight);
-    if (distanceToBottom.value <= viewportHeight) {
-        getNextDiscussions();
-    }
-    controlContainerRef.value.style.opacity = "0.3";
-    if (scrollTimer) clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(() => {
-        controlContainerRef.value.style.opacity = "1";
-    }, 300);
-};
-
-onMounted(() => {
-    window.addEventListener('resize',scrollHandle);
-    getNextDiscussions(); 
-});
-
-onUnmounted(() => {
-    window.removeEventListener('resize',scrollHandle);
-});
-
 watch(() => store.searchQuery, async () => {
     store.posts = [];
     store.endCursor = null;
@@ -117,81 +79,86 @@ watch(() => store.searchQuery, async () => {
     await getNextDiscussions();
 });
 
+onMounted(() => {
+    if (typeof window.getDiscussions !== "undefined"){
+        needInstall.value = false;
+    }
+    nextTick(() => {
+        const observer = new IntersectionObserver(async (entries) => {
+            const entry = entries[0];
+            if (entry.isIntersecting) {
+                await getNextDiscussions();
+            }
+        }, {
+            root: null, // 默认是视口
+            threshold: 0.1 // 元素 10% 可见时触发
+        });
+        observer.observe(messageRef.value);
+    });
+});
 </script>
 
 <style scoped lang="less">
+@keyframes bg-scroll {
+  0% {
+    background-position: left bottom;
+  }
+  100% {
+    background-position: right top;
+  }
+}
+
 main {
+    position: relative;
     width: 100vw;
-    height: 100vh;
-    padding: 100px 0;
+    min-height: 100vh;
+    padding-top: 100px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 9;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: url('@/assets/img/background.png') no-repeat center center;
-    background-size: cover;
-    background-position: left bottom;
-    animation: bg-scroll 30s linear infinite;
-    overflow-y: scroll;
-    overflow-x: hidden;
-}
-
-@keyframes bg-scroll {
-    0% {
+    .main-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        width: 100%;
+        height: 100%;
+        background: url('@/assets/img/background.png') no-repeat center center;
+        background-size: cover;
         background-position: left bottom;
-    }
-    100% {
-        background-position: right top;
-    }
-}
-
-.control-container {
-    position: fixed;
-    right: 80px;
-    bottom: 25px;
-    z-index: 10;
-    display: flex;
-    justify-content: end;
-    align-items: end;
-    transition: all 0.3s;
-    .btn-container {
+        animation: bg-scroll 30s linear infinite alternate;
+        &::after {
+        content: '';
         position: absolute;
-        right: -65px;
-        display: flex;
-        gap: 8px;
-        flex-direction: column;
-        .btn {
-            height: 50px;
-            aspect-ratio: 1/1;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 3px solid @color-black;
-            background: linear-gradient(#212121, #141414);
-            box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
-            transition: all 0.3s;
-            &:hover {
-                animation: border-glow 0.5s linear infinite alternate;
-            }
-            img {
-                width: 28px;
-                height: 28px;
-            }
-        }
+        width: 100%;
+        height: 100%;
+        background: url('@/assets/svg/fill-black.svg') repeat center center;
+        background-size: 14px;
     }
+  }
 }
 
-.message{
-    position: fixed;
-    bottom: 34px;
-    z-index: 1;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: @font-color-secoundary;
-    font-size: 1.25rem;
+
+.message {
+    color: @text-secondary-color;
+    font-size: 1.5rem;
+    padding: 48px 0;
 }
 
+.link {
+    color: #66ccff;
+    font-size: 32px;
+}
+
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 </style>
+
+

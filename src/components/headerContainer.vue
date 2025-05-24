@@ -1,37 +1,73 @@
 <template>
     <header>
-        <userInfo />  
-        <navBar />
+        <div class="left-wrapper">
+            <userInfo />  
+            <button class="write-btn" title="写帖子">
+                <a :href="`https://github.com/${store.owner}/${store.repo}/discussions/new/choose`" target="_blank"><img src="@/assets/svg/write.svg"></a>
+            </button>
+        </div>
+        <div class="right-wrapper">
+            <navBar :items="['推送', '日程', '历程', '绳网等级']"/>
+        </div>
     </header>
 </template>
 
 <script setup>
 import userInfo from "@/components/userInfo.vue";
 import navBar from "@/components/navBar.vue";
+import { useConfigStore } from "@/stores/config";
 
+const store = useConfigStore();
 </script>
 
 <style scoped lang="less">
-header{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 90px;
-    padding: 5px 40px;
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: 90px;
+  padding: 5px 40px;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
+  .left-wrapper {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.7);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
-    z-index: 10;
-    .backdrop-blur(10px);
+    gap: 8px;
+  }
+}
+
+.write-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  border: 3px solid #000;
+  background: linear-gradient(#212121, #141414);
+  box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
+  &:active {
+    animation: border-glow 0.5s linear infinite alternate;
+  }
+  img {
+    width: 28px;
+    height: 28px;
+  }
 }
 
 @media (max-width: 1440px) {
-    header{
-        justify-content: center;
-    }
+  header {
+    justify-content: center;
+  }
+  .right-wrapper {
+    display: none;
+  }
 }
-
 </style>

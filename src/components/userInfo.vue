@@ -1,7 +1,7 @@
 <template>
-    <div class="user-info" @click="clickHandle" :title="author?.login ? '已登录' : '点击登录'">
+    <div class="user-info" @click="clickHandle">
         <img class="avatar" :src="author?.avatar_url ?? defaultAvatarUrl">
-        <div class="info-text">
+        <div class="user-info-text">
             <span class="username">{{ author?.login ?? "传奇绳匠" }}</span>
             <div class="experience">
                 <div class="bar" :style="{ width }">
@@ -31,81 +31,67 @@ const curExp = ref(7890);
 const totalExp = ref(10000);
 const width = computed(() => `${Math.min(100, (curExp.value / totalExp.value) * 100)}%`);
 
-const isLogin = ref(localStorage.getItem("accessToken") !== null);
+onMounted(async () => {
+  try{
+    author.value = await window.getUserProfile();
+  }catch(e){
+    useToast().error("获取用户信息失败!");
+    console.error(e);
+  }
+});
 
 const clickHandle = () => {
-    if (author.value?.login) {
-        window.open(author.value.html_url,"_blank");
-    } else {
-        window.authLogin();
-    }
+  if (author.value?.html_url){
+    window.open(author.value.html_url,'_blank');
+  }
 };
-
-onMounted(async () => {
-    if (isLogin.value) {
-      try{
-        if (typeof window.getUserProfile === "undefined") throw new Error("window.getUserProfile is undefined");
-        author.value = await window.getUserProfile();
-      }catch(e){
-        useToast().error("获取用户信息失败!");
-        console.error(e);
-      }
-    }else{
-      window.authLogin();
-    }
-});
 
 </script>
 
 <style scoped lang="less">
 
+
 .user-info {
   display: flex;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   width: 300px;
   height: 60px;
-  padding: 5px 15px 5px 5px;
-  border: 3px solid @color-black;
+  padding: 5px;
+  padding-right: 15px;
+  border: 3px solid #000;
   border-radius: 50px;
   background: linear-gradient(#212121, #141414);
   box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
   cursor: pointer;
-  transition: all 0.3s;
-  &:hover {
+  &:active {
     animation: border-glow 0.5s linear infinite alternate;
   }
   .avatar {
     height: 100%;
     aspect-ratio: 1;
     border-radius: 50%;
-    flex-shrink: 0;
-    // border: 2px solid @color-black;
   }
-  .info-text {
+  .user-info-text {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    justify-content: space-around;
     flex: 1;
-
+    min-width: 0;
     .username {
-      align-items: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
       font-size: 16px;
+      .single-line-ellipsis();
     }
     .experience {
       height: 14px;
       width: 100%;
       border-radius: 50px;
-      background: @color-gray-dark;
-      box-shadow: inset 0 2px 2px #131313, inset 0 -2px 2px @color-gray;
+      background: linear-gradient(#141414, #212121);
+      box-shadow: inset 0 2px 2px #181818, inset 0 -2px 2px #313431;
       .bar {
         height: 100%;
         max-width: 100%;
         border-radius: 50px;
-        background: linear-gradient(90deg, @color-blue, @color-blue-light);
+        background: linear-gradient(90deg, #4661fd, #10bff0);
         padding: 0 2px;
         display: flex;
         align-items: center;
@@ -126,7 +112,7 @@ onMounted(async () => {
     }
     .level-text {
       font-size: 8px;
-      color: @font-color-secoundary;
+      color: @text-secondary-color;
     }
   }
 }

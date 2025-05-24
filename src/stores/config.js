@@ -1,51 +1,31 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 
 export const useConfigStore = defineStore('config', () => {
     const author = ref({});
     const posts = ref([]);
-    const curPostIndex = ref(null);
+    const curPost = ref({});
     const endCursor = ref(null);
     const hasNextPage = ref(null);
-    const isOpenPostDetail = ref(false);
+    const showPopup = ref(false);
     const isLoading = ref(false);
     const searchQuery = ref("");
-    const message = computed(() => {
-        if (isLoading.value) {
-            return '正在努力加载···'
-        } else if (hasNextPage.value === false) {
-            return '已经到底了···\\[ O_X ]/'
-        } else {
-            return ''
-        }
-    });
-      
-    const openPostDetail = (index) => {
-        curPostIndex.value = index;
-        isOpenPostDetail.value = true;
-    };
-
-    const closePostDetail = () => {
-        isOpenPostDetail.value = false;
-    };
-
-    const name = "claxmo";
+   
+    const owner = "claxmo";
     const repo = "inter-knot";
+
 
     return {
         author,
         posts,
-        curPostIndex,
+        curPost,
         endCursor,
         hasNextPage,
-        isOpenPostDetail,
+        showPopup,
         isLoading,
-        message,
         searchQuery,
-        openPostDetail,
-        closePostDetail,
-        name,
-        repo
+        owner,
+        repo,
 
     };
 });

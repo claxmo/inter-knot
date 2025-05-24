@@ -4,7 +4,7 @@ import App from './App.vue'
 import { createPinia } from 'pinia';
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
-import './assets/style.less';
+import '@/assets/style.less';
 
 const app = createApp(App)
 app.use(createPinia())
