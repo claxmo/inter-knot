@@ -73,14 +73,14 @@ const setQuery = (index, query) => {
     cursor: pointer;
     box-shadow: 0 0 0 2px #000;
     .text {
-      font-size: 20px;
+      font-size: 1.125rem;
     }
     .arrow{
       border-left: 8px solid transparent;
       border-right: 8px solid transparent;
-      border-top: 9px solid @text-primary-color;
+      border-top: 8px solid @text-primary-color;
       border-bottom: none;
-      border-radius: 2px;
+      border-radius: 8px;
     }
   }
   .back-glow {
@@ -103,7 +103,6 @@ const setQuery = (index, query) => {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s;
-    font-size: 1em;
     .query-option {
       align-items: center;
       display: flex;
@@ -112,7 +111,7 @@ const setQuery = (index, query) => {
       padding: 0 10px;
       height: 35px;
       cursor: pointer;
-      font-size: 20px;
+      font-size: 1.125rem;
       &.active{
           animation: background-glow 1s linear infinite alternate;
           color: @text-tertiary-color;
@@ -131,7 +130,7 @@ const setQuery = (index, query) => {
   .query-label .arrow{
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
-    border-bottom: 9px solid @text-primary-color;
+    border-bottom: 8px solid @text-primary-color;
     border-top: none;
   }
   .back-glow {

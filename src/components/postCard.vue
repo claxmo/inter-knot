@@ -95,7 +95,7 @@ onMounted(() => {
     .author-info {
       display: flex;
       width: 100%;
-      height: 30px;
+      height: 32px;
       margin-bottom: 5px;
       overflow: visible;
       .avatar {
@@ -202,7 +202,7 @@ onMounted(() => {
 }
 
 .post-card.R18:not(.viewed) .post-title * {
-  .text-linear-gradient(0, #FF386B, #ff668c);
+  .text-linear-gradient(0, #FF386B, #fe7f9f);
 }
 
 </style>

@@ -31,11 +31,9 @@
                         <span v-text="post.title"></span>
                     </span>
                     <div class="markdown-body" v-html="bodyHTML"></div>
-                    <span class="reply-btn">
-                        <a :href="`https://github.com/${store.owner}/${store.repo}/discussions/${post.number}`" target="_blank" title="写回复">
-                            <img src="@/assets/svg/write.svg"/>&nbsp;写回复
-                        </a>
-                    </span>
+                    <a :href="`https://github.com/${store.owner}/${store.repo}/discussions/${post.number}`" target="_blank" title="写回复" class="reply-btn">
+                        <img src="@/assets/svg/write.svg"/>&nbsp;写回复
+                    </a>
                     <ul class="comment-list">
                         <li class="comment-item" 
                             v-for="(comment, index) in comments.nodes"
@@ -180,7 +178,6 @@ const nextImage = () => {
     }
 }
 
-
 .popup-container {
     display: flex;
     justify-content: center;
@@ -259,6 +256,7 @@ const nextImage = () => {
         background-color: rgba(0, 0, 0, 0.7);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
         backdrop-filter: blur(10px);  
+        z-index: 1;
         .close-btn {
             cursor: pointer;
             height: 100%;
@@ -291,7 +289,7 @@ const nextImage = () => {
                 flex: 1;
                 min-width: 0;
                 .author-name {
-                    font-size: 20px;
+                    font-size: 22px;
                     color: @text-secondary-color;
                     .single-line-ellipsis();
                 }
@@ -357,12 +355,15 @@ const nextImage = () => {
     flex-direction: column;
     gap: 8px;
     width: 60%;
+    height: 100%;
     padding: 16px 24px;
     padding-bottom: 75px;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.5);
     border-radius: 25px;
     overflow-y: scroll;
     overflow-x: hidden;
+    // mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), black 15%, black 85%, rgba(0, 0, 0, 0.3));
+
     .post-title {
         span {
             font-size: 1.125rem;
@@ -466,22 +467,21 @@ const nextImage = () => {
     .post-detail {
         height: 100vh;
         width: 100vw;
+        border-radius: 0;
         main {
             flex-direction: column;
-            overflow-y: scroll;
-            overflow-x: hidden;
-
-
+            gap: 10px;
+            border-radius: 0;
             .media-container {
                 width: 100%;
                 min-height: 35%;
+                height: 35%;
             }
 
             .interaction-container {
                 width: 100%;
+                height: auto;
                 flex: 1;
-                overflow: visible;
-
             }
         }
     }

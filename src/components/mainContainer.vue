@@ -111,14 +111,14 @@ onMounted(() => {
 main {
     position: relative;
     width: 100vw;
-    min-height: 100vh;
+    height: 100vh;
     padding-top: 100px;
-    overflow-y: scroll;
-    overflow-x: hidden;
     z-index: 9;
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-y: scroll;
+    overflow-x: hidden;
     .main-background {
         position: fixed;
         top: 0;
@@ -131,14 +131,14 @@ main {
         background-position: left bottom;
         animation: bg-scroll 30s linear infinite alternate;
         &::after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: url('@/assets/svg/fill-black.svg') repeat center center;
-        background-size: 14px;
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('@/assets/svg/fill-black.svg') repeat center center;
+            background-size: 12px;
+        }
     }
-  }
 }
 
 
@@ -150,7 +150,7 @@ main {
 
 .link {
     color: #66ccff;
-    font-size: 32px;
+    font-size: 2rem;
 }
 
 .center {

@@ -1,17 +1,7 @@
-::-webkit-scrollbar {
-  // width: 4px;
-  width: 0px;
-  height: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  border-radius: 50px;
-  background-color: #808080;
-}
 
 @font-face {
   font-family: 'zzzFont';
-  src: url('@/assets/fonts/zzzFont.TTF') format('trueType');
+  src: url('@/assets/fonts/zzzFont.TTF') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -21,18 +11,21 @@
 * {
     padding: 0px;
     margin: 0px;
-    font-size: 16px;
+    font-size: 18px;
     text-decoration: none;
     box-sizing: border-box;
     color: @text-primary-color;
     font-family: 'zzzFont';
-
+    scrollbar-width: thin;
+    scrollbar-color: @text-secondary-color transparent;
 }
+
 
 body {
     width: 100vw;
     height: 100vh;
-    background: #000;
+    background: @bg-primary-color;
+    overflow: hidden;
 }
 
 
