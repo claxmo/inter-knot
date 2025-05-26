@@ -26,31 +26,34 @@
                     <span class="cur-page" v-show="imgUrls.length > 1">{{ curImgIndex + 1 }}/{{ imgUrls.length }}</span>
                 </div>
                 <div class="interaction-container">
-                    <span class="post-title">
-                        <span class="label" v-show="post.category?.name !== '常规'">[{{ post.category?.name }}]</span>
-                        <span v-text="post.title"></span>
-                    </span>
-                    <div class="markdown-body" v-html="bodyHTML"></div>
-                    <a :href="`https://github.com/${store.owner}/${store.repo}/discussions/${post.number}`" target="_blank" title="写回复" class="reply-btn">
-                        <img src="@/assets/svg/write.svg"/>&nbsp;写回复
-                    </a>
-                    <ul class="comment-list">
-                        <li class="comment-item" 
-                            v-for="(comment, index) in comments.nodes"
-                            :key="comment.id"
-                            :class="{ owner: comment.author?.login === store.author.login }" >
-                            <span class="avatar"><img :src="comment.author.avatarUrl" /></span>
-                            <div class="text">
-                                <span class="author-name">
-                                    <span class="label" v-if="comment.author.login === post.author.login">[楼主]</span>
-                                    <span>{{ comment.author.login }}</span>
-                                </span>
-                                <div class="markdown-body" v-html="comment.bodyHTML"></div>
-                            </div>
-                            <span class="floor">{{ index + 1 }}F</span>
-                        </li>
-                    </ul>    
-                    <span class="message" ref="messageRef">{{ message }}</span>
+                    <div class="mask"></div>
+                    <div class="container">
+                        <span class="post-title">
+                            <span class="label" v-show="post.category?.name !== '常规'">[{{ post.category?.name }}]</span>
+                            <span v-text="post.title"></span>
+                        </span>
+                        <div class="markdown-body" v-html="bodyHTML"></div>
+                        <a :href="`https://github.com/${store.owner}/${store.repo}/discussions/${post.number}`" target="_blank" title="写回复" class="reply-btn">
+                            <img src="@/assets/svg/write.svg"/>&nbsp;写回复
+                        </a>
+                        <ul class="comment-list">
+                            <li class="comment-item" 
+                                v-for="(comment, index) in comments.nodes"
+                                :key="comment.id"
+                                :class="{ owner: comment.author?.login === store.author.login }" >
+                                <span class="avatar"><img :src="comment.author.avatarUrl" /></span>
+                                <div class="text">
+                                    <span class="author-name">
+                                        <span class="label" v-if="comment.author.login === post.author.login">[楼主]</span>
+                                        <span>{{ comment.author.login }}</span>
+                                    </span>
+                                    <div class="markdown-body" v-html="comment.bodyHTML"></div>
+                                </div>
+                                <span class="floor">{{ index + 1 }}F</span>
+                            </li>
+                        </ul>    
+                        <span class="message" ref="messageRef">{{ message }}</span>
+                    </div>
                 </div>
             </main>
         </div>
@@ -253,10 +256,9 @@ const nextImage = () => {
         width: 100%;
         height: 85px;
         padding: 5px 36px;
-        background-color: rgba(0, 0, 0, 0.7);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
-        backdrop-filter: blur(10px);  
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
         z-index: 1;
+        background: linear-gradient(0deg, #000, transparent);
         .close-btn {
             cursor: pointer;
             height: 100%;
@@ -270,7 +272,6 @@ const nextImage = () => {
             gap: 10px;
             .avatar {
                 border: 4px solid @border-color;
-                box-shadow: 0 0 0 2px #000;
                 height: 100%;
                 aspect-ratio: 1/1;
                 border-radius: 50%;
@@ -279,6 +280,7 @@ const nextImage = () => {
                     aspect-ratio: 1/1;
                     border-radius: 50%;
                     object-fit: cover;
+                    border: 2px solid #000;
                 }
             }
             .text {
@@ -351,19 +353,26 @@ const nextImage = () => {
 }
 
 .interaction-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
     width: 60%;
     height: 100%;
-    padding: 16px 24px;
-    padding-bottom: 75px;
+    padding-right: 4px;
     background-color: rgba(0, 0, 0, 0.5);
     border-radius: 25px;
+    position: relative;
+    overflow: hidden;
+
+}
+
+.interaction-container .container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+    padding: 16px 24px;
+    padding-bottom: 75px;
     overflow-y: scroll;
     overflow-x: hidden;
-    // mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), black 15%, black 85%, rgba(0, 0, 0, 0.3));
-
     .post-title {
         span {
             font-size: 1.125rem;
@@ -384,82 +393,107 @@ const nextImage = () => {
         cursor: pointer;
         margin: 8px 0;
         img {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
         }
     }
-
-
-}
-
- .message {
-    width: 100%;
-    text-align: center;
-    color: @text-secondary-color;
-}
-
-.comment-list {
-    width: 100%;
-    height: auto;
-   
-    .comment-item {
-        min-height: 70px;
+    .comment-list {
         width: 100%;
-        border-bottom: 2px solid @border-color;
-        display: flex;
-        padding: 4px 0;
-        position: relative;
-        .avatar {
-            height: 58px;
-            aspect-ratio: 1/1;
-            border-radius: 50px;
-            border: 3px solid @border-color;
-            img {
-                height: 100%;
-                border-radius: 50px;
-                object-fit: cover;
-                border: 2px solid #000;
-            }
-        }
-        .text{
+        height: auto;
+    
+        .comment-item {
+            min-height: 70px;
+            width: 100%;
+            border-bottom: 2px solid @border-color;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 2px;
-            margin-left: 5px;
-            flex: 1;
-            min-width: 0;
-            min-height: 100%;
-            .author-name {
-                color: @text-secondary-color;
-                .single-line-ellipsis(); 
-            }           
-            .label {
-                margin-right: 2px;
+            padding: 4px 0;
+            position: relative;
+            .avatar {
+                height: 58px;
+                aspect-ratio: 1/1;
+                border-radius: 50px;
+                border: 3px solid @border-color;
+                img {
+                    height: 100%;
+                    border-radius: 50px;
+                    object-fit: cover;
+                    border: 2px solid #000;
+                }
             }
-        }
-        .floor {
-            position: absolute;
-            top: 12px;
-            right: 0;
-            z-index: 1;
-            font-size: 12px;
-            background-color: rgba(255,255,255,0.3);
-            padding: 0 12px;
-            border-radius: 25px;
-            border-top-left-radius: 0;
-            color: #000;
-
-        }
-        &.owner {
-            .text .author-name *{
-                color: #fdc220;;
+            .text{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: 2px;
+                margin-left: 5px;
+                flex: 1;
+                min-width: 0;
+                min-height: 100%;
+                .author-name {
+                    color: @text-secondary-color;
+                    .single-line-ellipsis(); 
+                }           
+                .label {
+                    margin-right: 2px;
+                }
             }
             .floor {
-                background-color: #fdc220;;
+                position: absolute;
+                top: 12px;
+                right: 0;
+                z-index: 1;
+                font-size: 12px;
+                background-color: rgba(255,255,255,0.3);
+                padding: 0 12px;
+                border-radius: 25px;
+                border-top-left-radius: 0;
+                color: #000;
+
+            }
+            &.owner {
+                .text .author-name *{
+                    color: #fdc220;;
+                }
+                .floor {
+                    background-color: #fdc220;;
+                }
             }
         }
     }
+    .message {
+        width: 100%;
+        text-align: center;
+        color: @text-secondary-color;
+    }
+}
+
+
+.interaction-container .mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    &::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 32px;
+        top: 0;
+        left: 0;
+        background: linear-gradient(180deg, #000, transparent);
+    }
+    &::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 32px;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(180deg, transparent, #000);
+    }
+
 }
 
 @media (max-width: 1080px) {
