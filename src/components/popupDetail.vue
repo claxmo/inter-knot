@@ -475,11 +475,12 @@ const nextImage = () => {
     width: 100%;
     height: 100%;
     pointer-events: none;
+    border-radius: 25px;
     &::after {
         content: '';
         position: absolute;
         width: 100%;
-        height: 32px;
+        height: 27px;
         top: 0;
         left: 0;
         background: linear-gradient(180deg, #000, transparent);
@@ -488,7 +489,7 @@ const nextImage = () => {
         content: '';
         position: absolute;
         width: 100%;
-        height: 32px;
+        height: 27px;
         bottom: 0;
         right: 0;
         background: linear-gradient(180deg, transparent, #000);
