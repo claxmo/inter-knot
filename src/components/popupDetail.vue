@@ -390,9 +390,9 @@ const nextImage = () => {
         span {
             font-size: 1.125rem;
         }
-        .label {
-            margin-right: 2px;
-        }
+        // .label {
+        //     // margin-right: 2px;
+        // }
     }
     .reply-btn {
         display: flex;
@@ -445,9 +445,9 @@ const nextImage = () => {
                     color: @text-secondary-color;
                     .single-line-ellipsis(); 
                 }           
-                .label {
-                    margin-right: 2px;
-                }
+                // .label {
+                //     margin-right: 2px;
+                // }
             }
             .floor {
                 position: absolute;

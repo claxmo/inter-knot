@@ -159,9 +159,9 @@ onMounted(() => {
       span {
         font-size: 1.125rem;
       }
-      .label {
-        margin-right: 2px;
-      }
+      // .label {
+      //   margin-right: 2px;
+      // }
     }
     .post-body {
       padding: 0 5px;
