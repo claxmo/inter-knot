@@ -26,7 +26,6 @@
                     <span class="cur-page" v-show="imgUrls.length > 1">{{ curImgIndex + 1 }}/{{ imgUrls.length }}</span>
                 </div>
                 <div class="interaction-container">
-                    <div class="mask"></div>
                     <div class="container">
                         <span class="post-title">
                             <span class="label" v-show="post.category?.name !== '常规'">[{{ post.category?.name }}]</span>
@@ -190,9 +189,14 @@ const nextImage = () => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('@/assets/svg/fill-white.svg') repeat center center;
-    background-size: 12px;
     background-color: rgba(0, 0, 0, 0.7);
+    background-image: repeating-linear-gradient(
+        45deg,            
+        rgba(57,57,57,0.3),             
+        rgba(57,57,57,0.3) 4px,          
+        transparent 4px,
+        transparent 8px;
+    );
     z-index: 11;
     transition: all 0.3s;
     &.show {
@@ -210,7 +214,6 @@ const nextImage = () => {
         }
     }
 }
-
 
 .meta {
     display: flex;
@@ -373,6 +376,16 @@ const nextImage = () => {
     padding-bottom: 75px;
     overflow-y: scroll;
     overflow-x: hidden;
+    &::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(0,0,0,0.7), transparent 5%, transparent 95%, rgba(0,0,0,0.7));
+    }
     .post-title {
         span {
             font-size: 1.125rem;
@@ -424,7 +437,6 @@ const nextImage = () => {
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                gap: 2px;
                 margin-left: 5px;
                 flex: 1;
                 min-width: 0;
@@ -465,36 +477,6 @@ const nextImage = () => {
         text-align: center;
         color: @text-secondary-color;
     }
-}
-
-
-.interaction-container .mask {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    border-radius: 25px;
-    &::after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 27px;
-        top: 0;
-        left: 0;
-        background: linear-gradient(180deg, #000, transparent);
-    }
-    &::before {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 27px;
-        bottom: 0;
-        right: 0;
-        background: linear-gradient(180deg, transparent, #000);
-    }
-
 }
 
 @media (max-width: 1080px) {

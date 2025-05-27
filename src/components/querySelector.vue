@@ -22,6 +22,8 @@
 <script setup>
 import { ref, defineProps } from 'vue';
 import { useConfigStore } from '@/stores/config';
+import { useToast } from 'vue-toastification';
+
 const props = defineProps({
   items: {
     type: Array,
@@ -34,7 +36,10 @@ const activeIndex = ref(0);
 const label = ref('全部');
 
 const setQuery = (index, query) => {
-    if (store.isLoading) return;
+    if (store.isLoading) {
+      useToast().info("请等待加载完成!");
+      return;
+    }
     activeIndex.value = index;
     label.value = props.items[index].label;
     store.searchQuery = query;

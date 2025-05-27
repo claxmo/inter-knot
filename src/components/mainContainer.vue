@@ -135,8 +135,13 @@ main {
             position: absolute;
             width: 100%;
             height: 100%;
-            background: url('@/assets/svg/fill-black.svg') repeat center center;
-            background-size: 12px;
+            background-image: repeating-linear-gradient(
+                45deg,            
+                rgba(0,0,0,0.3),             
+                rgba(0,0,0,0.3) 4px,          
+                transparent 4px,
+                transparent 8px;
+            );
         }
     }
 }
