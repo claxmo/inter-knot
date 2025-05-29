@@ -11,6 +11,7 @@
 </template>
 
 <script setup>
+import { debounce } from 'lodash-es';
 import { defineProps, ref, onMounted, watch, nextTick , onUnmounted,  defineExpose } from 'vue';
 
 const props = defineProps({
@@ -29,13 +30,12 @@ const props = defineProps({
 });
 const waterfall = ref(null);
 
-const layout = () => {
+const layout = debounce(() => {
     const getColumn = () => {
-        let innerWidth = window.innerWidth;
-        const column = Math.floor(innerWidth / props.width);
-        return column;
+        const containerWidth = waterfall.value.clientWidth;
+        const column = Math.floor(containerWidth / (props.width + props.gap));
+        return Math.max(column, 1);
     };
-    
     const getMinTop = (nextTop) => {
         let min = nextTop[0], index = 0;
         for (let i = 1; i < nextTop.length; i++) {
@@ -49,42 +49,39 @@ const layout = () => {
 
     if (waterfall.value) {
         const column = getColumn();
-        waterfall.value.style.width = props.width * column + props.gap * (column - 1) + "px";
+        const columnWidth = props.width + props.gap;
+        const containerWidth = waterfall.value.clientWidth;
+        const contentWidth = column * columnWidth - props.gap;
+        const offsetLeft = (containerWidth - contentWidth) / 2;
+        // waterfall.value.style.width = props.width * column + props.gap * (column - 1) + "px";
         let nextTop = new Array(column).fill(0);
         for (let i = 0; i < waterfall.value.children.length; i++) {
             const item = waterfall.value.children[i];
             let minTop = getMinTop(nextTop);
-            item.style.left = `${minTop.index * (props.width + props.gap)}px`;
+            item.style.left = `${offsetLeft + minTop.index * columnWidth}px`;
             item.style.top = `${minTop.min + props.gap}px`;
             item.style.width = props.width + "px"; 
             item.style.opacity = "1";
             nextTop[minTop.index] += item.offsetHeight + props.gap;
         }
         waterfall.value.style.paddingBottom = `${Math.max(...nextTop)}px`;
-
     }
-};
-
-let resizeTimer = null;
-
-const resizeHandle = () => {
-    if (resizeTimer) clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(layout, 200);
-};
+}, 100);
 
 onMounted(() => {
-    window.addEventListener('resize', resizeHandle);
+    layout()
+    window.addEventListener('resize', layout);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', resizeHandle);
+  window.removeEventListener('resize', layout);
 });
 
-watch(() => props.items.length, () => {
+watch(() => props.items, () => {
     nextTick(() => {
         layout();
     });    
-});
+}, {deep: true});
 
 defineExpose({ layout });
 
@@ -92,6 +89,7 @@ defineExpose({ layout });
 
 <style lang="css" scoped>
 .waterfall-container {
+    width: 100%;
     position: relative;
     overflow: visible;
 }

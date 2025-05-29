@@ -2,9 +2,13 @@
     <header>
         <div class="left-wrapper">
             <userInfo />  
-            <button class="write-btn" title="写帖子">
-                <a :href="`https://github.com/${store.owner}/${store.repo}/discussions/new/choose`" target="_blank"><img src="@/assets/svg/write.svg"></a>
-            </button>
+            <a 
+            :href="`https://github.com/${store.owner}/${store.repo}/discussions/new/choose`" 
+            target="_blank" 
+            class="write-btn" 
+            title="写帖子">
+              <img src="@/assets/svg/write.svg">
+            </a>
         </div>
         <div class="right-wrapper">
             <navBar :items="['推送', '日程', '历程', '绳网等级']"/>
@@ -33,14 +37,8 @@ header {
   height: 90px;
   padding: 5px 40px;
   background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
-  .left-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-  }
+  backdrop-filter: blur(10px);
 }
 
 .write-btn {
@@ -62,7 +60,15 @@ header {
   }
 }
 
-@media (max-width: 1440px) {
+.left-wrapper, 
+.right-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 1280px) {
   header {
     justify-content: center;
   }

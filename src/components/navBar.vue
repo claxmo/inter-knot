@@ -42,7 +42,6 @@ const setActive = (index, item) => {
   }
 }
 
-
 .navbar {
   display: flex;
   justify-content: center;

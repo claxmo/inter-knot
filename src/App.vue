@@ -7,7 +7,7 @@
 <script setup>
 import HeaderContainer from "@/components/headerContainer.vue";
 import MainContainer from "@/components/mainContainer.vue";
-import LoadingScreen from "./components/loadingScreen.vue";
+import LoadingScreen from "@/components/loadingScreen.vue";
 
 </script>
 

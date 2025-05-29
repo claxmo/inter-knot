@@ -1,10 +1,10 @@
 @text-primary-color: #f4f4f4;
 @text-secondary-color: #b4b4b4;
-@text-tertiary-color: #1b1b1b;
+@text-tertiary-color: #141414;
 
-@border-color: #4a4a4a;
-@bg-primary-color: #1f1f1f;
-@bg-secondary-color: #2f2f2f;
+@border-color: #3a3a3a;
+@bg-primary-color: #212121;
+@bg-secondary-color: #3a3a3a;
 
 @import '~github-markdown-css/github-markdown-dark.css';
 
@@ -43,8 +43,8 @@
 .multi-line-ellipsis(@lines: 2){
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
+    -webkit-line-clamp: @lines;
+    line-clamp: @lines;
     white-space: normal;
     text-overflow: ellipsis;
     overflow: hidden;

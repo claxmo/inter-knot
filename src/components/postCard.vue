@@ -1,5 +1,5 @@
 <template>
-    <div class="post-card" @click="$emit('click')" :class="{delegate: post.category.name === '委托', R18: post.category.name === 'R18'}">
+    <div class="post-card" @click="$emit('click')" :class="{delegate: isDelegate, R18: isR18}">
         <span class="views">
             <img src="@/assets/svg/views.svg" />
             <span class="view-num">{{ post.comments.totalCount }}</span>
@@ -17,7 +17,7 @@
                 <span class="author-name">{{ post.author.login }}</span>
             </div>
             <div class="post-title">
-                <span class="label" v-if="post.category.name !== '常规'">{{ `[${post.category.name}]` }}</span>
+                <span class="label" v-if="post.category.name !== '常规'">{{ `[${post.category.name}]` }}</span> 
                 <span v-text="post.title"></span>
             </div>
             <span class="post-body" v-text="post.bodyText || 'null'"></span>
@@ -27,7 +27,7 @@
 
 <script setup>
 import defaultCoverUrl from '@/assets/svg/default-cover.svg';
-import { defineProps,ref, defineEmits, toRef, onMounted} from 'vue';
+import { defineProps,ref, defineEmits, toRef, onMounted, computed} from 'vue';
 
 const props = defineProps({
     post: {
@@ -38,7 +38,8 @@ const props = defineProps({
 const post = toRef(props, "post");
 const emit = defineEmits(["click","imageLoaded"]);
 const coverUrl = ref(defaultCoverUrl);
-
+const isDelegate = computed(() => post.value.category.name === '委托');
+const isR18 = computed(() => post.value.category.name === 'R18');
 const isLoading = ref(true);
 const isError = ref(false);
 
@@ -141,16 +142,8 @@ onMounted(() => {
         margin-left: 5px;
         padding: 2px 0 0 4px;
         color: @text-secondary-color;
+        border-bottom: 3px solid @border-color;
         .single-line-ellipsis();
-        &::before {
-          content: "";
-          position: absolute;
-          left: 0;
-          bottom: 0;
-          width: 100%;
-          height: 3px;
-          background-color: @bg-secondary-color;
-        }
       }
     }
     .post-title {
@@ -159,9 +152,6 @@ onMounted(() => {
       span {
         font-size: 1.125rem;
       }
-      // .label {
-      //   margin-right: 2px;
-      // }
     }
     .post-body {
       padding: 0 5px;
@@ -202,7 +192,7 @@ onMounted(() => {
 }
 
 .post-card.R18:not(.viewed) .post-title * {
-  .text-linear-gradient(0, #FF386B, #fe7f9f);
+  .text-linear-gradient(0, #FF386B, #fc7395);
 }
 
 </style>

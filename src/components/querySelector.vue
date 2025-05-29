@@ -3,7 +3,7 @@
     <ul class="query-options">
       <li
         v-for="(item, index) in props.items"
-        :key="item.label"
+        :key="index"
         class="query-option"
         :class="{ active: activeIndex === index }"
         @click="setQuery(index, item.query)"
@@ -11,10 +11,7 @@
         {{ item.label }}
       </li>
     </ul>
-    <div class="query-label" @click="isOpen = !isOpen">
-      <span class="text">{{ label }}</span>
-      <span class="arrow"></span>
-    </div>
+    <div class="cur-label" @click="isOpen = !isOpen">{{ curLabel }}<span class="arrow"></span></div>
     <div class="back-glow"></div>
   </div>
 </template>
@@ -33,7 +30,7 @@ const props = defineProps({
 const store = useConfigStore();
 const isOpen = ref(false);
 const activeIndex = ref(0);
-const label = ref('全部');
+const curLabel = ref(props.items[0].label);
 
 const setQuery = (index, query) => {
     if (store.isLoading) {
@@ -41,7 +38,7 @@ const setQuery = (index, query) => {
       return;
     }
     activeIndex.value = index;
-    label.value = props.items[index].label;
+    curLabel.value = props.items[index].label;
     store.searchQuery = query;
     isOpen.value = !isOpen.value;
 };
@@ -62,14 +59,15 @@ const setQuery = (index, query) => {
   bottom: 42px;
   right: 42px;
   z-index: 10;
-  width: 280px;
-  .query-label {
+  width: 300px;
+  height: 50px;
+  .cur-label {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 10px;
+    padding: 0 12px;
     width: 100%;
-    height: 50px;
+    height: 100%;
     border: 4px solid @border-color;
     border-radius: 50px;
     background: url('@/assets/svg/point.svg') center repeat;
@@ -77,10 +75,8 @@ const setQuery = (index, query) => {
     background-color: #000;
     cursor: pointer;
     box-shadow: 0 0 0 2px #000;
-    .text {
-      font-size: 1.125rem;
-    }
-    .arrow{
+    font-size: 1.125rem;
+    .arrow {
       border-left: 8px solid transparent;
       border-right: 8px solid transparent;
       border-top: 8px solid @text-primary-color;
@@ -113,7 +109,7 @@ const setQuery = (index, query) => {
       display: flex;
       width: 100%;
       border-radius: 50px;
-      padding: 0 10px;
+      padding: 0 12px;
       height: 35px;
       cursor: pointer;
       font-size: 1.125rem;
@@ -132,7 +128,7 @@ const setQuery = (index, query) => {
     visibility: visible;
     
   }
-  .query-label .arrow{
+  .cur-label .arrow{
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
     border-bottom: 8px solid @text-primary-color;

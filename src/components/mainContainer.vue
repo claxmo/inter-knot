@@ -1,15 +1,19 @@
 <template>
     <main>
         <div class="main-background"></div>
-        <span v-if="needInstall" class="center">
-            <a href="https://greasyfork.org/zh-CN/scripts/534939-%E7%BB%B3%E7%BD%91%E8%B7%A8%E5%9F%9F%E5%8A%A9%E6%89%8B" class="link">点击下载绳网跨域助手</a>
-        </span>
-        <Waterfall v-else ref="waterfallRef" :items="store.posts" :width=300 :gap=25 >
-            <template #default="{ item }">
-                <Card :post="item" @click="showPopup(item)" @imageLoaded="waterfallRef.layout()"/>
-            </template>
-        </Waterfall>
-        <span class="message" ref="messageRef" :class="{center: !store.posts.length}">{{ message }}</span>
+        <template v-if="needInstall || needUpdate">
+            <span class="center">
+                <a href="https://greasyfork.org/zh-CN/scripts/534939-绳网跨域助手" class="link">点击{{ needUpdate ? "更新" : "下载"}}绳网跨域助手</a>
+            </span>
+        </template>
+        <template v-else>
+            <Waterfall ref="waterfallRef" :items="store.posts" :width=300 :gap=25 >
+                <template #default="{ item }">
+                    <Card :post="item" @click="showPopup(item)" @imageLoaded="waterfallRef.layout()"/>
+                </template>
+            </Waterfall>
+        </template> 
+        <span class="message" :class="{center: !store.posts.length}" ref="messageRef">{{ message }}</span>
     </main>
     <PopupDetail :post="store.curPost" :show="store.showPopup" @hide="store.showPopup = false"/>
     <QuerySelector :items="[
@@ -45,7 +49,8 @@ const message = computed(() => {
         return ''
     }
 });
-const needInstall = ref(true);
+const needInstall = ref(typeof window.version === 'undefined');
+const needUpdate = ref(!needInstall.value && window.version !== '1.4.1');
 
 const showPopup = (post) => {
     store.curPost = post;
@@ -80,9 +85,7 @@ watch(() => store.searchQuery, async () => {
 });
 
 onMounted(() => {
-    if (typeof window.getDiscussions !== "undefined"){
-        needInstall.value = false;
-    }
+    if (needInstall.value || needUpdate.value) return;
     nextTick(() => {
         const observer = new IntersectionObserver(async (entries) => {
             const entry = entries[0];
@@ -90,11 +93,11 @@ onMounted(() => {
                 await getNextDiscussions();
             }
         }, {
-            root: null, // 默认是视口
-            threshold: 0.1 // 元素 10% 可见时触发
+            root: null,
+            threshold: 0.1
         });
         observer.observe(messageRef.value);
-    });
+    }); 
 });
 </script>
 
@@ -126,10 +129,10 @@ main {
         z-index: -1;
         width: 100%;
         height: 100%;
-        background: url('@/assets/img/background.png') no-repeat center center;
+        background: url('@/assets/img/main-bg.png') no-repeat center center;
         background-size: cover;
         background-position: left bottom;
-        animation: bg-scroll 30s linear infinite alternate;
+        animation: bg-scroll 30s linear infinite;
         &::after {
             content: '';
             position: absolute;
@@ -145,7 +148,6 @@ main {
         }
     }
 }
-
 
 .message {
     color: @text-secondary-color;
