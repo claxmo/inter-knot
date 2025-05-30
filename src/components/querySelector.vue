@@ -24,7 +24,7 @@ import { useToast } from 'vue-toastification';
 const props = defineProps({
   items: {
     type: Array,
-    required: true
+    required: true,
   }
 });
 const store = useConfigStore();
@@ -84,15 +84,6 @@ const setQuery = (index, query) => {
       border-radius: 8px;
     }
   }
-  .back-glow {
-    z-index: -1;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    bottom: 0;
-    left: 0;
-    border-radius: 50px;
-  }
   .query-options {
     width: 100%;
     background-color: @bg-secondary-color;
@@ -135,6 +126,13 @@ const setQuery = (index, query) => {
     border-top: none;
   }
   .back-glow {
+    z-index: -1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    bottom: 0;
+    left: 0;
+    border-radius: 50px;
     animation: background-glow 1s linear infinite alternate,
                   scale-grow 0.3s cubic-bezier(0.35, 0.7, 0, 0.7) infinite alternate;
   }

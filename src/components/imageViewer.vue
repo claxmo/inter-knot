@@ -1,12 +1,14 @@
 <template>
     <div class="image-viewer">
-        <span class="prev-btn" @click="prevImage" title="上一张" v-show="props.urls.length > 1"></span>
         <img 
         v-for="(url, index) in props.urls"
         v-show="index === curIndex"
         :src="url" 
         :key="index" />
-        <span class="next-btn" @click="nextImage" title="下一张" v-show="props.urls.length > 1"></span>
+        <div class="control">
+            <span class="prev" @click="prevImage" title="上一张"></span>
+            <span class="next" @click="nextImage" title="下一张"></span>
+        </div>
         <span class="cur-page" v-show="props.urls.length > 1">{{ curIndex + 1 }}/{{ props.urls.length }}</span>
     </div>
 </template>
@@ -48,8 +50,23 @@ watch(() => props.urls, () => {
         height: 100%;
         object-fit: contain;
     }
-    .prev-btn,
-    .next-btn {
+    .cur-page{
+        position: absolute;
+        right: 8px;
+        bottom: 4px;
+        text-align: center;
+        color: rgba(255,255,255,0.3);
+    }
+}
+
+.image-viewer .control {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    .prev,
+    .next {
         position: absolute;
         width: 50%;
         height: 100%;
@@ -58,18 +75,11 @@ watch(() => props.urls, () => {
             background-color: rgba(0,0,0,0.3);
         }
     }
-    .prev-btn {
+    .prev {
         left: 0;
     }
-    .next-btn {
+    .next {
         right: 0;
-    }
-    .cur-page{
-        position: absolute;
-        right: 8px;
-        bottom: 4px;
-        text-align: center;
-        color: rgba(255,255,255,0.3);
     }
 }
 

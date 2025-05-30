@@ -8,7 +8,7 @@
                         <span class="author-name">{{ post.author?.login ?? "匿名用户" }}</span>
                         <ul class="meta">
                             <li class="meta-item"><img src="@/assets/svg/clock.svg">{{ new Date(post?.createdAt).toLocaleDateString("en-CA") }}</li>
-                            <li class="meta-item"><img src="@/assets/svg/views.svg">{{ post.comments?.totalCount }}</li>
+                            <li class="meta-item"><img src="@/assets/svg/views.svg">{{ post.upvoteCount }}</li>
                         </ul>
                     </div>
                 </div>
@@ -25,11 +25,7 @@
                             <span v-text="post.title"></span>
                         </span>
                         <div class="markdown-body" v-html="bodyHTML"></div>
-                        <a 
-                        :href="`https://github.com/${store.owner}/${store.repo}/discussions/${post.number}`" 
-                        target="_blank" 
-                        title="写回复" 
-                        class="reply-btn">
+                        <a :href="post.url" target="_blank" title="写回复" class="reply-btn">
                             <img src="@/assets/svg/write.svg"/>&nbsp;写回复
                         </a>
                         <ul class="comment-list">
@@ -148,7 +144,6 @@ onMounted(() => {
         observer.observe(messageRef.value);
     });
 });
-
 
 </script>
 
@@ -433,7 +428,7 @@ onMounted(() => {
 }
 
 
-@media (max-width: 1280px) {
+@media (max-width: 960px) {
 
     .post-detail {
         height: 100vh;

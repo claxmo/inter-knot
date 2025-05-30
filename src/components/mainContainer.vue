@@ -1,13 +1,18 @@
 <template>
     <main>
         <div class="main-background"></div>
-        <template v-if="needInstall || needUpdate">
+        <template v-if="needInstall">
             <span class="center">
-                <a href="https://greasyfork.org/zh-CN/scripts/534939-绳网跨域助手" class="link">点击{{ needUpdate ? "更新" : "下载"}}绳网跨域助手</a>
+                <a href="https://greasyfork.org/zh-CN/scripts/534939-绳网跨域助手" class="link">点击下载绳网跨域助手</a>
+            </span>
+        </template>
+        <template v-else-if="needUpdate">
+            <span class="center">
+                <a href="https://greasyfork.org/zh-CN/scripts/534939-绳网跨域助手" class="link">点击更新绳网跨域助手</a>
             </span>
         </template>
         <template v-else>
-            <Waterfall ref="waterfallRef" :items="store.posts" :width=300 :gap=25 >
+            <Waterfall ref="waterfallRef" :items="store.posts" :width=300 :gap=25 :maxCols=5>
                 <template #default="{ item }">
                     <Card :post="item" @click="showPopup(item)" @imageLoaded="waterfallRef.layout()"/>
                 </template>
@@ -50,7 +55,7 @@ const message = computed(() => {
     }
 });
 const needInstall = ref(typeof window.version === 'undefined');
-const needUpdate = ref(!needInstall.value && window.version !== '1.4.1');
+const needUpdate = ref(!needInstall.value && window.version !== '1.4.2');
 
 const showPopup = (post) => {
     store.curPost = post;
@@ -158,6 +163,7 @@ main {
 .link {
     color: #66ccff;
     font-size: 2rem;
+    text-decoration: underline;
 }
 
 .center {

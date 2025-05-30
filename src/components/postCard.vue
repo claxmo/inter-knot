@@ -2,7 +2,7 @@
     <div class="post-card" @click="$emit('click')" :class="{delegate: isDelegate, R18: isR18}">
         <span class="views">
             <img src="@/assets/svg/views.svg" />
-            <span class="view-num">{{ post.comments.totalCount }}</span>
+            <span class="view-num">{{ post.upvoteCount }}</span>
         </span>
         <img 
         class="cover"
@@ -27,7 +27,7 @@
 
 <script setup>
 import defaultCoverUrl from '@/assets/svg/default-cover.svg';
-import { defineProps,ref, defineEmits, toRef, onMounted, computed} from 'vue';
+import { defineProps,ref, defineEmits, toRefs, onMounted, computed} from 'vue';
 
 const props = defineProps({
     post: {
@@ -35,7 +35,7 @@ const props = defineProps({
         required: true,
     }
 });
-const post = toRef(props, "post");
+const { post } = toRefs(props);
 const emit = defineEmits(["click","imageLoaded"]);
 const coverUrl = ref(defaultCoverUrl);
 const isDelegate = computed(() => post.value.category.name === '委托');
@@ -68,7 +68,7 @@ onMounted(() => {
 
 .post-card {
   position: relative;
-  width: 300px;
+  width: 100%;
   background-color: @bg-primary-color;
   border: 4px solid #000;
   border-radius: 30px 30px 0 30px;

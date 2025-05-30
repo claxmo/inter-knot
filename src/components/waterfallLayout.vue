@@ -12,7 +12,7 @@
 
 <script setup>
 import { debounce } from 'lodash-es';
-import { defineProps, ref, onMounted, watch, nextTick , onUnmounted,  defineExpose } from 'vue';
+import { defineProps, ref, onMounted, watch, nextTick , onUnmounted,  defineExpose, toRefs } from 'vue';
 
 const props = defineProps({
     items: {
@@ -27,14 +27,23 @@ const props = defineProps({
         type: Number,
         required: true,
     },
+    maxCols: {
+        type: Number,
+        required: false,
+    }
 });
 const waterfall = ref(null);
+
+const { width, gap } = toRefs(props);
 
 const layout = debounce(() => {
     const getColumn = () => {
         const containerWidth = waterfall.value.clientWidth;
-        const column = Math.floor(containerWidth / (props.width + props.gap));
-        return Math.max(column, 1);
+        let column = Math.floor(containerWidth / (width.value + gap.value));
+        if (props.maxclos){
+            column = Math.min(props.maxCols, column); 
+        }
+        return column;
     };
     const getMinTop = (nextTop) => {
         let min = nextTop[0], index = 0;
@@ -49,20 +58,20 @@ const layout = debounce(() => {
 
     if (waterfall.value) {
         const column = getColumn();
-        const columnWidth = props.width + props.gap;
+        const columnWidth = width.value + gap.value;
         const containerWidth = waterfall.value.clientWidth;
-        const contentWidth = column * columnWidth - props.gap;
+        const contentWidth = column * columnWidth - gap.value;
         const offsetLeft = (containerWidth - contentWidth) / 2;
-        // waterfall.value.style.width = props.width * column + props.gap * (column - 1) + "px";
+        // waterfall.value.style.width = width * column + gap * (column - 1) + "px";
         let nextTop = new Array(column).fill(0);
         for (let i = 0; i < waterfall.value.children.length; i++) {
             const item = waterfall.value.children[i];
             let minTop = getMinTop(nextTop);
             item.style.left = `${offsetLeft + minTop.index * columnWidth}px`;
-            item.style.top = `${minTop.min + props.gap}px`;
-            item.style.width = props.width + "px"; 
+            item.style.top = `${minTop.min + gap.value}px`;
+            item.style.width = width.value + "px"; 
             item.style.opacity = "1";
-            nextTop[minTop.index] += item.offsetHeight + props.gap;
+            nextTop[minTop.index] += item.offsetHeight + gap.value;
         }
         waterfall.value.style.paddingBottom = `${Math.max(...nextTop)}px`;
     }
