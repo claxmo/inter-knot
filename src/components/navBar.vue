@@ -67,30 +67,27 @@ const setActive = (index, item) => {
     font-style: italic;
     cursor: pointer;
     overflow: visible;
-    &.active {
-      color: @text-tertiary-color;
-      transition: transform 0.3s;
-      &::after {
-        content: '';
-        position: absolute;
-        z-index: -1;
-        width: 75%;
-        height: 100%;
-        border-radius: 125px 25px 125px 25px;
-        animation:
-          background-glow 1s linear infinite alternate,
-          scale-grow 0.3s cubic-bezier(0.35, 0.7, 0, 0.7) infinite alternate;
-      }
+    &.active::after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      width: 75%;
+      height: 100%;
+      border-radius: 125px 25px 125px 25px;
+      animation:
+        background-glow 1s linear infinite alternate,
+        scale-grow 0.3s cubic-bezier(0.35, 0.7, 0, 0.7) infinite alternate;
+    }
 
-      &:first-child::after {
-        border-radius: 75px 25px 125px 75px;
-      }
+    &:first-child::after {
+      border-radius: 75px 25px 125px 75px;
+    }
 
-      &:last-child::after {
-        border-radius: 125px 75px 75px 25px;
-      }
+    &:last-child::after {
+      border-radius: 125px 75px 75px 25px;
     }
   }
 }
+
 </style>
 

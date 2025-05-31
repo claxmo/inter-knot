@@ -106,7 +106,6 @@ const setQuery = (index, query) => {
       font-size: 1.125rem;
       &.active{
           animation: background-glow 1s linear infinite alternate;
-          color: @text-tertiary-color;
         }
     }
   }

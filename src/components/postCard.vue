@@ -98,12 +98,13 @@ onMounted(() => {
       width: 100%;
       height: 32px;
       margin-bottom: 5px;
+      align-items: center;
       overflow: visible;
       .avatar {
         position: relative;
         height: 65px;
         aspect-ratio: 1 / 1;
-        margin-top: -28px;
+        margin-bottom: 22px;
         z-index: 1;
         border-radius: 50%;
         border: 4px solid @bg-primary-color;
@@ -139,9 +140,9 @@ onMounted(() => {
       .author-name {
         flex: 1;
         position: relative;
-        margin-left: 5px;
-        padding: 2px 0 0 4px;
+        margin-left: 9px;
         color: @text-secondary-color;
+        height: 100%;
         border-bottom: 3px solid @border-color;
         .single-line-ellipsis();
       }

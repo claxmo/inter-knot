@@ -55,7 +55,7 @@ const message = computed(() => {
     }
 });
 const needInstall = ref(typeof window.version === 'undefined');
-const needUpdate = ref(!needInstall.value && window.version !== '1.4.2');
+const needUpdate = ref(!needInstall.value && window.version !== '1.4.3');
 
 const showPopup = (post) => {
     store.curPost = post;
