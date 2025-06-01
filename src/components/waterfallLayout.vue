@@ -30,7 +30,7 @@ const props = defineProps({
     maxCols: {
         type: Number,
         required: false,
-    }
+    },
 });
 const waterfall = ref(null);
 
@@ -40,7 +40,7 @@ const layout = debounce(() => {
     const getColumn = () => {
         const containerWidth = waterfall.value.clientWidth;
         let column = Math.floor(containerWidth / (width.value + gap.value));
-        if (props.maxclos){
+        if (props.maxCols){
             column = Math.min(props.maxCols, column); 
         }
         return column;

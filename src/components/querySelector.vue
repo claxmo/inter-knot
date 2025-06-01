@@ -56,11 +56,11 @@ const setQuery = (index, query) => {
 
 .query-selector {
   position: fixed;
-  bottom: 42px;
-  right: 42px;
+  bottom: 28px;
+  right: 56px;
   z-index: 10;
-  width: 300px;
-  height: 50px;
+  width: 335px;
+  height: 55px;
   .cur-label {
     display: flex;
     align-items: center;
@@ -100,13 +100,16 @@ const setQuery = (index, query) => {
       display: flex;
       width: 100%;
       border-radius: 50px;
-      padding: 0 12px;
-      height: 35px;
+      padding: 0 8px;
+      height: 45px;
       cursor: pointer;
       font-size: 1.125rem;
       &.active{
           animation: background-glow 1s linear infinite alternate;
         }
+      &:active {
+        color: @text-secondary-color;
+      }
     }
   }
 }
@@ -114,7 +117,7 @@ const setQuery = (index, query) => {
 .query-selector.open {
   .query-options {
     opacity: 1;
-    bottom: 55px;
+    bottom: 65px;
     visibility: visible;
     
   }
@@ -137,4 +140,12 @@ const setQuery = (index, query) => {
   }
 }
 
+@media (max-width: 1080px){
+  .query-selector {
+    left: 50%;
+    bottom: 24px;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}
 </style>

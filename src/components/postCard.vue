@@ -1,5 +1,5 @@
 <template>
-    <div class="post-card" @click="$emit('click')" :class="{delegate: isDelegate, R18: isR18}">
+    <div class="post-card" @click="clickHandle" :class="{delegate: isDelegate, R18: isR18, viewed: viewed}">
         <span class="views">
             <img src="@/assets/svg/views.svg" />
             <span class="view-num">{{ post.upvoteCount }}</span>
@@ -17,8 +17,8 @@
                 <span class="author-name">{{ post.author.login }}</span>
             </div>
             <div class="post-title">
-                <span class="label" v-if="post.category.name !== '常规'">{{ `[${post.category.name}]` }}</span> 
-                <span v-text="post.title"></span>
+                <span class="icon" v-if="isDelegate">!</span>
+                <span class="text">{{post.category.name !== '常规' ? `[${post.category.name}]` : ''}}{{ post.title }}</span>
             </div>
             <span class="post-body" v-text="post.bodyText || 'null'"></span>
         </div>
@@ -42,6 +42,13 @@ const isDelegate = computed(() => post.value.category.name === '委托');
 const isR18 = computed(() => post.value.category.name === 'R18');
 const isLoading = ref(true);
 const isError = ref(false);
+const viewed = ref(false);
+
+const clickHandle = () => {
+  emit('click');
+  viewed.value = true;
+};
+
 
 const onLoad = () => {
     emit("imageLoaded");
@@ -82,7 +89,7 @@ onMounted(() => {
   .cover {
     display: block;
     width: 100%;
-    max-height: 400px;
+    max-height: 350px;
     min-height: 185px;
     object-fit: cover;
   }
@@ -149,9 +156,29 @@ onMounted(() => {
     }
     .post-title {
       padding: 0 5px;
-     .multi-line-ellipsis(2);
-      span {
-        font-size: 1.125rem;
+      display: flex;
+      align-items: center;
+      .multi-line-ellipsis(2);
+      .text {
+        font-size: 1.05rem;
+      }
+      .icon {
+        position: relative;
+        top: 6px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        height: 20px;
+        width: 20px;
+        flex-shrink: 0;
+        float: left;
+        border-radius: 4px;
+        background: linear-gradient(0, #4661fd, #10bff0);
+        color: #10bff0;
+        font-weight: bold;
+        font-size: 16px;
+        font-style: italic;
+        margin-right: 6px;
       }
     }
     .post-body {
@@ -180,20 +207,31 @@ onMounted(() => {
   }
 }
 
-.post-card.viewed .post-title * {
-  color: @text-secondary-color;
+.post-card.viewed .post-title {
+  .icon {
+    background: linear-gradient(0, #6e6e6e, #bcbcbc);
+    color: @text-tertiary-color;
+  }
+  .text{
+    color: @text-tertiary-color;
+    // .text-linear-gradient(0, #6e6e6e, #bcbcbc);
+  }
 }
 
-.post-card.delegate:not(.viewed) .post-title * {
-  .text-linear-gradient(0, #4661fd, #10bff0);
+.post-card.delegate:not(.viewed) .post-title {
+  .text {
+    .text-linear-gradient(0, #4661fd, #10bff0);
+  }
 }
 
 .post-card.R18 .cover {
   filter: blur(25px);
 }
 
-.post-card.R18:not(.viewed) .post-title * {
-  .text-linear-gradient(0, #FF386B, #fc7395);
+.post-card.R18:not(.viewed) .post-title {
+  .text{
+    .text-linear-gradient(0, #FF386B, #fc7395);
+  }
 }
 
 </style>

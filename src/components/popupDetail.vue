@@ -9,6 +9,7 @@
                         <ul class="meta">
                             <li class="meta-item"><img src="@/assets/svg/clock.svg">{{ new Date(post?.createdAt).toLocaleDateString("en-CA") }}</li>
                             <li class="meta-item"><img src="@/assets/svg/views.svg">{{ post.upvoteCount }}</li>
+                            <li class="meta-item">#{{ post.number }}</li>
                         </ul>
                     </div>
                 </div>
@@ -25,20 +26,21 @@
                             <span v-text="post.title"></span>
                         </span>
                         <div class="markdown-body" v-html="bodyHTML"></div>
-                        <a :href="post.url" target="_blank" title="写回复" class="reply-btn">
-                            <img src="@/assets/svg/write.svg"/>&nbsp;写回复
-                        </a>
+                        <div class="reply-box">
+                            <input type="text" class="reply-input" v-model='replyBody' placeholder="写回复..." />
+                            <button class="reply-submit" @click="addDiscussionComment(replyBody)">发送</button>
+                        </div>
                         <ul class="comment-list">
                             <li 
                             class="comment-item" 
                             v-for="(comment, index) in comments?.nodes"
                             :key="comment.id"
-                            :class="{ owner: comment.author.login === store.author.login }" >
-                                <span class="avatar"><img :src="comment.author.avatarUrl" /></span>
+                            :class="{ owner: comment.author?.login === store.author.login }" >
+                                <span class="avatar"><img :src="comment.author?.avatarUrl" /></span>
                                 <div class="text">
                                     <span class="author-name">
-                                        <span class="label" v-if="comment.author.login === post.author.login">[楼主]</span>
-                                        <span>{{ comment.author.login }}</span>
+                                        <span class="label" v-if="comment.author?.login === post.author.login">[楼主]</span>
+                                        <span>{{ comment.author?.login }}</span>
                                     </span>
                                     <div class="markdown-body" v-html="comment.bodyHTML"></div>
                                 </div>
@@ -145,6 +147,25 @@ onMounted(() => {
     });
 });
 
+const replyBody = ref('');
+
+const addDiscussionComment = async (body) => {
+    if (!post.value.id) return;
+    if (replyBody.value.trim() === ''){
+        return useToast().warning('评论内容不能为空!');
+    }
+    try{
+        const comment = await window.addDiscussionComment(post.value.id, body);
+        comments.value.nodes.unshift(comment);
+        replyBody.value = '';
+        useToast().success('评论发送成功!');
+    }catch (e){
+        useToast().error('评论发送失败!');
+        console.error(e);
+    }
+};
+
+
 </script>
 
 <style scoped lang="less">
@@ -195,7 +216,7 @@ onMounted(() => {
 .post-detail {
     border: 4px solid @border-color;
     width: 75%;
-    aspect-ratio: 1.7/1;
+    aspect-ratio: 1.8/1;
     transition: all 0.3s;
     border-radius: 50px 0px 50px 50px;
     overflow: hidden;
@@ -299,7 +320,7 @@ onMounted(() => {
 }
 
 .media-container {
-    width: 35%;
+    width: 30%;
     height: 100%;
     border: 4px solid @border-color;
     border-radius: 25px;
@@ -308,7 +329,7 @@ onMounted(() => {
 }
 
 .interaction-container {
-    width: 60%;
+    width: 65%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     border-radius: 25px;
@@ -342,23 +363,6 @@ onMounted(() => {
                 font-size: 1.125rem;
             }
         }
-        .reply-btn {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #000;
-            border: 4px solid @border-color;
-            border-radius: 50px;
-            min-height: 50px;
-            width: 100%;
-            cursor: pointer;
-            margin: 8px 0;
-            img {
-                width: 24px;
-                height: 24px;
-            }
-        }
-    
         .message {
             width: 100%;
             text-align: center;
@@ -428,6 +432,31 @@ onMounted(() => {
 }
 
 
+.reply-box {
+    width: 100%;
+    min-height: 50px;
+    display: flex;
+    gap: 8px;
+    .reply-input {
+        border: 4px solid @border-color;
+        background-color: #000;
+        color: @text-secondary-color;
+        border-radius: 50px;
+        width: 75%;
+        height: 100%;
+        padding: 0 10px;
+    }
+    .reply-submit {
+        border: 4px solid @border-color;
+        background-color: #000;
+        color: @text-secondary-color;
+        flex: 1;
+        border-radius: 50px;
+        height: 100%;
+        cursor: pointer;
+    }
+}
+
 @media (max-width: 960px) {
 
     .post-detail {
@@ -451,6 +480,7 @@ onMounted(() => {
             }
         }
     }
+    
 }
 </style>
 

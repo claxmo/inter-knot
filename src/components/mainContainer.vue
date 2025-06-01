@@ -12,7 +12,8 @@
             </span>
         </template>
         <template v-else>
-            <Waterfall ref="waterfallRef" :items="store.posts" :width=300 :gap=25 :maxCols=5>
+            <Waterfall 
+            ref="waterfallRef" :items="store.posts" :width=285 :gap=30 :maxCols=5>
                 <template #default="{ item }">
                     <Card :post="item" @click="showPopup(item)" @imageLoaded="waterfallRef.layout()"/>
                 </template>
@@ -47,15 +48,15 @@ const messageRef = ref(null);
 
 const message = computed(() => {
     if (store.isLoading) {
-        return '正在努力加载···'
+        return '正在努力加载···';
     } else if (store.hasNextPage === false) {
-        return '已经到底了···\\[ O_X ]/'
+        return '已经到底了···\\[ O_X ]/';
     } else {
-        return ''
+        return '';
     }
 });
 const needInstall = ref(typeof window.version === 'undefined');
-const needUpdate = ref(!needInstall.value && window.version !== '1.4.3');
+const needUpdate = ref(!needInstall.value && window.version !== '1.4.4');
 
 const showPopup = (post) => {
     store.curPost = post;
@@ -120,7 +121,7 @@ main {
     position: relative;
     width: 100vw;
     height: 100vh;
-    padding-top: 100px;
+    padding-top: 85px;
     z-index: 9;
     display: flex;
     flex-direction: column;
@@ -145,8 +146,8 @@ main {
             height: 100%;
             background-image: repeating-linear-gradient(
                 45deg,            
-                rgba(0,0,0,0.3),             
-                rgba(0,0,0,0.3) 4px,          
+                rgba(14,14,14,0.5),             
+                rgba(14,14,14,0.5) 2px,          
                 transparent 4px,
                 transparent 8px;
             );
@@ -155,9 +156,9 @@ main {
 }
 
 .message {
-    color: @text-secondary-color;
+    color: @text-tertiary-color;
     font-size: 1.5rem;
-    padding: 48px 0;
+    padding: 36px 0;
 }
 
 .link {
