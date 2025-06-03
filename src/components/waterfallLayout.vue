@@ -75,7 +75,7 @@ const layout = debounce(() => {
         }
         waterfall.value.style.paddingBottom = `${Math.max(...nextTop)}px`;
     }
-}, 100);
+}, 300);
 
 onMounted(() => {
     layout()
@@ -96,16 +96,15 @@ defineExpose({ layout });
 
 </script>
 
-<style lang="css" scoped>
+<style scoped lang="less">
 .waterfall-container {
     width: 100%;
     position: relative;
     overflow: visible;
-}
-
-.waterfall-item {
-    position: absolute;
-    transition: all 0.3s;
-    opacity: 0;
+    .waterfall-item {
+        position: absolute;
+        transition: all 0.3s;
+        opacity: 0;
+    }
 }
 </style>

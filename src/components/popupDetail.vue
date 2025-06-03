@@ -1,6 +1,11 @@
 <template>
     <div class="popup-container" :class="props.show ? 'show' : 'hide'" @click="$emit('hide')" >
         <div class="post-detail" @click.stop>
+            <div class="main-background">
+                <span>ZELESS ZONE ZERO ZELESS ZONE ZERO ZELESS ZONE ZERO</span>
+                <span>ZELESS ZONE ZERO ZELESS ZONE ZERO ZELESS ZONE ZERO</span>
+                <span>ZELESS ZONE ZERO ZELESS ZONE ZERO ZELESS ZONE ZERO</span>
+            </div>
             <header>
                 <div class="author-info">
                     <span class="avatar"><img :src="post.author?.avatarUrl || defaultAvatarUrl" /></span>
@@ -28,25 +33,9 @@
                         <div class="markdown-body" v-html="bodyHTML"></div>
                         <div class="reply-box">
                             <input type="text" class="reply-input" v-model='replyBody' placeholder="写回复..." />
-                            <button class="reply-submit" @click="addDiscussionComment(replyBody)">发送</button>
+                            <input type="button" class="reply-submit" @click="addDiscussionComment(replyBody)" ref="replySubmit" value="发送">
                         </div>
-                        <ul class="comment-list">
-                            <li 
-                            class="comment-item" 
-                            v-for="(comment, index) in comments?.nodes"
-                            :key="comment.id"
-                            :class="{ owner: comment.author?.login === store.author.login }" >
-                                <span class="avatar"><img :src="comment.author?.avatarUrl" /></span>
-                                <div class="text">
-                                    <span class="author-name">
-                                        <span class="label" v-if="comment.author?.login === post.author.login">[楼主]</span>
-                                        <span>{{ comment.author?.login }}</span>
-                                    </span>
-                                    <div class="markdown-body" v-html="comment.bodyHTML"></div>
-                                </div>
-                                <span class="floor">{{ index + 1 }}F</span>
-                            </li>
-                        </ul>    
+                        <CommentList :post="post" :comments="comments" />
                         <span class="message" ref="messageRef">{{ message }}</span>
                     </div>
                 </div>
@@ -57,11 +46,11 @@
 
 <script setup>
 import ImageViewer from '@/components/imageViewer.vue';
+import CommentList from '@/components/commentList.vue';
 import defaultCoverUrl from '@/assets/svg/default-cover.svg';
 import defaultAvatarUrl from '@/assets/svg/default-avatar.svg';
 import { ref, watch, nextTick, defineProps, toRefs, computed, onMounted } from 'vue';
 import { useToast } from 'vue-toastification';
-import { useConfigStore } from '@/stores/config';
 
 const props = defineProps({
     post: {
@@ -73,10 +62,14 @@ const props = defineProps({
         required: true
     }
 });
-
-const store = useConfigStore();
 const { post } = toRefs(props);
-const comments = ref(null);
+const comments = ref([]);
+const hasNextPage = ref(null);
+const endCursor = ref(null);
+
+
+
+
 const isLoading = ref(false);
 const bodyHTML = ref("");
 const imgUrls = ref([]);
@@ -84,7 +77,7 @@ const messageRef = ref(null);
 const message = computed(() => {
     if (isLoading.value){
         return "正在努力加载中···";
-    }else if (comments.value?.pageInfo?.hasNextPage === false){
+    }else if (hasNextPage.value === false){
         return "- 已无更多评论 -";
     }else{
         return "";
@@ -92,20 +85,13 @@ const message = computed(() => {
 });
 
 const getNextComments = async () => {
-    if (!post.value.id) return;
-    if (isLoading.value || comments.value?.pageInfo?.hasNextPage === false) return;
+    if (!post.value.id || isLoading.value || hasNextPage.value === false) return;
     isLoading.value = true;
     try{
-        const nextComments = await window.getComments(post.value.id, comments.value?.pageInfo?.endCursor);
-        if (!comments.value){
-            comments.value = nextComments;
-        }else{
-            comments.value.nodes.push(...nextComments.nodes.filter(
-                comment => !comments.value.nodes.some(c => c.id === comment.id)
-            ));
-            comments.value.pageInfo = nextComments.pageInfo;
-            comments.value.totalCount = nextComments.totalCount;
-        }  
+        const {nodes, pageInfo} = await window.getComments(post.value.id, endCursor.value);
+        comments.value.push(...nodes.filter(comment => !comments.value.some(c => c.id === comment.id)));
+        hasNextPage.value = pageInfo.hasNextPage;
+        endCursor.value = pageInfo.endCursor  
     }catch(e){
         useToast().error("获取评论列表失败!");
         console.error(e);
@@ -121,7 +107,9 @@ watch(() => props.show, (newValue) => {
     isLoading.value = false;
     imgUrls.value = [defaultCoverUrl];
     bodyHTML.value = post.value.bodyHTML;
-    comments.value = null;
+    comments.value = [];
+    hasNextPage.value = null;
+    endCursor.value = null;
     const imgRegx = /<img[^>]*src=['"]([^'"]+)['"][^>]*>/g;
     const matches = [...bodyHTML.value.matchAll(imgRegx)];
     if (matches.length){
@@ -148,6 +136,7 @@ onMounted(() => {
 });
 
 const replyBody = ref('');
+const replySubmit = ref(null);
 
 const addDiscussionComment = async (body) => {
     if (!post.value.id) return;
@@ -155,13 +144,20 @@ const addDiscussionComment = async (body) => {
         return useToast().warning('评论内容不能为空!');
     }
     try{
+        replySubmit.value.disabled = true;
+        replySubmit.value.value = "发送中···";
         const comment = await window.addDiscussionComment(post.value.id, body);
-        comments.value.nodes.unshift(comment);
+        comments.value.unshift(comment);
         replyBody.value = '';
         useToast().success('评论发送成功!');
     }catch (e){
         useToast().error('评论发送失败!');
         console.error(e);
+    }finally {
+        nextTick(() => {
+            replySubmit.value.disabled = false;
+            replySubmit.value.value = "发送";
+        });
     }
 };
 
@@ -169,13 +165,15 @@ const addDiscussionComment = async (body) => {
 </script>
 
 <style scoped lang="less">
-@keyframes bg-scroll {
-  0% {
-    background-position: left bottom;
-  }
-  100% {
-    background-position: right top;
-  }
+
+@keyframes scroll-left {
+  0% { transform: rotate(-15deg) translateX(0); }
+  100% { transform: rotate(-15deg) translateX(-35%); }
+}
+
+@keyframes scroll-right {
+  0% { transform: rotate(-15deg) translateX(0); }
+  100% { transform: rotate(-15deg) translateX(35%); }
 }
 
 .popup-container {
@@ -214,17 +212,39 @@ const addDiscussionComment = async (body) => {
 }
 
 .post-detail {
-    border: 4px solid @border-color;
     width: 75%;
     aspect-ratio: 1.8/1;
     transition: all 0.3s;
     border-radius: 50px 0px 50px 50px;
     overflow: hidden;
-    background: url('@/assets/img/main-bg.png') no-repeat center center;
-    background-size: cover;
-    background-position: left bottom;
-    animation: bg-scroll 30s linear infinite;
+    background-image: linear-gradient(0, #000, @bg-primary-color);
     position: relative;
+    border: 4px solid #000;
+    box-shadow: 0 0 0 5px rgba(49,49,49,0.7);
+    .main-background {
+        position: absolute;
+        inset: 0;
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
+        z-index: -1;
+        justify-content: center;
+        align-items: center;
+        span {
+            line-height: 1;
+            font-size: 420px;
+            white-space: nowrap;
+            transform: rotate(-15deg);
+            .text-linear-gradient(0, @bg-secondary-color, @bg-primary-color);
+        }
+        span:nth-child(odd) {
+            animation: scroll-left 60s linear infinite alternate;
+        }
+
+        span:nth-child(even) {
+            animation: scroll-right 60s linear infinite alternate;
+        }
+    }
     header {
         display: flex;
         justify-content: space-between;
@@ -237,20 +257,19 @@ const addDiscussionComment = async (body) => {
         padding: 5px 36px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
         z-index: 1;
-        background: linear-gradient(0deg, #000, transparent);    
+        background: linear-gradient(0deg, #000, rgba(0,0,0,0.3));    
     }
     main {
         display: flex;
         justify-content: space-around;
-        background: url("@/assets/svg/point.svg");
-        background-size: 8px;
         padding: 125px 25px 35px 25px;
         width: 100%;
         height: 100%;
-        border: 4px solid #000;
-        border-radius: 50px 0px 50px 50px;
-        background-color: rgba(0, 0, 0, 0.3);
+        background-color: rgba(0, 0, 0, 0.5);
         z-index: 0;
+        background-image: url("@/assets/svg/point.svg");
+        background-size: 8px;
+
     }
 }
 
@@ -331,7 +350,7 @@ const addDiscussionComment = async (body) => {
 .interaction-container {
     width: 65%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.7);
     border-radius: 25px;
     position: relative;
     overflow: hidden;
@@ -371,66 +390,6 @@ const addDiscussionComment = async (body) => {
     }
 }
 
-.interaction-container .container .comment-list {
-    width: 100%;
-    height: auto;
-    .comment-item {
-        min-height: 70px;
-        width: 100%;
-        border-bottom: 2px solid @border-color;
-        display: flex;
-        padding: 4px 0;
-        position: relative;
-        gap:8px;
-        .avatar {
-            height: 58px;
-            aspect-ratio: 1/1;
-            border-radius: 50px;
-            border: 3px solid @border-color;
-            img {
-                height: 100%;
-                border-radius: 50px;
-                object-fit: cover;
-                border: 2px solid #000;
-            }
-        }
-        .text{
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            margin-left: 5px;
-            flex: 1;
-            min-width: 0;
-            min-height: 100%;
-            .author-name {
-                color: @text-secondary-color;
-                .single-line-ellipsis(); 
-            }           
-        }
-        .floor {
-            position: absolute;
-            top: 12px;
-            right: 0;
-            z-index: 1;
-            font-size: 12px;
-            background-color: rgba(255,255,255,0.3);
-            padding: 0 12px;
-            border-radius: 25px;
-            border-top-left-radius: 0;
-            color: #000;
-
-        }
-        &.owner {
-            .text .author-name *{
-                color: #fdc220;;
-            }
-            .floor {
-                background-color: #fdc220;;
-            }
-        }
-    }
-}
-
 
 .reply-box {
     width: 100%;
@@ -440,7 +399,6 @@ const addDiscussionComment = async (body) => {
     .reply-input {
         border: 4px solid @border-color;
         background-color: #000;
-        color: @text-secondary-color;
         border-radius: 50px;
         width: 75%;
         height: 100%;
@@ -449,7 +407,6 @@ const addDiscussionComment = async (body) => {
     .reply-submit {
         border: 4px solid @border-color;
         background-color: #000;
-        color: @text-secondary-color;
         flex: 1;
         border-radius: 50px;
         height: 100%;

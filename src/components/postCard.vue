@@ -163,22 +163,19 @@ onMounted(() => {
         font-size: 1.05rem;
       }
       .icon {
-        position: relative;
-        top: 6px;
         display: inline-flex;
         justify-content: center;
         align-items: center;
         height: 20px;
         width: 20px;
         flex-shrink: 0;
-        float: left;
         border-radius: 4px;
         background: linear-gradient(0, #4661fd, #10bff0);
         color: #10bff0;
         font-weight: bold;
         font-size: 16px;
-        font-style: italic;
         margin-right: 6px;
+        font-style: italic;
       }
     }
     .post-body {
@@ -209,8 +206,8 @@ onMounted(() => {
 
 .post-card.viewed .post-title {
   .icon {
-    background: linear-gradient(0, #6e6e6e, #bcbcbc);
-    color: @text-tertiary-color;
+    background: linear-gradient(0, #bcbcbc, #6e6e6e);
+    color: #000;
   }
   .text{
     color: @text-tertiary-color;

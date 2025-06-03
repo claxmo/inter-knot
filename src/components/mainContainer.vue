@@ -1,19 +1,13 @@
 <template>
     <main>
         <div class="main-background"></div>
-        <template v-if="needInstall">
+        <template v-if="needInstall || needUpdate">
             <span class="center">
-                <a href="https://greasyfork.org/zh-CN/scripts/534939-绳网跨域助手" class="link">点击下载绳网跨域助手</a>
-            </span>
-        </template>
-        <template v-else-if="needUpdate">
-            <span class="center">
-                <a href="https://greasyfork.org/zh-CN/scripts/534939-绳网跨域助手" class="link">点击更新绳网跨域助手</a>
+                <a href="https://greasyfork.org/zh-CN/scripts/534939-绳网跨域助手" class="link">点击{{needUpdate ? '更新' : '下载'}}绳网跨域助手</a>
             </span>
         </template>
         <template v-else>
-            <Waterfall 
-            ref="waterfallRef" :items="store.posts" :width=285 :gap=30 :maxCols=5>
+            <Waterfall ref="waterfallRef" :items="store.posts" :width=285 :gap=30 :maxCols=5>
                 <template #default="{ item }">
                     <Card :post="item" @click="showPopup(item)" @imageLoaded="waterfallRef.layout()"/>
                 </template>
@@ -22,7 +16,7 @@
         <span class="message" :class="{center: !store.posts.length}" ref="messageRef">{{ message }}</span>
     </main>
     <PopupDetail :post="store.curPost" :show="store.showPopup" @hide="store.showPopup = false"/>
-    <QuerySelector :items="[
+    <QuerySelector :options="[
         { label: '全部', query: '' },
         { label: '我的', query: store.author?.login ? `author:${store.author.login}` : '' },
         { label: '公告', query: 'category:公告' },
@@ -45,7 +39,6 @@ import { useConfigStore } from '@/stores/config';
 const store = useConfigStore();
 const waterfallRef = ref(null);
 const messageRef = ref(null);
-
 const message = computed(() => {
     if (store.isLoading) {
         return '正在努力加载···';
@@ -67,12 +60,12 @@ const getNextDiscussions = async () => {
     if (store.isLoading || store.hasNextPage === false) return;
     store.isLoading = true;
     try{
-        const discussions = await window.getDiscussions(store.endCursor, store.searchQuery);
-        store.posts.push(...discussions.nodes.filter(post => 
-            !store.posts.some(existing => existing.id === post.id)
+        const {nodes, pageInfo} = await window.getDiscussions(store.endCursor, store.searchQuery);
+        store.posts.push(...nodes.filter(post => 
+            !store.posts.some(node => node.id === post.id)
         ));
-        store.endCursor =  discussions.pageInfo.endCursor;
-        store.hasNextPage =  discussions.pageInfo.hasNextPage;
+        store.endCursor =  pageInfo.endCursor;
+        store.hasNextPage =  pageInfo.hasNextPage;
     }catch(e){
         useToast().error("获取讨论列表失败!");
         console.error(e);
@@ -108,15 +101,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
-@keyframes bg-scroll {
-  0% {
-    background-position: left bottom;
-  }
-  100% {
-    background-position: right top;
-  }
-}
-
 main {
     position: relative;
     width: 100vw;
@@ -130,20 +114,16 @@ main {
     overflow-x: hidden;
     .main-background {
         position: fixed;
-        top: 0;
-        left: 0;
+        inset: 0;
         z-index: -1;
-        width: 100%;
-        height: 100%;
-        background: url('@/assets/img/main-bg.png') no-repeat center center;
+        background: url('@/assets/img/main-bg.png');
         background-size: cover;
-        background-position: left bottom;
-        animation: bg-scroll 30s linear infinite;
+        animation: background-scroll 30s linear infinite;
         &::after {
             content: '';
             position: absolute;
-            width: 100%;
-            height: 100%;
+            inset: 0;
+            background-color: rgba(32,32,32,0.1);
             background-image: repeating-linear-gradient(
                 45deg,            
                 rgba(14,14,14,0.5),             
@@ -164,7 +144,6 @@ main {
 .link {
     color: #66ccff;
     font-size: 2rem;
-    text-decoration: underline;
 }
 
 .center {

@@ -2,13 +2,13 @@
   <div class="query-selector" :class="{ open: isOpen }">
     <ul class="query-options">
       <li
-        v-for="(item, index) in props.items"
+        v-for="(option, index) in props.options"
         :key="index"
         class="query-option"
         :class="{ active: activeIndex === index }"
-        @click="setQuery(index, item.query)"
+        @click="setQuery(index, option.query)"
       >
-        {{ item.label }}
+        {{ option.label }}
       </li>
     </ul>
     <div class="cur-label" @click="isOpen = !isOpen">{{ curLabel }}<span class="arrow"></span></div>
@@ -22,7 +22,7 @@ import { useConfigStore } from '@/stores/config';
 import { useToast } from 'vue-toastification';
 
 const props = defineProps({
-  items: {
+  options: {
     type: Array,
     required: true,
   }
@@ -30,7 +30,7 @@ const props = defineProps({
 const store = useConfigStore();
 const isOpen = ref(false);
 const activeIndex = ref(0);
-const curLabel = ref(props.items[0].label);
+const curLabel = ref(props.options[0].label);
 
 const setQuery = (index, query) => {
     if (store.isLoading) {
@@ -38,7 +38,7 @@ const setQuery = (index, query) => {
       return;
     }
     activeIndex.value = index;
-    curLabel.value = props.items[index].label;
+    curLabel.value = props.options[index].label;
     store.searchQuery = query;
     isOpen.value = !isOpen.value;
 };
@@ -65,16 +65,18 @@ const setQuery = (index, query) => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 12px;
+    padding: 0 14px;
     width: 100%;
     height: 100%;
-    border: 4px solid @border-color;
+    border: 2px solid #000;
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.3),
+      inset 0 0 0 4px @border-color; 
     border-radius: 50px;
     background: url('@/assets/svg/point.svg') center repeat;
     background-size: 6px;
     background-color: #000;
     cursor: pointer;
-    box-shadow: 0 0 0 2px #000;
     font-size: 1.125rem;
     .arrow {
       border-left: 8px solid transparent;
@@ -100,8 +102,8 @@ const setQuery = (index, query) => {
       display: flex;
       width: 100%;
       border-radius: 50px;
-      padding: 0 8px;
-      height: 45px;
+      padding: 0 12px;
+      height: 50px;
       cursor: pointer;
       font-size: 1.125rem;
       &.active{
@@ -117,7 +119,7 @@ const setQuery = (index, query) => {
 .query-selector.open {
   .query-options {
     opacity: 1;
-    bottom: 65px;
+    bottom: 60px;
     visibility: visible;
     
   }

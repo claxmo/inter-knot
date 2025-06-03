@@ -45,21 +45,22 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 50px;
+  height: 45px;
   aspect-ratio: 1/1;
   border-radius: 50%;
-  border: 3px solid #000;
-  background: linear-gradient(#212121, #141414);
-  box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
+  background: #000;
+  border: 2px solid #000;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 0 0 4px @border-color; 
   &:active {
     animation: border-glow 0.5s linear infinite alternate;
   }
   img {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
   }
 }
-
 .left-wrapper, 
 .right-wrapper {
   display: flex;

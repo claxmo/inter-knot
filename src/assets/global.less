@@ -33,6 +33,15 @@
   }
 }
 
+@keyframes background-scroll {
+    from {
+        background-position: left bottom;
+    }
+    to {
+     background-position: right top;
+    }
+}
+
 .text-linear-gradient(@deg, @from, @to){
   background: linear-gradient(@deg, @from, @to);
   -webkit-background-clip: text;
@@ -60,3 +69,4 @@
 .active {
   color: #141414;
 }
+

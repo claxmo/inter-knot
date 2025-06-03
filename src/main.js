@@ -47,4 +47,6 @@ app.use(Toast, {
     rtl: false,
   });
   
-app.mount('#app')
+setTimeout(() => {
+  app.mount('#app')
+}, 500);

@@ -26,10 +26,7 @@ onMounted(() => {
 <style scoped lang="less">
 .loading-screen {
   position: fixed;
-  width: 100vw;
-  height: 100vh;
-  top: 0;
-  left: 0;
+  inset: 0;
   background: #fff;
   z-index: 1000;
   .loading-sprite {
@@ -38,7 +35,7 @@ onMounted(() => {
     right: 0;
     width: 530px;
     height: 150px;
-    background-image: url('@/assets/img/loading.png');
+    background-image: url('@/assets/img/sprite.png');
     background-repeat: no-repeat;
     background-position: 0 0;
     animation: sprite 1s steps(30) infinite;

@@ -46,7 +46,6 @@ const setActive = (index, item) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 4px solid @border-color;
   width: auto;
   height: 50px;
   border-radius: 50px;
@@ -54,7 +53,10 @@ const setActive = (index, item) => {
   background-color: #000;
   background-size: 6px;
   overflow: visible;
-  box-shadow: 0 0 0 2px #000;
+  border: 2px solid #000;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 0 0 4px @border-color; 
   .nav-item {
     display: flex;
     justify-content: center;
@@ -67,6 +69,9 @@ const setActive = (index, item) => {
     font-style: italic;
     cursor: pointer;
     overflow: visible;
+    &:active {
+      color: @text-secondary-color;
+    }
     &.active::after {
       content: '';
       position: absolute;
