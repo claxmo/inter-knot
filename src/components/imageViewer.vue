@@ -1,10 +1,8 @@
 <template>
     <div class="image-viewer">
-        <img 
-        v-for="(url, index) in props.urls"
-        v-show="index === curIndex"
-        :src="url" 
-        :key="index" />
+        <div class="image-list">
+            <img v-for="(url, index) in props.urls" v-show="index === curIndex" :src="url" :key="url" />
+        </div>   
         <div class="control" v-show="isMulti">
             <span class="prev" @click="prevImage" title="上一张"></span>
             <span class="next" @click="nextImage" title="下一张"></span>
@@ -47,10 +45,14 @@ watch(() => props.urls, () => {
     height: 100%;
     position: relative;
     overflow: hidden;
-    img {
+    .image-list {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
     }
     .cur-page{
         position: absolute;

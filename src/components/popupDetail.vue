@@ -5,14 +5,17 @@
                 <span>ZELESS ZONE ZERO ZELESS ZONE ZERO ZELESS ZONE ZERO</span>
                 <span>ZELESS ZONE ZERO ZELESS ZONE ZERO ZELESS ZONE ZERO</span>
                 <span>ZELESS ZONE ZERO ZELESS ZONE ZERO ZELESS ZONE ZERO</span>
+                <span>ZELESS ZONE ZERO ZELESS ZONE ZERO ZELESS ZONE ZERO</span>
+                <span>ZELESS ZONE ZERO ZELESS ZONE ZERO ZELESS ZONE ZERO</span>
             </div>
             <header>
                 <div class="author-info">
-                    <span class="avatar"><img :src="post.author?.avatarUrl || defaultAvatarUrl" /></span>
+                    <span class="avatar">
+                        <a :href="post.url" target="_blank"><img :src="post.author?.avatarUrl" /></a>
+                    </span>
                     <div class="text">
-                        <span class="author-name">{{ post.author?.login ?? "匿名用户" }}</span>
+                        <span class="author-name" target="_blank">{{ post.author?.login }}</span>
                         <ul class="meta">
-                            <li class="meta-item"><img src="@/assets/svg/clock.svg">{{ new Date(post?.createdAt).toLocaleDateString("en-CA") }}</li>
                             <li class="meta-item"><img src="@/assets/svg/views.svg">{{ post.upvoteCount }}</li>
                             <li class="meta-item">#{{ post.number }}</li>
                         </ul>
@@ -26,17 +29,15 @@
                 </div>
                 <div class="interaction-container">
                     <div class="container">
-                        <span class="post-title">
-                            <span class="label" v-show="post.category?.name !== '常规'">[{{ post.category?.name }}]</span>
-                            <span v-text="post.title"></span>
-                        </span>
-                        <div class="markdown-body" v-html="bodyHTML"></div>
-                        <div class="reply-box">
-                            <input type="text" class="reply-input" v-model='replyBody' placeholder="写回复..." />
-                            <input type="button" class="reply-submit" @click="addDiscussionComment(replyBody)" ref="replySubmit" value="发送">
+                        <div class="text">
+                            <span class="post-title">
+                                <span class="label" v-show="post.category?.name !== '常规'">[{{ post.category?.name }}]</span>
+                                <span v-text="post.title"></span>
+                            </span>
+                            <div class="markdown-body" v-html="bodyHTML"></div>
                         </div>
-                        <CommentList :post="post" :comments="comments" />
-                        <span class="message" ref="messageRef">{{ message }}</span>
+                        <a class="reply-btn" :href="post.url" target="_blank"><img src="@/assets/svg/write.svg" />写回复</a>
+                        <CommentList :postId="post.id" :postAuthor="post.author" />
                     </div>
                 </div>
             </main>
@@ -48,9 +49,7 @@
 import ImageViewer from '@/components/imageViewer.vue';
 import CommentList from '@/components/commentList.vue';
 import defaultCoverUrl from '@/assets/svg/default-cover.svg';
-import defaultAvatarUrl from '@/assets/svg/default-avatar.svg';
-import { ref, watch, nextTick, defineProps, toRefs, computed, onMounted } from 'vue';
-import { useToast } from 'vue-toastification';
+import { ref, watch, defineProps, toRefs } from 'vue';
 
 const props = defineProps({
     post: {
@@ -63,117 +62,33 @@ const props = defineProps({
     }
 });
 const { post } = toRefs(props);
-const comments = ref([]);
-const hasNextPage = ref(null);
-const endCursor = ref(null);
-
-
-
-
-const isLoading = ref(false);
 const bodyHTML = ref("");
 const imgUrls = ref([]);
-const messageRef = ref(null);
-const message = computed(() => {
-    if (isLoading.value){
-        return "正在努力加载中···";
-    }else if (hasNextPage.value === false){
-        return "- 已无更多评论 -";
-    }else{
-        return "";
-    }
-});
-
-const getNextComments = async () => {
-    if (!post.value.id || isLoading.value || hasNextPage.value === false) return;
-    isLoading.value = true;
-    try{
-        const {nodes, pageInfo} = await window.getComments(post.value.id, endCursor.value);
-        comments.value.push(...nodes.filter(comment => !comments.value.some(c => c.id === comment.id)));
-        hasNextPage.value = pageInfo.hasNextPage;
-        endCursor.value = pageInfo.endCursor  
-    }catch(e){
-        useToast().error("获取评论列表失败!");
-        console.error(e);
-    }finally{
-        nextTick(() => {
-            isLoading.value = false;
-        });
-    }       
-};
 
 watch(() => props.show, (newValue) => {
     if (!newValue) return;
-    isLoading.value = false;
     imgUrls.value = [defaultCoverUrl];
     bodyHTML.value = post.value.bodyHTML;
-    comments.value = [];
-    hasNextPage.value = null;
-    endCursor.value = null;
     const imgRegx = /<img[^>]*src=['"]([^'"]+)['"][^>]*>/g;
     const matches = [...bodyHTML.value.matchAll(imgRegx)];
     if (matches.length){
         imgUrls.value = matches.map(match => match[1]);
         bodyHTML.value = bodyHTML.value.replace(imgRegx, '');
     }
-    getNextComments();
-
 });
-
-onMounted(() => {
-    nextTick(() => {
-        const observer = new IntersectionObserver(async (entries) => {
-            const entry = entries[0];
-            if (entry.isIntersecting) {
-                await getNextComments();
-            }
-        }, {
-            root: null,
-            threshold: 0.1
-        });
-        observer.observe(messageRef.value);
-    });
-});
-
-const replyBody = ref('');
-const replySubmit = ref(null);
-
-const addDiscussionComment = async (body) => {
-    if (!post.value.id) return;
-    if (replyBody.value.trim() === ''){
-        return useToast().warning('评论内容不能为空!');
-    }
-    try{
-        replySubmit.value.disabled = true;
-        replySubmit.value.value = "发送中···";
-        const comment = await window.addDiscussionComment(post.value.id, body);
-        comments.value.unshift(comment);
-        replyBody.value = '';
-        useToast().success('评论发送成功!');
-    }catch (e){
-        useToast().error('评论发送失败!');
-        console.error(e);
-    }finally {
-        nextTick(() => {
-            replySubmit.value.disabled = false;
-            replySubmit.value.value = "发送";
-        });
-    }
-};
-
 
 </script>
 
 <style scoped lang="less">
 
 @keyframes scroll-left {
-  0% { transform: rotate(-15deg) translateX(0); }
-  100% { transform: rotate(-15deg) translateX(-35%); }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-35%); }
 }
 
 @keyframes scroll-right {
-  0% { transform: rotate(-15deg) translateX(0); }
-  100% { transform: rotate(-15deg) translateX(35%); }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(35%); }
 }
 
 .popup-container {
@@ -212,30 +127,30 @@ const addDiscussionComment = async (body) => {
 }
 
 .post-detail {
-    width: 75%;
+    width: 70%;
     aspect-ratio: 1.8/1;
     transition: all 0.3s;
     border-radius: 50px 0px 50px 50px;
     overflow: hidden;
-    background-image: linear-gradient(0, #000, @bg-primary-color);
     position: relative;
     border: 4px solid #000;
     box-shadow: 0 0 0 5px rgba(49,49,49,0.7);
+    background-image: linear-gradient(-10deg, #000, @bg-primary-color);
     .main-background {
         position: absolute;
         inset: 0;
-        overflow: visible;
         display: flex;
         flex-direction: column;
-        z-index: -1;
         justify-content: center;
         align-items: center;
+        transform: rotate(-10deg);
+        overflow: visible;
+        z-index: -1;
         span {
             line-height: 1;
-            font-size: 420px;
+            font-size: 300px;
             white-space: nowrap;
-            transform: rotate(-15deg);
-            .text-linear-gradient(0, @bg-secondary-color, @bg-primary-color);
+            .text-linear-gradient(0, rgba(32,32,32,0.5), rgba(49,49,49,0.5));
         }
         span:nth-child(odd) {
             animation: scroll-left 60s linear infinite alternate;
@@ -254,92 +169,96 @@ const addDiscussionComment = async (body) => {
         left: 0;
         width: 100%;
         height: 85px;
-        padding: 5px 36px;
+        padding: 0 20px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+        background-image: linear-gradient(0, #101010, rgba(14, 14, 14, 0.7));
         z-index: 1;
-        background: linear-gradient(0deg, #000, rgba(0,0,0,0.3));    
+        &::after{
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.3));
+            z-index: -1;
+        }
     }
     main {
         display: flex;
         justify-content: space-around;
-        padding: 125px 25px 35px 25px;
+        gap: 24px;
+        padding: 110px 20px 25px 20px;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 0;
         background-image: url("@/assets/svg/point.svg");
-        background-size: 8px;
-
+        background-size: 6px;
+        z-index: 0;
     }
 }
 
-.post-detail header{
-    .author-info {
-        height: 70px;
-        display: flex;
-        flex: 1;
-        min-width: 0;
-        gap: 8px;
-        .avatar {
-            border: 4px solid @border-color;
+.author-info {
+    height: 70px;
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    gap: 8px;
+    .avatar {
+        border: 4px solid @border-color;
+        height: 100%;
+        aspect-ratio: 1/1;
+        border-radius: 50%;
+        img {
             height: 100%;
             aspect-ratio: 1/1;
             border-radius: 50%;
-            img {
-                height: 100%;
-                aspect-ratio: 1/1;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 2px solid #000;
-            }
-        }
-        .text {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 5px;
-            flex: 1;
-            min-width: 0;
-            .author-name {
-                font-size: 22px;
-                color: @text-secondary-color;
-                .single-line-ellipsis();
-            }   
+            object-fit: cover;
+            border: 2px solid #000;
         }
     }
-
-    .meta {
+    .text {
         display: flex;
-        gap: 8px;
-        .meta-item {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 3px;
-            height: 20px;
-            white-space: nowrap;          
-            overflow: hidden;             
-            text-overflow: ellipsis;
-            font-size: 14px;
-            background-color: rgba(255,255,255,0.3);
-            border-radius: 50px;
-            padding: 0 8px;
-            img {
-                width: 18px;
-                height: 18px;
-            }
-        }
-    }
-
-    .close-btn {
-        cursor: pointer;
-        height: 100%;
-        aspect-ratio: 1/1;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        flex: 1;
+        min-width: 0;
+        .author-name {
+            font-size: 22px;
+            color: @text-secondary-color;
+            .single-line-ellipsis();
+        }   
     }
 }
 
+.meta {
+    display: flex;
+    gap: 8px;
+    .meta-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 3px;
+        height: 20px;
+        white-space: nowrap;          
+        overflow: hidden;             
+        text-overflow: ellipsis;
+        font-size: 14px;
+        background-color: rgba(255,255,255,0.3);
+        border-radius: 50px;
+        padding: 0 8px;
+        img {
+            width: 18px;
+            height: 18px;
+        }
+    }
+}
+
+.close-btn {
+    cursor: pointer;
+    height: 100%;
+    aspect-ratio: 1/1;
+}
+
 .media-container {
-    width: 30%;
+    width: 35%;
     height: 100%;
     border: 4px solid @border-color;
     border-radius: 25px;
@@ -348,8 +267,8 @@ const addDiscussionComment = async (body) => {
 }
 
 .interaction-container {
-    width: 65%;
     height: 100%;
+    flex: 1;
     background-color: rgba(0, 0, 0, 0.7);
     border-radius: 25px;
     position: relative;
@@ -357,9 +276,6 @@ const addDiscussionComment = async (body) => {
     .container {
         width: 100%;
         height: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 8px; 
         padding: 16px 24px;
         padding-bottom: 75px;
         overflow-y: scroll;
@@ -373,71 +289,60 @@ const addDiscussionComment = async (body) => {
             left: 0;
             pointer-events: none;
             background: 
-                linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent 24px),
-                linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent 24px);
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent 32px),
+                linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent 32px);
 
         }
-        .post-title {
-            span {
+        .text {
+            width: 100%;
+            margin-bottom: 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            .post-title span{
                 font-size: 1.125rem;
             }
         }
-        .message {
-            width: 100%;
-            text-align: center;
-            color: @text-secondary-color;
-        }
     }
 }
 
-
-.reply-box {
+.reply-btn {
     width: 100%;
-    min-height: 50px;
+    height: 50px;
+    border: 4px solid @border-color;
+    background: #000;
+    border-radius: 50px;
     display: flex;
-    gap: 8px;
-    .reply-input {
-        border: 4px solid @border-color;
-        background-color: #000;
-        border-radius: 50px;
-        width: 75%;
-        height: 100%;
-        padding: 0 10px;
-    }
-    .reply-submit {
-        border: 4px solid @border-color;
-        background-color: #000;
-        flex: 1;
-        border-radius: 50px;
-        height: 100%;
-        cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 18px;
+    img {
+        width: 24px;
+        height: 24px;
     }
 }
 
-@media (max-width: 960px) {
-
+@media (max-width: 1080px) {
     .post-detail {
         height: 100vh;
         width: 100vw;
         border-radius: 0;
         main {
             flex-direction: column;
-            gap: 10px;
-            border-radius: 0;
+            padding: 100px 0 0 0;
+            gap: 15px;
             .media-container {
                 width: 100%;
-                min-height: 35%;
                 height: 35%;
+                flex-shrink: 0;
             }
 
             .interaction-container {
                 width: 100%;
-                height: auto;
                 flex: 1;
             }
         }
-    }
-    
+    }  
 }
 </style>
 

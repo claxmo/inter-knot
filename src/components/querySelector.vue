@@ -11,8 +11,10 @@
         {{ option.label }}
       </li>
     </ul>
-    <div class="cur-label" @click="isOpen = !isOpen">{{ curLabel }}<span class="arrow"></span></div>
-    <div class="back-glow"></div>
+    <div class="cur-label" @click="isOpen = !isOpen">
+      {{ curLabel }}
+      <span class="arrow"></span>
+    </div>
   </div>
 </template>
 
@@ -35,12 +37,13 @@ const curLabel = ref(props.options[0].label);
 const setQuery = (index, query) => {
     if (store.isLoading) {
       useToast().info("请等待加载完成!");
-      return;
+    }else{
+      activeIndex.value = index;
+      curLabel.value = props.options[index].label;
+      store.searchQuery = query;
+      isOpen.value = !isOpen.value;
     }
-    activeIndex.value = index;
-    curLabel.value = props.options[index].label;
-    store.searchQuery = query;
-    isOpen.value = !isOpen.value;
+   
 };
 </script>
 
@@ -123,22 +126,22 @@ const setQuery = (index, query) => {
     visibility: visible;
     
   }
-  .cur-label .arrow{
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 8px solid @text-primary-color;
-    border-top: none;
-  }
-  .back-glow {
-    z-index: -1;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    bottom: 0;
-    left: 0;
-    border-radius: 50px;
-    animation: background-glow 1s linear infinite alternate,
+  .cur-label {
+    .arrow{
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid @text-primary-color;
+      border-top: none;
+    }
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      border-radius: 50px;
+      animation: background-glow 1s linear infinite alternate,
                   scale-grow 0.3s cubic-bezier(0.35, 0.7, 0, 0.7) infinite alternate;
+    }
   }
 }
 

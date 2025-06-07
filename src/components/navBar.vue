@@ -35,10 +35,10 @@ const setActive = (index, item) => {
 <style scoped lang="less">
 @keyframes scale-grow {
   0% {
-    transform: scale(1.35);
+    transform: scale(1.05);
   }
   100% {
-    transform: scale(1.45);
+    transform: scale(1.15);
   }
 }
 
@@ -69,21 +69,19 @@ const setActive = (index, item) => {
     font-style: italic;
     cursor: pointer;
     overflow: visible;
-    &:active {
+     &:active {
       color: @text-secondary-color;
     }
     &.active::after {
       content: '';
       position: absolute;
       z-index: -1;
-      width: 75%;
-      height: 100%;
+      inset: 0;
       border-radius: 125px 25px 125px 25px;
       animation:
         background-glow 1s linear infinite alternate,
         scale-grow 0.3s cubic-bezier(0.35, 0.7, 0, 0.7) infinite alternate;
     }
-
     &:first-child::after {
       border-radius: 75px 25px 125px 75px;
     }

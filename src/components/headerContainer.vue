@@ -45,7 +45,7 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 45px;
+  height: 50px;
   aspect-ratio: 1/1;
   border-radius: 50%;
   background: #000;

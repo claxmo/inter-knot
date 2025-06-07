@@ -12,7 +12,7 @@
 
 <script setup>
 import { debounce } from 'lodash-es';
-import { defineProps, ref, onMounted, watch, nextTick , onUnmounted,  defineExpose, toRefs } from 'vue';
+import { defineProps, ref, onMounted, watch, nextTick , onUnmounted,  defineExpose } from 'vue';
 
 const props = defineProps({
     items: {
@@ -31,14 +31,26 @@ const props = defineProps({
         type: Number,
         required: false,
     },
+    breakpoints: {
+        type: Array,
+        required: false,
+    }
 });
 const waterfall = ref(null);
-
-const { width, gap } = toRefs(props);
+const width = ref(props.width);
+const gap = ref(props.gap);
 
 const layout = debounce(() => {
     const getColumn = () => {
         const containerWidth = waterfall.value.clientWidth;
+        if (props.breakpoints) {
+            props.breakpoints.forEach(item => {
+                if (containerWidth >= item.width){
+                    width.value = item.itemWidth;
+                    gap.value = item.gap;
+                }
+            });
+        }
         let column = Math.floor(containerWidth / (width.value + gap.value));
         if (props.maxCols){
             column = Math.min(props.maxCols, column); 
@@ -79,7 +91,9 @@ const layout = debounce(() => {
 
 onMounted(() => {
     layout()
-    window.addEventListener('resize', layout);
+    window.addEventListener('resize', () => {
+        setTimeout(layout,100);
+    });
 });
 
 onUnmounted(() => {

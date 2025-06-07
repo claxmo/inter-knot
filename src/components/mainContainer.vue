@@ -7,7 +7,17 @@
             </span>
         </template>
         <template v-else>
-            <Waterfall ref="waterfallRef" :items="store.posts" :width=285 :gap=30 :maxCols=5>
+            <Waterfall 
+            ref="waterfallRef" 
+            :items="store.posts" 
+            :width=285 
+            :gap=30 
+            :maxCols=5 
+            :breakpoints="[
+                { width: 400, itemWidth: 205, gap: 5 },
+                { width: 600, itemWidth: 250, gap: 20 },
+                { width: 1200, itemWidth: 285, gap: 30 },
+            ]">
                 <template #default="{ item }">
                     <Card :post="item" @click="showPopup(item)" @imageLoaded="waterfallRef.layout()"/>
                 </template>
@@ -49,7 +59,7 @@ const message = computed(() => {
     }
 });
 const needInstall = ref(typeof window.version === 'undefined');
-const needUpdate = ref(!needInstall.value && window.version !== '1.4.4');
+const needUpdate = ref(!needInstall.value && window.version !== '1.4.5');
 
 const showPopup = (post) => {
     store.curPost = post;
@@ -123,7 +133,6 @@ main {
             content: '';
             position: absolute;
             inset: 0;
-            background-color: rgba(32,32,32,0.1);
             background-image: repeating-linear-gradient(
                 45deg,            
                 rgba(14,14,14,0.5),             

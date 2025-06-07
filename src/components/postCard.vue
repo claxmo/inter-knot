@@ -27,7 +27,7 @@
 
 <script setup>
 import defaultCoverUrl from '@/assets/svg/default-cover.svg';
-import { defineProps,ref, defineEmits, toRefs, onMounted, computed} from 'vue';
+import { defineProps,ref, defineEmits, toRefs, onMounted, computed } from 'vue';
 
 const props = defineProps({
     post: {
@@ -49,7 +49,6 @@ const clickHandle = () => {
   viewed.value = true;
 };
 
-
 const onLoad = () => {
     emit("imageLoaded");
     isLoading.value = false;
@@ -67,8 +66,8 @@ onMounted(() => {
   if (match){
     coverUrl.value = match[1];
   }
-});
 
+});
 </script>
 
 <style scoped lang="less">
@@ -89,9 +88,9 @@ onMounted(() => {
   .cover {
     display: block;
     width: 100%;
-    max-height: 350px;
-    min-height: 185px;
     object-fit: cover;
+    max-height: 400px;
+    min-height: 185px;
   }
   .footer {
     position: relative;
@@ -156,26 +155,26 @@ onMounted(() => {
     }
     .post-title {
       padding: 0 5px;
-      display: flex;
-      align-items: center;
       .multi-line-ellipsis(2);
       .text {
         font-size: 1.05rem;
+        flex: 1;
       }
       .icon {
+        position: relative;
+        top: 2px;
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        height: 20px;
-        width: 20px;
+        height: 1.25rem;
+        width: 1.25rem;
         flex-shrink: 0;
-        border-radius: 4px;
-        background: linear-gradient(0, #4661fd, #10bff0);
-        color: #10bff0;
+        border-radius: 6px;
+        background: linear-gradient(0, #7e60dd, #10bff0);
+        color: #000;
         font-weight: bold;
-        font-size: 16px;
-        margin-right: 6px;
-        font-style: italic;
+        font-size: 1rem;
+        margin-right: 4px;
       }
     }
     .post-body {
@@ -195,7 +194,7 @@ onMounted(() => {
     gap: 4px;
     .view-num {
       font-size: 18px;
-      padding-bottom: 3px;
+      padding-bottom: 4px;
     }
     img {
       width: 24px;
@@ -207,11 +206,9 @@ onMounted(() => {
 .post-card.viewed .post-title {
   .icon {
     background: linear-gradient(0, #bcbcbc, #6e6e6e);
-    color: #000;
   }
   .text{
     color: @text-tertiary-color;
-    // .text-linear-gradient(0, #6e6e6e, #bcbcbc);
   }
 }
 
