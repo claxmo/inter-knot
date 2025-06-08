@@ -55,7 +55,7 @@ const setActive = (index, item) => {
   overflow: visible;
   border: 2px solid #000;
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
     inset 0 0 0 4px @border-color; 
   .nav-item {
     display: flex;

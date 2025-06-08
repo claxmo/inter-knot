@@ -73,7 +73,7 @@ const setQuery = (index, query) => {
     height: 100%;
     border: 2px solid #000;
     box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.3),
+      inset 1px 1px 1px rgba(255, 255, 255, 0.3),
       inset 0 0 0 4px @border-color; 
     border-radius: 50px;
     background: url('@/assets/svg/point.svg') center repeat;

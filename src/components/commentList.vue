@@ -111,7 +111,6 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     overflow-y: visible;
-    gap: 8px;
 }
 
 .comment-list {
@@ -177,7 +176,9 @@ onMounted(() => {
 }
 
 .message {
+    padding: 8px 0;
     color: @text-secondary-color;
+    font-size: 0.875rem;
 }
 
 </style>

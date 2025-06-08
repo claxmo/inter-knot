@@ -146,8 +146,8 @@ main {
 
 .message {
     color: @text-tertiary-color;
-    font-size: 1.5rem;
-    padding: 36px 0;
+    font-size: 1.25rem;
+    padding: 2.25rem 0;
 }
 
 .link {

@@ -296,9 +296,6 @@ watch(() => props.show, (newValue) => {
         .text {
             width: 100%;
             margin-bottom: 36px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
             .post-title span{
                 font-size: 1.125rem;
             }
