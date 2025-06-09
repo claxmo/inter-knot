@@ -29,13 +29,11 @@
                 </div>
                 <div class="interaction-container">
                     <div class="container">
-                        <div class="text">
-                            <span class="post-title">
-                                <span class="label" v-show="post.category?.name !== '常规'">[{{ post.category?.name }}]</span>
-                                <span v-text="post.title"></span>
-                            </span>
-                            <div class="markdown-body" v-html="bodyHTML"></div>
-                        </div>
+                         <span class="post-title">
+                            <span class="label" v-show="post.category?.name !== '常规'">[{{ post.category?.name }}]</span>
+                            <span v-text="post.title"></span>
+                        </span>                           
+                        <div class="markdown-body text" v-html="bodyHTML"></div>
                         <a class="reply-btn" :href="post.url" target="_blank"><img src="@/assets/svg/write.svg" />写回复</a>
                         <CommentList :postId="post.id" :postAuthor="post.author" />
                     </div>
@@ -69,11 +67,11 @@ watch(() => props.show, (newValue) => {
     if (!newValue) return;
     imgUrls.value = [defaultCoverUrl];
     bodyHTML.value = post.value.bodyHTML;
-    const imgRegx = /<img[^>]*src=['"]([^'"]+)['"][^>]*>/g;
-    const matches = [...bodyHTML.value.matchAll(imgRegx)];
+    const imgRegex = /(?:<br\s*\/?>\s*)?<a[^>]*>\s*<img[^>]*src=['"]([^'"]+)['"][^>]*>\s*<\/a>/g;
+    const matches = [...bodyHTML.value.matchAll(imgRegex)];
     if (matches.length){
         imgUrls.value = matches.map(match => match[1]);
-        bodyHTML.value = bodyHTML.value.replace(imgRegx, '');
+        bodyHTML.value = bodyHTML.value.replace(imgRegex, '');
     }
 });
 
@@ -276,7 +274,7 @@ watch(() => props.show, (newValue) => {
     .container {
         width: 100%;
         height: 100%;
-        padding: 16px 24px;
+        padding: 20px;
         padding-bottom: 75px;
         overflow-y: scroll;
         overflow-x: hidden;
@@ -293,12 +291,11 @@ watch(() => props.show, (newValue) => {
                 linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent 32px);
 
         }
+        .post-title span {
+            font-size: 1.05rem;
+        }
         .text {
-            width: 100%;
             margin-bottom: 36px;
-            .post-title span{
-                font-size: 1.125rem;
-            }
         }
     }
 }

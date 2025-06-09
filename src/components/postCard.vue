@@ -209,6 +209,8 @@ onMounted(() => {
   }
   .text{
     color: @text-tertiary-color;
+    .multi-line-ellipsis(2);
+
   }
 }
 

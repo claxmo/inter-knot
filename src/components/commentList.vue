@@ -178,7 +178,7 @@ onMounted(() => {
 .message {
     padding: 8px 0;
     color: @text-secondary-color;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
 }
 
 </style>
