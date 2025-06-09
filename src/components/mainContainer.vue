@@ -14,8 +14,8 @@
             :gap=30 
             :maxCols=5 
             :breakpoints="[
-                { width: 300, itemWidth: 185, gap: 0 },
-                { width: 400, itemWidth: 215, gap: 5 },
+                { width: 300, itemWidth: 165, gap: 0 },
+                { width: 400, itemWidth: 200, gap: 5 },
                 { width: 500, itemWidth: 250, gap: 10 },
                 { width: 600, itemWidth: 285, gap: 15 },
                 { width: 1200, itemWidth: 285, gap: 30 },
