@@ -158,7 +158,6 @@ onMounted(() => {
       .multi-line-ellipsis(2);
       .text {
         font-size: 1.05rem;
-        flex: 1;
       }
       .icon {
         position: relative;
@@ -174,7 +173,7 @@ onMounted(() => {
         color: #000;
         font-weight: bold;
         font-size: 1rem;
-        margin-right: 4px;
+        margin-right: 6px;
       }
     }
     .post-body {
@@ -204,12 +203,12 @@ onMounted(() => {
 }
 
 .post-card.viewed .post-title {
+  .multi-line-ellipsis(2);
   .icon {
     background: linear-gradient(0, #bcbcbc, #6e6e6e);
   }
   .text{
     color: @text-tertiary-color;
-    .multi-line-ellipsis(2);
 
   }
 }
