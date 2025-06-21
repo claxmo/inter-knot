@@ -12,7 +12,7 @@
 
 <script setup>
 import { debounce } from 'lodash-es';
-import { defineProps, ref, onMounted, watch, nextTick , onUnmounted,  defineExpose } from 'vue';
+import { defineProps, ref, onMounted, watch, nextTick , onUnmounted,  defineExpose, toRefs } from 'vue';
 
 const props = defineProps({
     items: {
@@ -27,34 +27,21 @@ const props = defineProps({
         type: Number,
         required: true,
     },
-    maxCols: {
-        type: Number,
-        required: false,
-    },
     breakpoints: {
         type: Array,
-        required: false,
+        required: true,
     }
 });
 const waterfall = ref(null);
-const width = ref(props.width);
-const gap = ref(props.gap);
+const {width, gap} = toRefs(props);
 
 const layout = debounce(() => {
     const getColumn = () => {
         const containerWidth = waterfall.value.clientWidth;
-        if (props.breakpoints) {
-            props.breakpoints.forEach(item => {
-                if (containerWidth >= item.width){
-                    width.value = item.itemWidth;
-                    gap.value = item.gap;
-                }
-            });
-        }
-        let column = Math.floor(containerWidth / (width.value + gap.value));
-        if (props.maxCols){
-            column = Math.min(props.maxCols, column); 
-        }
+        let column = 0;
+        props.breakpoints.forEach(item => {
+            if (containerWidth >= item.width) column = item.cols
+        });
         return column;
     };
     const getMinTop = (nextTop) => {
@@ -74,7 +61,6 @@ const layout = debounce(() => {
         const containerWidth = waterfall.value.clientWidth;
         const contentWidth = column * columnWidth - gap.value;
         const offsetLeft = (containerWidth - contentWidth) / 2;
-        // waterfall.value.style.width = width * column + gap * (column - 1) + "px";
         let nextTop = new Array(column).fill(0);
         for (let i = 0; i < waterfall.value.children.length; i++) {
             const item = waterfall.value.children[i];
@@ -90,10 +76,7 @@ const layout = debounce(() => {
 }, 300);
 
 onMounted(() => {
-    layout()
-    window.addEventListener('resize', () => {
-        setTimeout(layout,100);
-    });
+    window.addEventListener('resize', layout);
 });
 
 onUnmounted(() => {

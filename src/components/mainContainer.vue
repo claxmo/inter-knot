@@ -11,36 +11,27 @@
             ref="waterfallRef" 
             :items="store.posts" 
             :width=285 
-            :gap=15 
-            :maxCols=5 
+            :gap=30 
             :breakpoints="[
-                { width: 600, itemWidth: 285, gap: 15 },
-                { width: 1200, itemWidth: 285, gap: 30 },
+                { width: 315, cols: 1},
+                { width: 630, cols: 2},
+                { width: 945, cols: 3},
+                { width: 1260, cols: 4},
+                { width: 1575, cols: 5},
             ]">
                 <template #default="{ item }">
-                    <Card :post="item" @click="showPopup(item)" @imageLoaded="waterfallRef.layout()"/>
+                    <Card :post="item" @click="showPopup(item)" @resize="waterfallRef.layout()"/>
                 </template>
             </Waterfall>
         </template> 
         <span class="message" :class="{center: !store.posts.length}" ref="messageRef">{{ message }}</span>
     </main>
-    <PopupDetail :post="store.curPost" :show="store.showPopup" @hide="store.showPopup = false"/>
-    <QuerySelector :options="[
-        { label: '全部', query: '' },
-        { label: '我的', query: store.author?.login ? `author:${store.author.login}` : '' },
-        { label: '公告', query: 'category:公告' },
-        { label: '委托', query: 'category:委托' },
-        { label: '灌水', query: 'category:灌水' },
-        { label: 'R18', query: 'category:R18' },
-        { label: '常规', query: 'category:常规' },
-    ]"/>
+   
 </template>
 
 <script setup>
 import Waterfall from "@/components/waterfallLayout.vue";
 import Card from "@/components/postCard.vue";
-import PopupDetail from "@/components/popupDetail.vue";
-import QuerySelector from "@/components/querySelector.vue";
 import { ref, computed, onMounted, watch, nextTick } from "vue";
 import { useToast } from 'vue-toastification';
 import { useConfigStore } from '@/stores/config';
@@ -57,8 +48,8 @@ const message = computed(() => {
         return '';
     }
 });
-const needInstall = ref(typeof window.version === 'undefined');
-const needUpdate = ref(!needInstall.value && window.version !== '1.4.5');
+const needInstall = ref(false);
+const needUpdate = ref(false);
 
 const showPopup = (post) => {
     store.curPost = post;
@@ -69,10 +60,12 @@ const getNextDiscussions = async () => {
     if (store.isLoading || store.hasNextPage === false) return;
     store.isLoading = true;
     try{
-        const {nodes, pageInfo} = await window.getDiscussions(store.endCursor, store.searchQuery);
-        store.posts.push(...nodes.filter(post => 
-            !store.posts.some(node => node.id === post.id)
-        ));
+        const {nodes, pageInfo} = await window.searchDiscussion(store.searchQuery, store.endCursor);
+        store.posts.push(
+            ...nodes.filter(
+                post => !store.posts.some(node => node.id === post.id)
+            )
+        );
         store.endCursor =  pageInfo.endCursor;
         store.hasNextPage =  pageInfo.hasNextPage;
     }catch(e){
@@ -93,7 +86,9 @@ watch(() => store.searchQuery, async () => {
 });
 
 onMounted(() => {
-    if (needInstall.value || needUpdate.value) return;
+    if (typeof window.version === 'undefined') needInstall.value = true;
+    if (!needInstall.value && window.version !== '1.5.0') needUpdate.value = true;
+
     nextTick(() => {
         const observer = new IntersectionObserver(async (entries) => {
             const entry = entries[0];
@@ -110,6 +105,17 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
+
+@keyframes background-scroll {
+    from {
+        background-position: left bottom;
+    }
+    to {
+     background-position: right top;
+    }
+}
+
+
 main {
     position: relative;
     width: 100vw;

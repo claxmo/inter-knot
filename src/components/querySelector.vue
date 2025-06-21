@@ -1,14 +1,14 @@
 <template>
   <div class="query-selector" :class="{ open: isOpen }">
-    <ul class="query-options">
+    <ul class="query-list">
       <li
-        v-for="(option, index) in props.options"
+        v-for="(item, index) in props.items"
         :key="index"
-        class="query-option"
+        class="query-item"
         :class="{ active: activeIndex === index }"
-        @click="setQuery(index, option.query)"
+        @click="clickHandle(index, item.query)"
       >
-        {{ option.label }}
+        {{ item.label }}
       </li>
     </ul>
     <div class="cur-label" @click="isOpen = !isOpen">
@@ -19,32 +19,26 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from 'vue';
-import { useConfigStore } from '@/stores/config';
-import { useToast } from 'vue-toastification';
+import { ref, defineProps, defineEmits } from 'vue';
 
 const props = defineProps({
-  options: {
+  items: {
     type: Array,
     required: true,
   }
 });
-const store = useConfigStore();
 const isOpen = ref(false);
 const activeIndex = ref(0);
-const curLabel = ref(props.options[0].label);
+const curLabel = ref(props.items[0].label);
+const emit = defineEmits(["change"]);
 
-const setQuery = (index, query) => {
-    if (store.isLoading) {
-      useToast().info("请等待加载完成!");
-    }else{
-      activeIndex.value = index;
-      curLabel.value = props.options[index].label;
-      store.searchQuery = query;
-      isOpen.value = !isOpen.value;
-    }
-   
-};
+const clickHandle = (index, query) => {
+  emit("change", query);
+  activeIndex.value = index;
+  curLabel.value = props.items[index].label;
+  isOpen.value = false;
+
+}; 
 </script>
 
 <style scoped lang="less">
@@ -89,7 +83,7 @@ const setQuery = (index, query) => {
       border-radius: 8px;
     }
   }
-  .query-options {
+  .query-list {
     width: 100%;
     background-color: @bg-secondary-color;
     list-style: none;
@@ -100,7 +94,7 @@ const setQuery = (index, query) => {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s;
-    .query-option {
+    .query-item {
       align-items: center;
       display: flex;
       width: 100%;
@@ -120,7 +114,7 @@ const setQuery = (index, query) => {
 }
 
 .query-selector.open {
-  .query-options {
+  .query-list {
     opacity: 1;
     bottom: 60px;
     visibility: visible;

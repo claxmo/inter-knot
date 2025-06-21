@@ -49,4 +49,4 @@ app.use(Toast, {
   
 setTimeout(() => {
   app.mount('#app')
-}, 500);
+}, 100);

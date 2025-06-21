@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="level">
-            <div class="level-num">{{ Math.min(60, author?.public_repos ?? 0) }}</div>
+            <div class="level-num">{{ level }}</div>
             <div class="level-text">LEVEL</div>
         </div>
     </div>
@@ -30,6 +30,7 @@ const { author } = storeToRefs(store);
 const curExp = ref(7890);
 const totalExp = ref(10000);
 const width = computed(() => `${Math.min(100, (curExp.value / totalExp.value) * 100)}%`);
+const level = computed(() => Math.min(60, author?.public_repos ?? 0) );
 
 onMounted(async () => {
   try{
@@ -105,13 +106,17 @@ const clickHandle = () => {
   .level {
     height: 100%;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
     .level-num {
       font-size: 24px;
-      margin-bottom: -6px;
+      line-height: 1;
     }
     .level-text {
       font-size: 8px;
-      color: @text-secondary-color;
+      line-height: 1;
+      color: @text-tertiary-color;
     }
   }
 }

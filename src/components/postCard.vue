@@ -1,8 +1,8 @@
 <template>
     <div class="post-card" @click="clickHandle" :class="{delegate: isDelegate, R18: isR18, viewed: viewed}">
-        <span class="views">
-            <img src="@/assets/svg/views.svg" />
-            <span class="view-num">{{ post.upvoteCount }}</span>
+        <span class="comment-count">
+            <img class="icon" src="@/assets/svg/views.svg" />
+            <span class="count-num">{{ post.comments.totalCount }}</span>
         </span>
         <img 
         class="cover"
@@ -16,11 +16,11 @@
                 <span class="avatar"><img :src="post.author.avatarUrl" /></span>
                 <span class="author-name">{{ post.author.login }}</span>
             </div>
-            <div class="post-title">
+            <div class="title">
                 <span class="icon" v-if="isDelegate">!</span>
-                <span class="text">{{post.category.name !== '常规' ? `[${post.category.name}]` : ''}}{{ post.title }}</span>
+                <span class=text>{{post.category.name !== '常规' ? `[${post.category.name}]` : ''}}{{ post.title }}</span>
             </div>
-            <span class="post-body" v-text="post.bodyText || 'null'"></span>
+            <span class="body" v-text="post.bodyText || 'null'"></span>
         </div>
     </div>
 </template>
@@ -36,7 +36,7 @@ const props = defineProps({
     }
 });
 const { post } = toRefs(props);
-const emit = defineEmits(["click","imageLoaded"]);
+const emit = defineEmits(["click","resize"]);
 const coverUrl = ref(defaultCoverUrl);
 const isDelegate = computed(() => post.value.category.name === '委托');
 const isR18 = computed(() => post.value.category.name === 'R18');
@@ -50,7 +50,7 @@ const clickHandle = () => {
 };
 
 const onLoad = () => {
-    emit("imageLoaded");
+    emit("resize");
     isLoading.value = false;
 };
 
@@ -153,7 +153,7 @@ onMounted(() => {
         .single-line-ellipsis();
       }
     }
-    .post-title {
+    .title {
       padding: 0 5px;
       .multi-line-ellipsis(2);
       .text {
@@ -176,13 +176,13 @@ onMounted(() => {
         margin-right: 6px;
       }
     }
-    .post-body {
+    .body {
       padding: 0 5px;
       color: @text-secondary-color;
       .single-line-ellipsis();
     }
   }
-  .views {
+  .comment-count {
     position: absolute;
     top: 5px;
     left: 15px;
@@ -191,18 +191,18 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
     gap: 4px;
-    .view-num {
+    .count-num {
       font-size: 18px;
       padding-bottom: 4px;
     }
-    img {
+    .icon {
       width: 24px;
       height: 24px;
     }
   }
 }
 
-.post-card.viewed .post-title {
+.post-card.viewed .title {
   .multi-line-ellipsis(2);
   .icon {
     background: linear-gradient(0, #bcbcbc, #6e6e6e);
@@ -213,20 +213,16 @@ onMounted(() => {
   }
 }
 
-.post-card.delegate:not(.viewed) .post-title {
-  .text {
+.post-card.delegate:not(.viewed) .title .text{
     .text-linear-gradient(0, #4661fd, #10bff0);
-  }
 }
 
 .post-card.R18 .cover {
   filter: blur(25px);
 }
 
-.post-card.R18:not(.viewed) .post-title {
-  .text{
+.post-card.R18:not(.viewed) .title .text {
     .text-linear-gradient(0, #FF386B, #fc7395);
-  }
 }
 
 </style>
