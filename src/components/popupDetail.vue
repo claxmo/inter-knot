@@ -13,7 +13,7 @@
             </div>
             <header>
                 <div class="author-info">
-                    <a class="avatar" :href="post.url" target-="_blank"><img :src="post.author?.avatarUrl || defaultAvatarUrl"></a>
+                    <a class="avatar" :href="post.url" target="_blank"><img :src="post.author?.avatarUrl || defaultAvatarUrl"></a>
                     <div class="content">
                         <span class="author-name">{{ post.author?.login || "匿名用户" }}</span>
                         <ul class="meta">
