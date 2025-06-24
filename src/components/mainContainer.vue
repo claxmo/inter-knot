@@ -130,7 +130,7 @@ main {
         position: fixed;
         inset: 0;
         z-index: -1;
-        background: url('@/assets/img/main-bg.png') repeat;
+        background: url('@/assets/img/main-bg.png');
         animation: background-scroll 30s linear infinite;
         &::after {
             content: '';
