@@ -1,9 +1,9 @@
 <template>
     <div class="post-card" @click="clickHandle" :class="{delegate: isDelegate, R18: isR18, viewed: viewed}">
-        <span class="comment-count">
+        <div class="comment-count">
             <img class="icon" src="@/assets/svg/views.svg" />
             <span class="count-num">{{ post.comments.totalCount }}</span>
-        </span>
+        </div>          
         <img 
         class="cover"
         :src="isLoading || isError ? defaultCoverUrl : coverUrl" 
@@ -192,7 +192,6 @@ onMounted(() => {
     align-items: center;
     gap: 4px;
     .count-num {
-      font-size: 18px;
       padding-bottom: 4px;
     }
     .icon {

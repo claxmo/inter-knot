@@ -87,7 +87,7 @@ watch(() => store.searchQuery, async () => {
 
 onMounted(() => {
     if (typeof window.version === 'undefined') needInstall.value = true;
-    if (!needInstall.value && window.version !== '1.5.0') needUpdate.value = true;
+    if (!needInstall.value && window.version !== '1.6.0') needUpdate.value = true;
 
     nextTick(() => {
         const observer = new IntersectionObserver(async (entries) => {

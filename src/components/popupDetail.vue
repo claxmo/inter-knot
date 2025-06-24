@@ -36,23 +36,43 @@
                                 <span v-text="post.title"></span>
                             </div>
                             <div class="markdown-body post-body" v-html="bodyHTML"></div>
-                        </div>                            
-                        <a class="reply-btn" :href="post.url" target="_blank"><img src="@/assets/svg/write.svg" />写回复</a>
-                        <ul class="comment-list">
-                            <li class="comment-item" v-for="(comment, index) in comments.nodes" :key="comment.id" :class="{ 'is-owner': comment.authorAssociation === 'OWNER' }">
-                                <div class="author-info">
-                                    <a class="avatar" :href="comment.url" target="_blank"><img :src="comment.author?.avatarUrl || defaultAvatarUrl"></a>
-                                    <div class="content">
-                                        <span class="author-name">
-                                            {{ post.author?.login === comment.author?.login ? '[楼主]' : '' }}{{ comment.author?.login }}
-                                        </span>
-                                        <span class="markdown-body comment-body" v-html="comment.bodyHTML"></span>
-                                    </div>
+                        </div>            
+                        <div class="reply-box">
+                            <textarea class="reply-input" v-model="replyText" placeholder="写回复..." maxlength="300" rows="3"></textarea>
+                            <div class="reply-control">
+                                <div class="char-count">{{replyText.length}}/300</div>
+                                <button class="reply-submit" ref="replySubmit" :disabled="replyText.trim().length === 0" @click="addComment(post.id, replyText)">发送</button>
+                            </div>
+                        </div>                
+                        <!-- <a class="reply-btn" :href="post.url" target="_blank"><img src="@/assets/svg/write.svg" />写回复</a> -->
+                         <div class="comment-container">
+                            <div class="comments-control">
+                                <div class="comment-count">共 {{ comments.totalCount }} 条回复</div>
+                                <div class="comment-order">
+                                    <span :class="{ active: isAsc }" @click="isAsc = true">正序</span>
+                                    <span :class="{ active: !isAsc }" @click="isAsc = false">倒序</span>
                                 </div>
-                                <div class="floor">F{{ index + 1 }}</div>
-                            </li>
-                        </ul>  
-                        <span class="message" ref="messageRef">{{ message }}</span>
+                            </div>
+                            <ul class="comment-list">
+                                <li class="comment-item" v-for="(comment, index) in comments.nodes" :key="comment.id" :class="{ 'is-owner': comment.authorAssociation === 'OWNER' }">
+                                    <div class="author-info">
+                                        <a class="avatar" :href="comment.url" target="_blank"><img :src="comment.author?.avatarUrl || defaultAvatarUrl"></a>
+                                        <div class="content">
+                                            <span class="author-name">
+                                                {{ post.author?.login === comment.author?.login ? '[楼主]' : '' }}{{ comment.author?.login }}
+                                            </span>
+                                            <span class="markdown-body comment-body" v-html="comment.bodyHTML"></span>
+                                        </div>
+                                    </div>
+                                    <div class="comment-control">
+                                        <div class="comment-createdAt">{{ new Date(comment.createdAt).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }) }}</div>
+                                        <div class="delete-btn" @click="deleteComment(comment.id)" v-if="comment.viewerCanDelete">删除</div>
+                                    </div>
+                                    <div class="floor">F{{ isAsc ? index + 1 : comments.totalCount - index }}</div>
+                                </li>
+                            </ul>  
+                            <span class="message" ref="messageRef">{{ message }}</span>
+                         </div>
                     </div>
                 </div>
             </main>
@@ -84,34 +104,46 @@ const comments = ref({
     nodes: [],
     totalCount: 0,
     pageInfo: {
-        startCursor: null,
-        hasPreviousPage: null
+      startCursor: null,
+      hasPreviousPage: null,
+      endCursor: null,
+      hasNextPage: null
+        }
     }
-});
+);
+
+const cursor = computed(() => isAsc.value ? comments.value.pageInfo.endCursor : comments.value.pageInfo.startCursor );
+const hasPage = computed(() => isAsc.value ? comments.value.pageInfo.hasNextPage : comments.value.pageInfo.hasPreviousPage );
 
 const isLoading = ref(false);
 const messageRef = ref(null);
 const message = computed(() => {
     if (isLoading.value){
         return "正在努力加载中···";
-    }else if (comments.value.pageInfo.hasPreviousPage === false){
+    }else if (hasPage.value === false){
         return "- 已无更多评论 -";
     }else{
         return "";
     }
 });
+const replyText = ref('');
+const replySubmit = ref(null);
+const isAsc = ref(true);
 
 const getNextComments = async () => {
     if (!post.value.id) return;
-    if (isLoading.value || comments.value.pageInfo.hasPreviousPage === false) return;
+    if (isLoading.value || hasPage.value === false) return;
     isLoading.value = true;
     try{
-        const newComments = await window.getComments(post.value.id, comments.value.pageInfo.startCursor);
-        comments.value.nodes.push(
-            ...newComments.nodes.filter(
-                comment => !comments.value.nodes.some(c => c.id === comment.id)
-            )
-        ); 
+        const newComments = await window.getComments(post.value.id, cursor.value, isAsc.value);
+        const newNodes = newComments.nodes.filter(
+            comment => !comments.value.nodes.some(c => c.id === comment.id)
+        )
+        if (isAsc.value){
+            comments.value.nodes.push(...newNodes);
+        }else {
+            comments.value.nodes.push(...newNodes.reverse());
+        }
         comments.value.pageInfo = newComments.pageInfo;
         comments.value.totalCount = newComments.totalCount;
     }catch(e){
@@ -122,6 +154,53 @@ const getNextComments = async () => {
             isLoading.value = false;
         });
     }       
+};
+
+const addComment = async (_id, body) => {
+    if (!_id || body.trim().length === 0) return;
+    try{
+        replySubmit.value.disabled = true;
+        const comment = await window.addComment(_id, body);
+        comments.value.nodes.unshift(comment);
+        replyText.value = '';
+        comments.value.totalCount += 1;
+        useToast().success('评论发送成功!');
+    }catch (e){
+        useToast().error('评论发送失败!');
+        console.error(e);
+    }finally {
+        nextTick(() => {
+            replySubmit.value.disabled = false;
+        });
+    }
+
+}; 
+
+const deleteComment = async (_id) => {
+    try {
+        await window.deleteComment(_id);
+        comments.value.nodes = comments.value.nodes.filter(c => c.id !== _id);
+        comments.value.totalCount -= 1;
+        useToast().success('评论删除成功!');
+    } catch(e) {
+        useToast().error('评论删除失败!');
+        console.error(e);
+    }
+};
+
+const reloadComments = async () => {
+    comments.value = {
+    nodes: [],
+    totalCount: 0,
+    pageInfo: {
+      startCursor: null,
+      hasPreviousPage: null,
+      endCursor: null,
+      hasNextPage: null
+    }
+  };
+  isLoading.value = false;
+  await getNextComments();
 };
 
 onMounted(() => {
@@ -140,20 +219,6 @@ onMounted(() => {
 });
 
 watch(() => post.value, () => {
-    comments.value = {
-        nodes: [],
-        totalCount: 0,
-        pageInfo: {
-            startCursor: null,
-            hasPreviousPage: null
-        }
-    }
-    isLoading.value = false;
-    getNextComments();
-});
-
-watch(() => props.show, (newValue) => {
-    if (!newValue) return;
     imgUrls.value = [defaultCoverUrl];
     bodyHTML.value = post.value.bodyHTML;
     const imgRegex = /(?:<br\s*\/?>\s*)?<a[^>]*>\s*<img[^>]*src=['"]([^'"]+)['"][^>]*>\s*<\/a>/g;
@@ -162,7 +227,11 @@ watch(() => props.show, (newValue) => {
         imgUrls.value = matches.map(match => match[1]);
         bodyHTML.value = bodyHTML.value.replace(imgRegex, '');
     }
+    reloadComments();   
 });
+
+watch(() => isAsc.value, () => {reloadComments();});
+
 </script>
 
 <style scoped lang="less">
@@ -291,6 +360,7 @@ watch(() => props.show, (newValue) => {
                     color: @text-secondary-color;
                     .single-line-ellipsis();
                 }
+                
                 .meta {
                     display: flex;
                     gap: 8px;
@@ -368,7 +438,7 @@ watch(() => props.show, (newValue) => {
                     width: 100%;
                     display: flex;
                     flex-direction: column;
-                    gap: 12px;
+                    gap: 8px;
                     .post-title {
                         * {
                             font-size: 1.05rem;
@@ -379,80 +449,184 @@ watch(() => props.show, (newValue) => {
                     }
                   
                 }
-                .reply-btn {
+                // .reply-btn {
+                //     width: 100%;
+                //     height: 50px;
+                //     border: 4px solid @border-color;
+                //     background: #000;
+                //     border-radius: 50px;
+                //     display: flex;
+                //     justify-content: center;
+                //     align-items: center;
+                //     margin-bottom: 18px;
+                //     img {
+                //         width: 24px;
+                //         height: 24px;
+                //     }
+                // }
+                .reply-box {
                     width: 100%;
-                    height: 50px;
-                    border: 4px solid @border-color;
-                    background: #000;
-                    border-radius: 50px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    margin-bottom: 18px;
-                    img {
-                        width: 24px;
-                        height: 24px;
+                    padding: 8px;
+                    margin-bottom: 16px;
+                    border-radius:10px;
+                    border: 2px dashed @border-color;
+                    .reply-input {
+                        width: 100%;
+                        min-height: 32px;
+                        max-height: 250px;
+                        resize: vertical;
+                        border-radius: 10px;
+                        padding: 0 8px;
+                        border: none;
+                        color: @text-secondary-color;
+                        background-color: @bg-primary-color;
+                        box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+
+                    }
+            
+                    .reply-control {
+                        width: 100%;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        .char-count {
+                            font-size: 0.875rem;
+                            color: @text-secondary-color;
+                        }
+                        .reply-submit {
+                            display: inline-block;
+                            padding: 4px 12px;
+                            font-size: 16px;
+                            font-weight: bold;
+                            background-color: @bg-secondary-color;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            transition: transform 0.1s;
+
+                            &:hover {
+                                background-color: lighten(@bg-secondary-color, 5%);
+                            }
+
+                            &:active {
+                                transform: scale(0.97);
+                            }
+
+                            &:disabled {
+                                background-color: @text-tertiary-color;
+                                cursor: not-allowed;
+                                opacity: 0.6;
+                            }
+                        }
                     }
                 }
-                .comment-list {
+                .comment-container{
                     width: 100%;
-                    list-style: none;
-                    .comment-item {
-                        position: relative;
-                        min-height: 70px;
-                        width: 100%;
-                        padding: 4px 0;
-                        border-bottom: 2px solid @border-color;
-                        .author-info {
-                            flex: 1;
+                    .comments-control {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 8px;
+                        .comment-count {
+                            color: @text-tertiary-color;
+                            font-size: 16px;
+                        }
+                        .comment-order {
                             display: flex;
-                            gap: 8px;
-                            .avatar {
-                                height: 58px;
-                                aspect-ratio: 1/1;
-                                border-radius: 50px;
-                                border: 3px solid @border-color;
-                                img {
-                                    height: 100%;
-                                    aspect-ratio: 1/1;
-                                    border-radius: 50%;
-                                    object-fit: cover;
-                                    border: 2px solid #000;
-                                }
+                            gap: 12px;
+                            span {
+                                color: @text-tertiary-color;
+                                cursor: pointer;
+                                padding: 2px 4px;
+                                font-size: 16px;
                             }
-                            .content {
+                            .active {
+                                color: @text-primary-color;
+                                border-bottom: 2px solid @text-primary-color;
+                            }
+                        }
+
+                    }
+                    .comment-list {
+                        width: 100%;
+                        list-style: none;
+                        .comment-item {
+                            position: relative;
+                            min-height: 70px;
+                            width: 100%;
+                            padding: 4px 0;
+                            border-bottom: 2px solid @border-color;
+                            .author-info {
                                 flex: 1;
-                                .author-name {
-                                    color: @text-secondary-color;
-                                    .single-line-ellipsis(); 
+                                display: flex;
+                                gap: 8px;
+                                .avatar {
+                                    height: 58px;
+                                    aspect-ratio: 1/1;
+                                    border-radius: 50px;
+                                    border: 3px solid @border-color;
+                                    img {
+                                        height: 100%;
+                                        aspect-ratio: 1/1;
+                                        border-radius: 50%;
+                                        object-fit: cover;
+                                        border: 2px solid #000;
+                                    }
+                                }
+                                .content {
+                                    flex: 1;
+                                    .author-name {
+                                        color: @text-secondary-color;
+                                        .single-line-ellipsis(); 
+                                    }
+                                    .comment-body {
+                                        white-space: normal;
+                                        word-break: break-word;
+                                        overflow-wrap: break-word;
+                                    }
                                 }
                             }
-                        }
-                        .floor {
-                            position: absolute;
-                            top: 12px;
-                            right: 0;
-                            z-index: 1;
-                            font-size: 12px;
-                            background-color: rgba(255,255,255,0.3);
-                            padding: 0 12px;
-                            border-radius: 0 25px 25px 25px;
-                            color: #000;
-                        }
-                        &.is-owner {
-                            .author-info .content .author-name{
-                                color: #fdc220;
+                            .comment-control {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                padding-left: 66px;
+                                .comment-createdAt {
+                                    color: @text-tertiary-color;
+                                    font-size: 14px;
+                                }
+                                .delete-btn {
+                                    font-size: 14px;
+                                    color: rgb(255,77,77);
+                                    cursor: pointer;
+                                }
                             }
                             .floor {
-                                background-color: #fdc220;
+                                position: absolute;
+                                top: 12px;
+                                right: 0;
+                                z-index: 1;
+                                font-size: 12px;
+                                background-color: rgba(255,255,255,0.3);
+                                padding: 0 12px;
+                                border-radius: 0 25px 25px 25px;
+                                color: #000;
+                            }
+                            &.is-owner {
+                                .author-info .content .author-name{
+                                    color: #fdc220;
+                                }
+                                .floor {
+                                    background-color: #fdc220;
+                                }
                             }
                         }
                     }
                 }
                 .message {
-                    padding: 8px 0;
+                    padding: 24px 0;
                     color: @text-tertiary-color;
-                    font-size: 0.95rem;
+                    font-size: 0.9rem;
                     width: 100%;
                     display: flex;
                     justify-content: center;

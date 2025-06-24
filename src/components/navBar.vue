@@ -33,20 +33,22 @@ const setActive = (index, item) => {
 </script>
   
 <style scoped lang="less">
-@keyframes scale-grow {
-  0% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1.15);
-  }
+
+@keyframes nav-color {
+  0% { background-color: #fbfe00; }
+  100% { background-color: #aefe00; }
+}
+
+@keyframes nav-size {
+   0% { scale: 1.05; }
+  100% { scale: 1.15; }
+  
 }
 
 .navbar {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  width: auto;
   height: 50px;
   border-radius: 50px;
   background: url('@/assets/svg/point.svg') center repeat;
@@ -61,9 +63,8 @@ const setActive = (index, item) => {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
     z-index: 1;
-    width: 220px;
+    width: 200px;
     height: 100%;
     font-size: 24px;
     font-style: italic;
@@ -72,22 +73,38 @@ const setActive = (index, item) => {
      &:active {
       color: @text-secondary-color;
     }
-    &.active::after {
-      content: '';
-      position: absolute;
-      z-index: -1;
-      inset: 0;
-      border-radius: 125px 25px 125px 25px;
-      animation:
-        background-glow 1s linear infinite alternate,
-        scale-grow 0.3s cubic-bezier(0.35, 0.7, 0, 0.7) infinite alternate;
-    }
-    &:first-child::after {
-      border-radius: 75px 25px 125px 75px;
-    }
-
-    &:last-child::after {
-      border-radius: 125px 75px 75px 25px;
+    &.active {
+      position: relative;
+      &::after {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        left: 10%;
+        right: 10%;
+        border-radius: 15px;
+        transform: skewX(-27deg);
+      }
+      &:first-child:before,
+      &:last-child:before {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        width: 50%;
+        height: 100%;
+        border-radius: 50px;    
+      }
+      &:first-child:before {
+        left: -5px;
+      }
+      &:last-child:before {
+        right: -5px;
+      }
+      &::after,
+      &::before {
+        animation: nav-color 1s linear infinite alternate,
+            nav-size 0.6s cubic-bezier(0.35, 0.7, 0, 0.8) infinite alternate;
+      } 
     }
   }
 }
