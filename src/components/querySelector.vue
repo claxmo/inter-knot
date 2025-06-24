@@ -44,10 +44,10 @@ const clickHandle = (index, query) => {
 <style scoped lang="less">
 @keyframes scale-grow {
   0% {
-    transform: scale(1.05);
+    transform: scale(1.01);
   }
   100% {
-    transform: scaleX(1.1) scaleY(1.35);
+    transform: scaleX(1.06) scaleY(1.15);
   }
 }
 
@@ -134,7 +134,7 @@ const clickHandle = (index, query) => {
       z-index: -2;
       border-radius: 50px;
       animation: background-glow 1s linear infinite alternate,
-                  scale-grow 0.3s cubic-bezier(0.35, 0.7, 0, 0.7) infinite alternate;
+                  scale-grow 0.6s cubic-bezier(0.35, 0.7, 0, 0.8) infinite alternate;
     }
   }
 }

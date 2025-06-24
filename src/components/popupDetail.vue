@@ -22,7 +22,10 @@
                         </ul>
                     </div>
                 </div>
-                <img class="close-btn" src="@/assets/svg/close.svg" alt="关闭" @click="$emit('hide')" />
+                <div class="right">
+                    <span class="delete-btn" @click="deletePost(post.id)" v-if="post.viewerCanDelete"><img class="icon" src="@/assets/svg/delete.svg"></span>
+                    <img class="close-btn" src="@/assets/svg/close.svg" alt="关闭" @click="$emit('hide')" />
+                </div>
             </header>
             <main>
                 <div class="media-container">
@@ -84,7 +87,8 @@
 import ImageViewer from '@/components/imageViewer.vue';
 import defaultCoverUrl from '@/assets/svg/default-cover.svg';
 import defaultAvatarUrl from '@/assets/svg/default-avatar.svg';
-import { ref, watch, defineProps, toRefs, computed, nextTick, onMounted } from 'vue';
+import { showDialog } from '@/utils/showDialog';
+import { ref, watch, defineProps, toRefs, computed, nextTick, onMounted, defineEmits } from 'vue';
 import { useToast } from 'vue-toastification';
 
 const props = defineProps({
@@ -97,6 +101,7 @@ const props = defineProps({
         required: true
     }
 });
+const emit = defineEmits(['hide','delete']);
 const { post } = toRefs(props);
 const bodyHTML = ref("");
 const imgUrls = ref([]);
@@ -156,11 +161,11 @@ const getNextComments = async () => {
     }       
 };
 
-const addComment = async (_id, body) => {
-    if (!_id || body.trim().length === 0) return;
+const addComment = async (postId, body) => {
+    if (!postId || body.trim().length === 0) return;
     try{
         replySubmit.value.disabled = true;
-        const comment = await window.addComment(_id, body);
+        const comment = await window.addComment(postId, body);
         comments.value.nodes.unshift(comment);
         replyText.value = '';
         comments.value.totalCount += 1;
@@ -176,17 +181,36 @@ const addComment = async (_id, body) => {
 
 }; 
 
-const deleteComment = async (_id) => {
+const deleteComment = async (postId) => {
     try {
-        await window.deleteComment(_id);
-        comments.value.nodes = comments.value.nodes.filter(c => c.id !== _id);
-        comments.value.totalCount -= 1;
-        useToast().success('评论删除成功!');
+        const res = await showDialog("删除后不可恢复,是否删除?");
+        if (res === 'confirm'){
+            await window.deleteComment(postId);
+            comments.value.nodes = comments.value.nodes.filter(c => c.id !== postId);
+            comments.value.totalCount -= 1;
+            useToast().success('评论删除成功!');
+        }     
     } catch(e) {
         useToast().error('评论删除失败!');
         console.error(e);
     }
 };
+
+const deletePost = async (postId) => {
+    try {
+        const res = await showDialog("删除后不可恢复,是否删除?");
+        if (res === 'confirm'){
+            await window.deleteDiscussion(postId);
+            emit("delete", postId);
+            emit("hide");
+            useToast().success('帖子删除成功!');
+        }     
+    } catch(e) {
+        useToast().error('帖子删除失败!');
+        console.error(e);
+    }
+};
+
 
 const reloadComments = async () => {
     comments.value = {
@@ -383,10 +407,37 @@ watch(() => isAsc.value, () => {reloadComments();});
                 }
             }
         }
-        .close-btn {
-            cursor: pointer;
+        .right {
             height: 100%;
-            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+             .close-btn {
+                cursor: pointer;
+                height: 100%;
+                aspect-ratio: 1/1;
+            }
+            .delete-btn {
+                 display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 50px;
+                aspect-ratio: 1/1;
+                border-radius: 50%;
+                background: #000;
+                border: 2px solid #000;
+                box-shadow:
+                    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+                    inset 0 0 0 4px @border-color; 
+                cursor: pointer;
+                &:active {
+                    animation: border-glow 0.5s linear infinite alternate;
+                }
+                .icon {
+                    width: 24px;
+                    height: 24px;
+                }
+            }
         }
     }
     main {
@@ -470,6 +521,7 @@ watch(() => isAsc.value, () => {reloadComments();});
                     margin-bottom: 16px;
                     border-radius:10px;
                     border: 2px dashed @border-color;
+                    background-color: #000;
                     .reply-input {
                         width: 100%;
                         min-height: 32px;

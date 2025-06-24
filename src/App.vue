@@ -1,7 +1,7 @@
 <template>
   <HeaderContainer />
   <MainContainer />
-  <PopupDetail :post="store.curPost" :show="store.showPopup" @hide="store.showPopup = false"/>
+  <PopupDetail :post="store.curPost" :show="store.showPopup" @hide="store.showPopup = false" @delete="(postId) => store.posts = store.posts.filter(post => post.id !== postId) "/>
   <QuerySelector 
     :items="[
       { label: '全部', query: '' },

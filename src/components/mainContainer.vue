@@ -115,7 +115,6 @@ onMounted(() => {
     }
 }
 
-
 main {
     position: relative;
     width: 100vw;
@@ -131,8 +130,7 @@ main {
         position: fixed;
         inset: 0;
         z-index: -1;
-        background: url('@/assets/img/main-bg.png');
-        background-size: cover;
+        background: url('@/assets/img/main-bg.png') repeat;
         animation: background-scroll 30s linear infinite;
         &::after {
             content: '';
