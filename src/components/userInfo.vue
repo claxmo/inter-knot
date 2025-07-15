@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="level">
-            <div class="level-num">{{ level }}</div>
+            <div class="level-num">{{ author?.public_repos ?? 0 }}</div>
             <div class="level-text">LEVEL</div>
         </div>
     </div>
@@ -30,7 +30,6 @@ const { author } = storeToRefs(store);
 const curExp = ref(7890);
 const totalExp = ref(10000);
 const width = computed(() => `${Math.min(100, (curExp.value / totalExp.value) * 100)}%`);
-const level = computed(() => Math.min(60, author?.public_repos ?? 0) );
 
 onMounted(async () => {
   try{
@@ -52,24 +51,26 @@ const clickHandle = () => {
 <style scoped lang="less">
 
 .user-info {
+  width: 320px;
+  height: 65px;
+  padding: 8px;
+  padding-right: 10px;
   display: flex;
   gap: 8px;
-  width: 300px;
-  height: 60px;
-  padding: 5px;
-  padding-right: 15px;
   border: 3px solid #000;
-  border-radius: 50px;
-  background: linear-gradient(#212121, #141414);
-  box-shadow: inset 0 2px 2px #313431, inset 0 -2px 2px #181818;
+  border-radius: @max-radius;
+  background: linear-gradient(#222222, #141414);
+  box-shadow: inset 0 2px 2px #323232, inset 0 -2px 2px #181818;
   cursor: pointer;
+  flex-shrink: 0;
   &:active {
-    animation: border-glow 0.5s linear infinite alternate;
+    animation: border-color 0.7s linear infinite alternate;
   }
   .avatar {
     height: 100%;
     aspect-ratio: 1;
     border-radius: 50%;
+    user-select: none;
   }
   .user-info-text {
     display: flex;
@@ -78,43 +79,44 @@ const clickHandle = () => {
     flex: 1;
     min-width: 0;
     .username {
-      font-size: 16px;
+      font-size: 1.125rem;
       .single-line-ellipsis();
     }
     .experience {
-      height: 14px;
+      user-select: none;
+      height: 0.875rem;
       width: 100%;
-      border-radius: 50px;
-      background: linear-gradient(#141414, #212121);
-      box-shadow: inset 0 2px 2px #181818, inset 0 -2px 2px #313431;
+      border-radius: @max-radius;
+      background: linear-gradient(#141414, #222222);
+      box-shadow: inset 0 2px 2px #181818, inset 0 -2px 2px #323232;
       .bar {
         height: 100%;
         max-width: 100%;
-        border-radius: 50px;
+        border-radius: @max-radius;
         background: linear-gradient(90deg, #4661fd, #10bff0);
-        padding: 0 2px;
+        padding: 0 4px;
         display: flex;
         align-items: center;
         .cur-exp,
         .total-exp {
-          font-size: 12px;
-          text-align: center;
+          font-size: 0.75rem;
         }
       }
     }
   }
   .level {
     height: 100%;
-    text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
+    align-items: center;
+    user-select: none;
     .level-num {
-      font-size: 24px;
+      font-size: 1.75rem;
       line-height: 1;
     }
     .level-text {
-      font-size: 8px;
+      font-size: 0.5rem;
       line-height: 1;
       color: @text-tertiary-color;
     }

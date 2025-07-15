@@ -1,27 +1,38 @@
 
 @font-face {
-  font-family: 'zzzFont';
-  src: url('@/assets/fonts/zzzFont.TTF') format('truetype');
+  font-family: 'zzz-default';
+  src: url('@/assets/fonts/zzz-default.woff2') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
+
 * {
-    padding: 0px;
-    margin: 0px;
-    font-size: 18px;
-    text-decoration: none;
-    box-sizing: border-box;
-    color: @text-primary-color;
-    font-family: 'zzzFont';
-    scrollbar-width: thin;
-    scrollbar-color: @border-color transparent;
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+  box-sizing: border-box;
+  font-family: 'zzz-default', sans-serif;
+  scrollbar-width: thin;
+  scrollbar-color: @border-color transparent;
+
+
 }
 
+html {
+  font-size: 16px;
+}
 
 body {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  font-size: 1.125rem;
+  color: @text-primary-color;
+
+
+}
+
+a:hover {
+  color: @color-yellow;
 }

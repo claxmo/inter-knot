@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkinter_knot"]=self["webpackChunkinter_knot"]||[]).push([[145],{5145:function(n,e,t){t.r(e),t.d(e,{modelJson:function(){return u},weightBundles:function(){return r}});var u=function(){return t.e(155).then(t.bind(t,1155))},r=[function(){return t.e(539).then(t.bind(t,1539))},function(){return t.e(432).then(t.bind(t,7432))}]}}]);
+//# sourceMappingURL=145.93222566.js.map

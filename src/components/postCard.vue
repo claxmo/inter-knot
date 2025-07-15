@@ -1,33 +1,46 @@
 <template>
-    <div class="post-card" @click="clickHandle" :class="{delegate: isDelegate, R18: isR18, viewed: viewed}">
-        <div class="comment-count">
-            <img class="icon" src="@/assets/svg/views.svg" />
-            <span class="count-num">{{ post.comments.totalCount }}</span>
-        </div>          
+    <div class="post-card" @click="viewed = true" :class="{mission: post.category.name === '委托', viewed: viewed}">               
         <img 
         class="cover"
-        :src="isLoading || isError ? defaultCoverUrl : coverUrl" 
+        :style="{
+          filter: filter,
+        }"
+        :src="post.cover === undefined ? defaultCoverUrl : post.cover" 
         loading="lazy" 
-        @load="onLoad" 
-        @error="onError"
+        @load="isLoaded = true" 
+        @error="isError = true"
+        ref="cover"
         />
+        <div class="reaction-count">
+            <svg t="1729428731220" class="icon" viewBox="0 0 1316 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="8355" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24">
+              <path d="M658.139429 365.129143c-38.838857 0-75.410286 15.140571-102.985143 42.715428a144.676571 144.676571 0 0 0-42.715429 102.985143c0 38.912 15.140571 75.483429 42.715429 103.058286s64.146286 42.715429 102.985143 42.715429c38.838857 0 75.410286-15.140571 102.985142-42.715429s42.715429-64.146286 42.715429-103.058286c0-38.765714-15.140571-75.337143-42.715429-102.985143a144.457143 144.457143 0 0 0-102.985142-42.715428z m644.973714 146.432c-0.365714-8.045714-12.653714-47.542857-29.842286-88.722286-17.554286-42.422857-47.250286-103.862857-88.429714-155.062857A587.044571 587.044571 0 0 0 987.428571 107.812571C892.708571 60.342857 781.897143 36.278857 658.139429 36.278857c-123.611429 0-234.422857 24.137143-329.142858 71.68a590.921143 590.921143 0 0 0-197.485714 159.744C90.477714 319.122286 60.928 380.562286 43.373714 422.985143c-17.188571 41.179429-29.257143 80.749714-29.696 88.722286v0.585142c0.365714 8.045714 12.653714 47.542857 29.842286 88.868572 17.700571 42.422857 47.250286 103.862857 88.283429 154.989714A587.044571 587.044571 0 0 0 329.142857 915.968c95.305143 47.762286 205.970286 71.899429 329.142857 71.899429 123.318857 0 234.057143-24.137143 329.142857-71.899429a590.482286 590.482286 0 0 0 197.485715-159.670857c41.106286-51.273143 70.802286-112.713143 88.356571-155.136 17.188571-41.179429 29.476571-80.749714 29.842286-88.722286v-0.292571-0.585143zM658.139429 758.491429a247.881143 247.881143 0 0 1-247.588572-247.588572A247.954286 247.954286 0 0 1 658.139429 263.314286a247.954286 247.954286 0 0 1 247.588571 247.515428 247.881143 247.881143 0 0 1-247.588571 247.588572z" fill="currentColor" p-id="8356"></path>
+            </svg>
+            <span>{{ post.reactions.totalCount }}</span>
+        </div> 
         <div class="footer">
             <div class="author-info">
                 <span class="avatar"><img :src="post.author.avatarUrl" /></span>
                 <span class="author-name">{{ post.author.login }}</span>
             </div>
-            <div class="title">
-                <span class="icon" v-if="isDelegate">!</span>
-                <span class=text>{{post.category.name !== '常规' ? `[${post.category.name}]` : ''}}{{ post.title }}</span>
+            <div class="post-title">
+              <img class="icon" v-if="post.category.name === '委托'" :src="viewed ? iconMissionViewed : iconMission" />           
+              <span class="text">
+                {{ post.category.name !== '常规' ? `[${post.category.name}]` : ''}}{{ post.title }}
+              </span>
             </div>
-            <span class="body" v-text="post.bodyText || 'null'"></span>
+            <div class="post-body" v-text="post.bodyText || 'null'"></div>
         </div>
     </div>
 </template>
 
 <script setup>
 import defaultCoverUrl from '@/assets/svg/default-cover.svg';
-import { defineProps,ref, defineEmits, toRefs, onMounted, computed } from 'vue';
+import iconMission from '@/assets/img/IconInterknotMission.png';
+import iconMissionViewed from '@/assets/img/IconInterknotMission02.png';
+import { useElementSize, useElementVisibility } from '@vueuse/core';
+import { defineProps,ref, defineEmits, toRefs, onMounted, watch } from 'vue';
+import { isNSFW } from '@/utils/nsfw';
+import { html2dom } from '@/utils/utils';
 
 const props = defineProps({
     post: {
@@ -36,37 +49,42 @@ const props = defineProps({
     }
 });
 const { post } = toRefs(props);
-const emit = defineEmits(["click","resize"]);
-const coverUrl = ref(defaultCoverUrl);
-const isDelegate = computed(() => post.value.category.name === '委托');
-const isR18 = computed(() => post.value.category.name === 'R18');
-const isLoading = ref(true);
+const cover = ref(null);
+const isLoaded = ref(false);
 const isError = ref(false);
 const viewed = ref(false);
+const filter = ref("none");
 
-const clickHandle = () => {
-  emit('click');
-  viewed.value = true;
-};
+const emit = defineEmits(["resize"]);
+const { height } = useElementSize(cover);
+watch(height, () => {
+  emit('resize');
+});
 
-const onLoad = () => {
-    emit("resize");
-    isLoading.value = false;
-};
-
-const onError = () => {
-    isLoading.value = false;
-    isError.value = true;
-    
-};
-
-onMounted(() => {
-  const imgRegex = /<img[^>]+src=['"]([^'"]+)['"][^>]*>/i;
-  const match = post.value.bodyHTML.match(imgRegex);
-  if (match){
-    coverUrl.value = match[1];
+const coverVisibility = useElementVisibility(cover);
+watch(coverVisibility, async (visible) => {
+  if (!visible) return;
+  if (post.value.isNSFW !== undefined) return;
+  if (await isNSFW(cover.value)) {
+    post.value.isNSFW = true;
+    filter.value = "blur(20px)";
+  }else {
+    post.value.isNSFW = false;
+    filter.value = "none";
   }
+});
 
+onMounted(async () => {
+  const template = html2dom(post.value.bodyHTML);
+  const img = template.content.querySelector("img");
+  if (img) {
+    try {
+      post.value.cover = URL.createObjectURL(await window.getBlob(img.src));
+    } catch {
+      post.value.cover = defaultCoverUrl;
+      isError.value = true;
+    }
+  }
 });
 </script>
 
@@ -83,7 +101,7 @@ onMounted(() => {
   cursor: pointer;
   transition: all 0.3s;
   &:active {
-    animation: border-glow 0.5s linear infinite alternate;
+    animation: border-color 0.7s linear infinite alternate;
   }
   .cover {
     display: block;
@@ -94,19 +112,17 @@ onMounted(() => {
   }
   .footer {
     position: relative;
-    display: flex;
-    flex-direction: column;
     width: 100%;
-    padding: 0 15px 8px;
+    padding: 0 16px 8px;
     background-color: @bg-primary-color;
     .author-info {
       display: flex;
       width: 100%;
       height: 32px;
-      margin-bottom: 5px;
       align-items: center;
       overflow: visible;
       .avatar {
+        user-select: none;
         position: relative;
         height: 65px;
         aspect-ratio: 1 / 1;
@@ -146,82 +162,55 @@ onMounted(() => {
       .author-name {
         flex: 1;
         position: relative;
-        margin-left: 9px;
-        color: @text-secondary-color;
+        margin-left: 8px;
+        padding-left: 4px;
+        color: @text-tertiary-color;
         height: 100%;
         border-bottom: 3px solid @border-color;
         .single-line-ellipsis();
       }
     }
-    .title {
-      padding: 0 5px;
-      .multi-line-ellipsis(2);
-      .text {
-        font-size: 1.05rem;
-      }
+    .post-title {
+      width: 100%;
+      padding: 0 4px;
+      .multi-line-ellipsis(3);
       .icon {
-        position: relative;
-        top: 2px;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        height: 1.25rem;
-        width: 1.25rem;
-        flex-shrink: 0;
-        border-radius: 6px;
-        background: linear-gradient(0, #7e60dd, #10bff0);
-        color: #000;
-        font-weight: bold;
-        font-size: 1rem;
-        margin-right: 6px;
+        width: 22px;
+        height: 22px;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      .text {
+        font-size: 1.125em;
+        line-height: 0;
+        vertical-align: middle;
+
       }
     }
-    .body {
-      padding: 0 5px;
+    .post-body {
+      width: 100%;
+      padding: 0 4px;
       color: @text-secondary-color;
       .single-line-ellipsis();
     }
   }
-  .comment-count {
+  .reaction-count {
     position: absolute;
     top: 5px;
     left: 15px;
-    z-index: 9;
+    z-index: 2;
     display: flex;
-    justify-content: center;
     align-items: center;
     gap: 4px;
-    .count-num {
-      padding-bottom: 4px;
-    }
-    .icon {
-      width: 24px;
-      height: 24px;
-    }
   }
 }
 
-.post-card.viewed .title {
-  .multi-line-ellipsis(2);
-  .icon {
-    background: linear-gradient(0, #bcbcbc, #6e6e6e);
-  }
-  .text{
-    color: @text-tertiary-color;
-
-  }
+.post-card.viewed .post-title .text{
+  color: @text-secondary-color;
 }
 
-.post-card.delegate:not(.viewed) .title .text{
-    .text-linear-gradient(0, #4661fd, #10bff0);
-}
-
-.post-card.R18 .cover {
-  filter: blur(25px);
-}
-
-.post-card.R18:not(.viewed) .title .text {
-    .text-linear-gradient(0, #FF386B, #fc7395);
+.post-card.mission:not(.viewed) .post-title .text{
+  .text-linear-gradient(0, #4661fd, #10bff0);
 }
 
 </style>

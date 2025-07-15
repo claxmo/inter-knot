@@ -1,12 +1,12 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-
 import { createPinia } from 'pinia';
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
 import '@/assets/style.less';
 
 const app = createApp(App)
+
 app.use(createPinia())
 
 app.use(Toast, {
@@ -32,20 +32,21 @@ app.use(Toast, {
     draggablePercent: 0.6,
   
     // 悬停时是否显示关闭按钮
-    showCloseButtonOnHover: false,
+    showCloseButtonOnHover: true,
   
     // 是否隐藏底部的进度条
-    hideProgressBar: true,
+    hideProgressBar: false,
   
     // 是否显示关闭按钮（可以传 `false`、`true` 或自定义组件）
-    closeButton: false,
+    closeButton: true,
   
     // 是否显示默认图标（你也可以在 toast 里单独传 icon）
     icon: true,
   
     // 是否启用从右向左显示（适合阿拉伯语等 RTL 语言）
     rtl: false,
-  });
+  }
+);
   
 setTimeout(() => {
   app.mount('#app')

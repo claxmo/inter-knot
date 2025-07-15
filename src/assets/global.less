@@ -1,10 +1,15 @@
-@text-primary-color: #f4f4f4;
-@text-secondary-color: #b3b3b3;
-@text-tertiary-color: #828282;
+@text-primary-color: #f4f4f4e6;
+@text-secondary-color: #f4f4f4a6;
+@text-tertiary-color: #f4f4f473;
+
+@color-yellow: #fbfe00;
+@color-green: #aefe00;
 
 @border-color: #323232;
-@bg-primary-color: #212121;
+@bg-primary-color: #222222;
 @bg-secondary-color: #323232;
+
+@max-radius: 999px;
 
 @import '~github-markdown-css/github-markdown-dark.css';
 
@@ -12,25 +17,31 @@
     background-color: transparent;
     * {
         color: @text-secondary-color;
+        font-weight: normal;
     }
 }
 
-@keyframes border-glow {
-  0% {
-      border-color: #fbfe00;
+@keyframes border-color {
+  from {
+      border-color: @color-yellow;
   }
-  100% {
-      border-color: #aefe00;
+  to {
+      border-color: @color-green;
   }
 }
 
-@keyframes background-glow {
-  0% {
-      background-color: #fbfe00;
+@keyframes background-color {
+  from {
+      background-color: @color-yellow;
   }
-  100% {
-      background-color: #aefe00;
+  to {
+      background-color: @color-green;
   }
+}
+
+@keyframes scale-size {
+  from { scale: 1.01}
+  to { scale: 1.1; }
 }
 
 .text-linear-gradient(@deg, @from, @to){
@@ -56,8 +67,3 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.active {
-  color: #141414;
-}
-

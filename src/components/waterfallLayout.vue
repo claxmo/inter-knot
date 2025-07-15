@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { debounce } from 'lodash-es';
+import { useDebounceFn } from '@vueuse/core';
 import { defineProps, ref, onMounted, watch, nextTick , onUnmounted,  defineExpose, toRefs } from 'vue';
 
 const props = defineProps({
@@ -35,7 +35,7 @@ const props = defineProps({
 const waterfall = ref(null);
 const {width, gap} = toRefs(props);
 
-const layout = debounce(() => {
+const layout = useDebounceFn(() => {
     const getColumn = () => {
         const containerWidth = waterfall.value.clientWidth;
         let column = 0;
@@ -67,7 +67,7 @@ const layout = debounce(() => {
             let minTop = getMinTop(nextTop);
             item.style.left = `${offsetLeft + minTop.index * columnWidth}px`;
             item.style.top = `${minTop.min + gap.value}px`;
-            item.style.width = width.value + "px"; 
+            item.style.width = `${width.value}px`; 
             item.style.opacity = "1";
             nextTop[minTop.index] += item.offsetHeight + gap.value;
         }
@@ -87,7 +87,7 @@ watch(() => props.items, () => {
     nextTick(() => {
         layout();
     });    
-}, {deep: true});
+});
 
 defineExpose({ layout });
 

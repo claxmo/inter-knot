@@ -9,10 +9,12 @@
   },
   "dependencies": {
     "@tensorflow/tfjs": "^4.22.0",
+    "@vueuse/core": "^13.5.0",
     "core-js": "^3.8.3",
     "github-markdown-css": "^5.8.1",
     "lodash-es": "^4.17.21",
     "marked": "^15.0.8",
+    "naive-ui": "^2.42.0",
     "nsfwjs": "^4.2.1",
     "pinia": "^3.0.1",
     "vue": "^3.2.13",

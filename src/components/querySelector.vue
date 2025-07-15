@@ -1,64 +1,59 @@
 <template>
-  <div class="query-selector" :class="{ open: isOpen }">
-    <ul class="query-list">
-      <li
-        v-for="(item, index) in props.items"
-        :key="index"
-        class="query-item"
-        :class="{ active: activeIndex === index }"
-        @click="clickHandle(index, item.query)"
-      >
-        {{ item.label }}
-      </li>
-    </ul>
-    <div class="cur-label" @click="isOpen = !isOpen">
-      {{ curLabel }}
-      <span class="arrow"></span>
+    <div class="query-selector" :class="{ open: isOpen }">
+      <ul>
+        <li
+          v-for="(item, index) in items"
+          :key="index"
+          :class="{ active: activeIndex === index }"
+          @click="clickHandle(index)"
+        >
+          {{ item.label }}
+        </li>
+      </ul>
+      <div class="label" @click="isOpen = !isOpen">
+        {{ label }}
+        <span class="arrow"></span>
+      </div>
     </div>
-  </div>
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue';
-
-const props = defineProps({
-  items: {
-    type: Array,
-    required: true,
-  }
-});
+import { ref } from 'vue';
+import { useConfigStore } from '@/stores/config';
+const store = useConfigStore();
+const items = ref([
+    { label: '全部', query: '' },
+    { label: '我的', query: store.author?.login ? `author:${store.author.login}` : '' },
+    { label: '公告', query: 'category:公告' },
+    { label: '委托', query: 'category:委托' },
+    { label: '灌水', query: 'category:灌水' },
+    { label: 'R18', query: 'category:R18' },
+    { label: '常规', query: 'category:常规' },
+  ]);
 const isOpen = ref(false);
 const activeIndex = ref(0);
-const curLabel = ref(props.items[0].label);
-const emit = defineEmits(["change"]);
+const label = ref(items.value[0].label);
 
-const clickHandle = (index, query) => {
-  emit("change", query);
+const clickHandle = (index) => {
+  store.searchQuery = items.value[index].query;
   activeIndex.value = index;
-  curLabel.value = props.items[index].label;
+  label.value = items.value[index].label;
   isOpen.value = false;
 
 }; 
 </script>
 
 <style scoped lang="less">
-@keyframes scale-grow {
-  0% {
-    transform: scale(1.01);
-  }
-  100% {
-    transform: scaleX(1.06) scaleY(1.15);
-  }
-}
 
 .query-selector {
+  user-select: none;
   position: fixed;
-  bottom: 28px;
-  right: 56px;
+  bottom: 24px;
+  right: 48px;
   z-index: 10;
   width: 335px;
   height: 55px;
-  .cur-label {
+  .label {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -74,75 +69,84 @@ const clickHandle = (index, query) => {
     background-size: 6px;
     background-color: #000;
     cursor: pointer;
-    font-size: 1.125rem;
+    font-size: 1.25rem;
     .arrow {
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 8px solid @text-primary-color;
+      border-left: 0.5rem solid transparent;
+      border-right: 0.5rem solid transparent;
+      border-top: 0.5rem solid @text-primary-color;
       border-bottom: none;
-      border-radius: 8px;
+      border-radius: 15px;
     }
   }
-  .query-list {
+
+  ul {
+    list-style: none;
     width: 100%;
     background-color: @bg-secondary-color;
-    list-style: none;
     padding: 5px;
-    border-radius: 20px;
+    border-radius: 25px;
     position: absolute;
     bottom: 30px;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s;
-    .query-item {
+    li {
       align-items: center;
       display: flex;
       width: 100%;
-      border-radius: 50px;
+      border-radius: @max-radius;
       padding: 0 12px;
       height: 50px;
       cursor: pointer;
-      font-size: 1.125rem;
+      font-size: 1.25rem;
       &.active{
-          animation: background-glow 1s linear infinite alternate;
-        }
+        color: #000;
+        animation: background-color 0.7s linear infinite alternate;
+      }
       &:active {
         color: @text-secondary-color;
       }
     }
   }
+  &.open {
+    ul {
+      opacity: 1;
+      bottom: 60px;
+      visibility: visible; 
+    }
+    .label {
+      @keyframes scale-size {
+        from {
+          transform: scale(1.01);
+        }
+        to {
+          transform: scaleX(1.06) scaleY(1.16);
+        }
+      }
+      .arrow{
+        border-left: 0.5rem solid transparent;
+        border-right: 0.5rem solid transparent;
+        border-bottom: 0.5rem solid @text-primary-color;
+        border-top: none;
+        border-radius: 15px;
+      }
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -2;
+        border-radius: @max-radius;
+        animation: background-color 0.7s linear infinite alternate,
+                    scale-size 0.3s cubic-bezier(0.35, 0.7, 0, 0.7) infinite alternate;
+      }
+    }
+  }
 }
 
-.query-selector.open {
-  .query-list {
-    opacity: 1;
-    bottom: 60px;
-    visibility: visible;
-    
-  }
-  .cur-label {
-    .arrow{
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-bottom: 8px solid @text-primary-color;
-      border-top: none;
-    }
-    &::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: -2;
-      border-radius: 50px;
-      animation: background-glow 1s linear infinite alternate,
-                  scale-grow 0.6s cubic-bezier(0.35, 0.7, 0, 0.8) infinite alternate;
-    }
-  }
-}
 
-@media (max-width: 1080px){
+@media (max-width: 1200px){
   .query-selector {
     left: 50%;
-    bottom: 24px;
     right: auto;
     transform: translateX(-50%);
   }

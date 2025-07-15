@@ -7,26 +7,24 @@ export const useConfigStore = defineStore('config', () => {
     const curPost = ref({});
     const endCursor = ref(null);
     const hasNextPage = ref(null);
-    const showPopup = ref(false);
+    const showDetail = ref(false);
     const isLoading = ref(false);
     const searchQuery = ref("");
    
     const owner = "claxmo";
     const repo = "inter-knot";
-
-
+   
     return {
         author,
         posts,
         curPost,
         endCursor,
         hasNextPage,
-        showPopup,
+        showDetail,
         isLoading,
         searchQuery,
         owner,
         repo,
-
     };
 });
 
