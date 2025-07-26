@@ -35,17 +35,19 @@ const setIndex = (index) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 55px;
+  height: 56px;
+  width: fit-content;
   border-radius: @max-radius;
-  background: url('@/assets/svg/point.svg') center repeat;
-  background-color: #000;
-  background-size: 6px;
-  overflow: visible;
+  background: repeating-conic-gradient(#000 0deg, #000 90deg, #121212 90deg, #121212 180deg);
+  background-image: repeating-conic-gradient(rgb(0, 0, 0) 0deg, rgb(0, 0, 0) 90deg, rgb(18, 18, 18) 90deg, rgb(18, 18, 18) 180deg);
+  background-size: 4px 4px;
   border: 3px solid #000;
-  user-select: none;
   box-shadow:
-    inset 1px 1px 1px rgba(255,255,255,0.38),
+    inset 1px 1px 1px lighten(@border-color, 20%),
     inset 0 0 0 4px @border-color; 
+  overflow: visible;
+  user-select: none;
+
   .tab-item {
     display: flex;
     justify-content: center;
@@ -53,11 +55,10 @@ const setIndex = (index) => {
     z-index: 1;
     width: 220px;
     height: 100%;
-    font-size: 1.5rem;
+    font-size: 24px;
     font-style: italic;
     cursor: pointer;
     overflow: visible;
-    user-select: none;
     &:active {
       color: @text-secondary-color;
     }
@@ -65,38 +66,45 @@ const setIndex = (index) => {
       color: #000;
       position: relative;
       &::after {
+        z-index: -1;
         content: '';
         position: absolute;
-        z-index: -1;
-        inset: 0;
-        left: 10%;
-        right: 10%;
-        border-radius: 15px;
+        inset: 0 0 0 27px;
         transform: skewX(-27deg);
-      }
-      &:first-child:before,
-      &:last-child:before {
-        content: '';
-        position: absolute;
-        z-index: -1;
-        width: 50%;
-        height: 100%;
-        border-radius: @max-radius;    
-      }
-      &:first-child:before {
-        left: -7px;
-      }
-      &:last-child:before {
-        right: -7px;
-      }
-      &::after,
-      &::before {
+        border-radius: 15px;
         animation: 
           background-color 0.7s linear infinite alternate,
-          scale-size 0.3s cubic-bezier(0.35, 0.7, 0, 0.7) infinite alternate;
-      } 
+          scale-size 0.3s cubic-bezier(0.25, 0.7, 0, 0.7) infinite alternate;
+      }
+      &::before {
+        z-index: -1;
+        content: '';
+        position: absolute;
+        inset: 0 27px 0 0;
+        transform: skewX(-27deg);
+        border-radius: 15px;
+        animation: 
+          background-color 0.7s linear infinite alternate,
+          scale-size 0.3s cubic-bezier(0.25, 0.7, 0, 0.7) infinite alternate;
+      }
+      &:first-child::before {
+        transform: none;
+        border-radius: @max-radius;
+      }
+      &:last-child::after {
+        transform: none;
+        border-radius: @max-radius;
+      }
     }
   }
+  
+}
+
+@keyframes scale-size {
+  to { 
+    scale: 1.15;
+  }
+  
 }
 
 @media (max-width: 1200px) {

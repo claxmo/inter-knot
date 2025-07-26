@@ -1,6 +1,6 @@
-@text-primary-color: #f4f4f4e6;
-@text-secondary-color: #f4f4f4a6;
-@text-tertiary-color: #f4f4f473;
+@text-primary-color: #ffffffe6;
+@text-secondary-color: #ffffffa6;
+@text-tertiary-color: #ffffff73;
 
 @color-yellow: #fbfe00;
 @color-green: #aefe00;
@@ -39,31 +39,15 @@
   }
 }
 
-@keyframes scale-size {
-  from { scale: 1.01}
-  to { scale: 1.1; }
-}
-
-.text-linear-gradient(@deg, @from, @to){
-  background: linear-gradient(@deg, @from, @to);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 .multi-line-ellipsis(@lines: 2){
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: @lines;
-    line-clamp: @lines;
-    white-space: normal;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: @lines;
+  line-clamp: @lines;
+  white-space: normal;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  overflow-wrap: break-word;
 } 
 
-.single-line-ellipsis() {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+

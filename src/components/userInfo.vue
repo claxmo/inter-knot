@@ -21,8 +21,8 @@
 import defaultAvatarUrl from '@/assets/svg/default-avatar.svg';
 import { computed, onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useToast } from 'vue-toastification';
 import { useConfigStore } from '@/stores/config';
+import { useToast } from 'vue-toastification';
 
 const store = useConfigStore();
 const { author } = storeToRefs(store);
@@ -40,9 +40,16 @@ onMounted(async () => {
   }
 });
 
-const clickHandle = () => {
+const clickHandle = async () => {
   if (author.value?.html_url){
     window.open(author.value.html_url,'_blank');
+  }else {
+    try{
+      author.value = await window.getUserProfile();
+    }catch(e){
+      useToast().error("获取用户信息失败!");
+      console.error(e);
+    }
   }
 };
 
@@ -52,9 +59,8 @@ const clickHandle = () => {
 
 .user-info {
   width: 320px;
-  height: 65px;
+  height: 64px;
   padding: 8px;
-  padding-right: 10px;
   display: flex;
   gap: 8px;
   border: 3px solid #000;
@@ -79,12 +85,13 @@ const clickHandle = () => {
     flex: 1;
     min-width: 0;
     .username {
-      font-size: 1.125rem;
-      .single-line-ellipsis();
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; 
     }
     .experience {
       user-select: none;
-      height: 0.875rem;
+      height: 16px;
       width: 100%;
       border-radius: @max-radius;
       background: linear-gradient(#141414, #222222);
@@ -92,14 +99,15 @@ const clickHandle = () => {
       .bar {
         height: 100%;
         max-width: 100%;
+        padding: 0 4px;
         border-radius: @max-radius;
         background: linear-gradient(90deg, #4661fd, #10bff0);
-        padding: 0 4px;
         display: flex;
         align-items: center;
         .cur-exp,
         .total-exp {
-          font-size: 0.75rem;
+          font-size: 12px;
+         
         }
       }
     }
@@ -112,13 +120,15 @@ const clickHandle = () => {
     align-items: center;
     user-select: none;
     .level-num {
-      font-size: 1.75rem;
+      font-size: 24px;
       line-height: 1;
     }
     .level-text {
-      font-size: 0.5rem;
+      font-size: 10px;
       line-height: 1;
       color: @text-tertiary-color;
+      font-family: sans-serif;
+      font-weight: bold;
     }
   }
 }

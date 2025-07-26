@@ -27,23 +27,15 @@ export async function isNSFW(imgElement) {
     const model = await loadModel();
     const predictions = await model.classify(imgElement);
 
-    const scores = Object.fromEntries(
-      predictions.map(p => [p.className, p.probability])
+    const topPrediction = predictions.reduce((max, curr) =>
+      curr.probability > max.probability ? curr : max
     );
 
-    const NSFW_THRESHOLD = 0.7;
-    const NEUTRAL_MAX = 0.3;
-
-    const nsfwScore =
-      (scores["Porn"] || 0) +
-      (scores["Hentai"] || 0) +
-      (scores["Sexy"] || 0) * 0.5;
-
-    const neutralScore = scores["Neutral"] || 0;
-
-    return nsfwScore >= NSFW_THRESHOLD && neutralScore <= NEUTRAL_MAX;
-  } catch (err) {
-    console.error("NSFW 检测失败:", err);
+    const result = ["Porn", "Sexy"].includes(topPrediction.className);
+    // console.log({src: imgElement.src, predictions});
+    return result;
+  } catch (e) {
+    console.error(e);
     return false;
   }
 }

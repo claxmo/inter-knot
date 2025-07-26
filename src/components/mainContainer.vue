@@ -1,6 +1,6 @@
 <template>
     <main>
-        <div class="main-background">
+        <div class="background-scroll">
             <section>
                 <img src="@/assets/img/InterKnotPageBG2.png" v-for="i in 9" :key="i"/>
             </section>
@@ -50,17 +50,27 @@
     @hide="hideHandle" 
     @delete="deleteHandle" 
     />
-    <QuerySelector />
+    <SelectorBox :items="[
+        { label: '全部', value: '' },
+        { label: '我的', value: store.author?.login ? `author:${store.author.login}` : '' },
+        { label: '公告', value: 'category:公告' },
+        { label: '委托', value: 'category:委托' },
+        { label: '灌水', value: 'category:灌水' },
+        { label: 'R18', value: 'category:R18' },
+        { label: '常规', value: 'category:常规' },
+    ]"
+    @change="searchDiscussion"/>
 </template>
 
 <script setup>
 import Waterfall from "@/components/waterfallLayout.vue";
 import Card from "@/components/postCard.vue";
 import PopupDetail from "@/components/popupDetail.vue";
-import QuerySelector from "@/components/querySelector.vue";
-import { ref, onMounted, watch, nextTick } from "vue";
-import { useToast } from 'vue-toastification';
+import SelectorBox from "./selectorBox.vue";
+import { ref, onMounted, nextTick } from "vue";
 import { useConfigStore } from '@/stores/config';
+import { useToast } from 'vue-toastification';
+
 
 const store = useConfigStore();
 const waterfall = ref(null);
@@ -160,20 +170,21 @@ onMounted(async () => {
     }
 });
 
-watch(() => store.searchQuery, () => {
-    store.posts = [];
-    store.endCursor = null;
-    store.hasNextPage = null;
+const searchDiscussion = async (query) => {
     nextTick(async () => {
+        store.searchQuery = query;
+        store.posts = [];
+        store.endCursor = null;
+        store.hasNextPage = null;
         await getNextDiscussions();
     });
-});
+};  
 
 const loadingRef = ref(null);
 
 onMounted(() => {
     if (typeof window.version === 'undefined') needInstall.value = true;
-    if (!needInstall.value && window.version !== '1.7.0') needUpdate.value = true;    
+    if (!needInstall.value && window.version !== '1.7.1') needUpdate.value = true;    
     nextTick(() => {
         const observer = new IntersectionObserver(async (entries) => {
             const entry = entries[0];
@@ -203,7 +214,7 @@ main {
     z-index: 9;
 }
 
-.main-background {
+.background-scroll {
   position: fixed;
   inset: 0;
   z-index: -1;
